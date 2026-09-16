@@ -1,0 +1,9 @@
+<Solution>
+  <Project Path="docker-compose.dcproj">
+    <Build />
+  </Project>
+  <Project Path="FS.Loja.Core/FS.Loja.Core.csproj" Id="a062d40b-e322-440c-9e83-57f1e9654f5c" />
+  <Project Path="FS.Store.DAL/FS.Store.DAL.csproj" Id="e8dd4509-6e3a-48e8-86b0-3b830a60b398" />
+  <Project Path="FS.Store.Model/FS.Store.Model.csproj" Id="ad82b82e-8e25-4230-a7b1-a437ba77ac4e" />
+  <Project Path="FS.Store.WebAPI/FS.Store.WebAPI.csproj" />
+</Solution>

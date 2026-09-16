@@ -1,0 +1,6 @@
+services:
+  fs.store.webapi:
+    image: ${DOCKER_REGISTRY-}fsstorewebapi
+    build:
+      context: .
+      dockerfile: FS.Store.WebAPI/Dockerfile
