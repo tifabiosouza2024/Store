@@ -3,7 +3,7 @@ setlocal enabledelayedexpansion
 
 
 rem Caminho do arquivo XML
-set "arquivo=Directory.Build.props"
+set "arquivo=.\FS.Store.WebAPI\Directory.Build.props"
 
 rem Ler VERSAO
 for /f "tokens=*" %%A in ('findstr "<ProjectVersion>" %arquivo%') do (
@@ -72,7 +72,7 @@ REM ============================================================
 REM Docker Build
 REM ============================================================
 
-copy .\FS.Store\Dockerfile .\Dockerfile >nul
+copy .\FS.Store.WebAPI\Dockerfile .\Dockerfile >nul
 
 echo Criando imagem Docker...
 
@@ -96,7 +96,7 @@ REM ============================================================
 REM Login Docker
 REM ============================================================
 
-docker login -u devfabiosouza -p @#2c4h56RL@#
+docker login -u devfabiosouza -p d@F14s0989
 
 if errorlevel 1 (
     echo Erro no login do Docker.
