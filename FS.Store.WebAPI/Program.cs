@@ -1,10 +1,13 @@
 using FS.Store.WebAPI.Configs;
 
 var builder = WebApplication.CreateBuilder(args);
+var services = builder.Services;
 
 // Add services to the container.
-builder.Services.AddControllersWithViews()
+services.AddControllersWithViews()
     .AddRazorRuntimeCompilation();
+
+services.ConfigureScopes();
 
 var app = builder.Build();
 

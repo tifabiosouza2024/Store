@@ -4,3 +4,22 @@ services:
     build:
       context: .
       dockerfile: FS.Store.WebAPI/Dockerfile
+    environment:
+      TZ: America/Sao_Paulo
+    volumes:
+      - C:/Projetos/Particular/Presentations:/app/wwwroot/img/presentation
+
+  db:
+    container_name: store_db
+    image: mysql:9.7
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: storedb
+      MYSQL_USER: store_usr
+      MYSQL_PASSWORD: store_pwd
+      TZ: America/Sao_Paulo
+    ports:
+      - '3302:3306'
+    volumes:
+      - C:/Projetos/Particular/Database/Store:/var/lib/mysql
