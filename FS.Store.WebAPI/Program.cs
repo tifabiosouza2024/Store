@@ -1,7 +1,4 @@
-using FS.Store.DAL.Context;
-using FS.Store.Model.Utils;
 using FS.Store.WebAPI.Configs;
-using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
@@ -10,17 +7,10 @@ var services = builder.Services;
 services.AddControllersWithViews()
     .AddRazorRuntimeCompilation();
 
-services.AddDbContext<AppDbContext>(options =>
-{
-    options
-        .UseLazyLoadingProxies()
-        .UseMySQL(
-            EnvironmentUtil.Configuration
-                .GetConnectionString("DefaultConnection")
-        );
-});
+services.ConfigureDatabase(builder.Configuration);
 
-services.AddJwt(builder.Configuration);
+services.ConfigureAuthentication();
+services.AddAuthorization();
 
 services.DependencyInjections();
 
@@ -49,15 +39,17 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseRouting();
-
-app.UseAuthentication();
-app.UseAuthorization();
 
 app.UseStaticFiles();
 
-app.MapStaticAssets();
-app.AddMapControllerRouteConfiguration();
+app.UseRouting();
 
+app.UseAuthentication();
+
+app.UseAuthorization();
+
+app.MapStaticAssets();
+
+app.AddMapControllerRouteConfiguration();
 
 app.Run();

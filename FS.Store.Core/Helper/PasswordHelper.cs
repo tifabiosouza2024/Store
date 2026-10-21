@@ -7,9 +7,7 @@ namespace FS.Store.Core.Helper
     public class PasswordHelper(IPasswordHasher<User> _passwordHasher)
     {
         public string HashPassword(User user, string password)
-        {
-            return _passwordHasher.HashPassword(user, password);
-        }
+            => _passwordHasher.HashPassword(user, password);
 
         public bool IsCorrectPassword(User? user, string? password)
         {

@@ -1,0 +1,52 @@
+﻿@{
+    ViewData["Title"] = "Acesso negado";
+    Layout = "_Layout";
+}
+
+<div class="container d-flex align-items-center justify-content-center min-vh-100 py-5">
+    <div class="text-center" style="max-width: 520px;">
+
+        <div class="mb-4">
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-danger bg-opacity-10"
+                 style="width: 120px; height: 120px;">
+                <i class="bi bi-shield-lock text-danger" style="font-size: 4rem;"></i>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <span class="badge rounded-pill text-bg-danger px-3 py-2">
+                Erro 403
+            </span>
+        </div>
+
+        <h1 class="fw-bold mb-3">Acesso negado</h1>
+
+        <p class="text-secondary fs-5 mb-4">
+            Você não tem permissão para acessar esta página.
+            Se acredita que isso é um engano, entre em contato com o administrador do sistema.
+        </p>
+
+        <div class="d-flex flex-column flex-sm-row justify-content-center gap-2">
+            <a asp-area="Admin"
+               asp-controller="CashSession"
+               asp-action="Index"
+               class="btn btn-primary btn-lg px-4">
+                <i class="bi bi-house-door me-2"></i>
+                Ir para o painel
+            </a>
+
+            <button type="button"
+                    class="btn btn-outline-secondary btn-lg px-4"
+                    onclick="history.back()">
+                <i class="bi bi-arrow-left me-2"></i>
+                Voltar
+            </button>
+        </div>
+
+        <div class="mt-5 text-secondary small">
+            <i class="bi bi-info-circle me-1"></i>
+            O acesso a este recurso pode exigir permissões adicionais.
+        </div>
+
+    </div>
+</div>

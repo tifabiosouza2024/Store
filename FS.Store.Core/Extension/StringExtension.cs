@@ -2,14 +2,10 @@
 {
     public static class StringExtension
     {
-        public static bool IsNotNullAndNotEmpty(this string? val)
-        {
-            return !string.IsNullOrEmpty(val);
-        }
+        public static bool IsNotNullOrEmpty(this string? val)
+            => !string.IsNullOrWhiteSpace(val);
 
         public static bool IsNullOrEmpty(this string? value)
-        {
-            return string.IsNullOrEmpty(value);
-        }
+            => string.IsNullOrWhiteSpace(value);
     }
 }

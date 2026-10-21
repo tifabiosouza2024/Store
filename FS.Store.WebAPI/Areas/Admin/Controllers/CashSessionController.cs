@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace FS.Store.WebAPI.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize]
+    [Authorize(Roles = "SUPER")]
     public class CashSessionController : Controller
     {
         public IActionResult Index()

@@ -9,10 +9,7 @@ namespace FS.Store.WebAPI.Areas.Catalog.Controllers
     {
         public IActionResult Index()
         {
-            var presentationPath = Path.Combine(
-            _environment.WebRootPath,
-            "img",
-            "presentation");
+            var presentationPath = Path.Combine(_environment.WebRootPath, "img", "presentation");
 
             var images = Directory
                 .EnumerateFiles(presentationPath)

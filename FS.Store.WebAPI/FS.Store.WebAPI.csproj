@@ -25,7 +25,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FS.Store.Core\FS.Store.Core.csproj" />
-    <ProjectReference Include="..\FS.Store.DAL\FS.Store.DAL.csproj" />
     <ProjectReference Include="..\FS.Store.Model\FS.Store.Model.csproj" />
   </ItemGroup>
 

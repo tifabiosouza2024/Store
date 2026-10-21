@@ -61,7 +61,7 @@ namespace FS.Store.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("roles");
+                    b.ToTable("roles", (string)null);
                 });
 
             modelBuilder.Entity("FS.Store.Model.Entity.User", b =>
@@ -126,7 +126,7 @@ namespace FS.Store.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("users");
+                    b.ToTable("users", (string)null);
                 });
 
             modelBuilder.Entity("FS.Store.Model.Entity.UserRole", b =>
@@ -168,7 +168,7 @@ namespace FS.Store.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("user_roles");
+                    b.ToTable("user_roles", (string)null);
                 });
 
             modelBuilder.Entity("FS.Store.Model.Entity.UserRole", b =>

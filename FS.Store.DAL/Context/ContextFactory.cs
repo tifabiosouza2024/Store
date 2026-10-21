@@ -15,18 +15,12 @@ namespace FS.Store.DAL.Context
             var connectionString = ConnectionString;
 
             if (string.IsNullOrWhiteSpace(connectionString))
-            {
-                throw new InvalidOperationException(
-                    "A connection string DefaultConnection não foi encontrada.");
-            }
+                throw new InvalidOperationException("A connection string DefaultConnection não foi encontrada.");
 
             var builder = new MySqlConnectionStringBuilder(connectionString);
 
             if (string.IsNullOrWhiteSpace(builder.Server))
-            {
-                throw new InvalidOperationException(
-                    "O host da conexão MySQL está vazio.");
-            }
+                throw new InvalidOperationException("O host da conexão MySQL está vazio.");
 
             var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
 

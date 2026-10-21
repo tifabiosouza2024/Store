@@ -32,18 +32,18 @@ namespace FS.Store.DAL.Context
                     {
                         var entity = modelBuilder.Entity(clrType);
 
-                        entity.Property(nameof(BaseEntity<int>.CreatedAt))
+                        entity.Property(nameof(BaseEntity<>.CreatedAt))
                             .HasColumnType("datetime(0)")
                             .HasDefaultValueSql("CURRENT_TIMESTAMP")
                             .ValueGeneratedOnAdd();
 
-                        entity.Property(nameof(BaseEntity<int>.UpdatedAt))
+                        entity.Property(nameof(BaseEntity<>.UpdatedAt))
                             .HasColumnType("datetime(0)")
                             .HasDefaultValueSql(
                                 "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
                             .ValueGeneratedOnAddOrUpdate();
 
-                        entity.Property(nameof(BaseEntity<int>.Deleted))
+                        entity.Property(nameof(BaseEntity<>.Deleted))
                             .HasDefaultValue(false);
 
                         break;
