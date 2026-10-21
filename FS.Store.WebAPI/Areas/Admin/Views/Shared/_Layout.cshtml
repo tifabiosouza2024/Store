@@ -1,51 +1,145 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+﻿
+<!DOCTYPE html>
+<html lang="pt-br">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>@ViewData["Title"] - FS.Store</title>
-    <script type="importmap"></script>
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+    <link rel="stylesheet" href="~/css/admin/site.css" asp-append-version="true" />
+
     <link rel="stylesheet" href="~/FS.Store.styles.css" asp-append-version="true" />
 </head>
+
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">FS.Store</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="Admin" asp-controller="Public" asp-action="Login">Admin no Login</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="Admin" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
+    @{
+        var isAuthenticated = User.Identity?.IsAuthenticated == true;
+        var currentArea = ViewContext.RouteData.Values["area"]?.ToString();
+        var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+        var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+
+        var isCashSession = currentController == "CashSession";
+        var isDashboard = currentController == "Home" && currentArea == "Admin";
+    }
+
+    <div class="app-shell">
+
+        @if (isAuthenticated)
+        {
+            <!-- Menu lateral -->
+            <aside class="offcanvas-lg offcanvas-start sidebar" tabindex="-1" id="adminSidebar" aria-labelledby="sidebarTitle">
+
+                <div class="sidebar-brand">
+                    <a asp-area="Admin" asp-controller="Home" asp-action="Index" class="brand-link">
+                        <span class="brand-icon">
+                            <i class="bi bi-shop"></i>
+                        </span>
+
+                        <span>
+                            <strong id="sidebarTitle">FS.Store</strong>
+                            <small>Gestão da loja</small>
+                        </span>
+                    </a>
+
+                    <button type="button" class="btn-close d-lg-none" data-bs-dismiss="offcanvas" data-bs-target="#adminSidebar" aria-label="Fechar menu">
+                    </button>
                 </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            aqui é admin
-            @RenderBody()
-        </main>
+
+                <div class="sidebar-content">
+                    <div class="menu-caption">MENU PRINCIPAL</div>
+
+                    <nav class="nav flex-column sidebar-nav">
+                        <a asp-area="Admin" asp-controller="Home" asp-action="Index" class="nav-link @(isDashboard ? "active" : "")">
+                            <i class="bi bi-grid-1x2"></i>
+                            <span>Painel inicial</span>
+                        </a>
+
+                        <a asp-area="Admin" asp-controller="CashSession" asp-action="Index" class="nav-link @(isCashSession ? "active" : "")">
+                            <i class="bi bi-cash-stack"></i>
+                            <span>Caixa</span>
+                        </a>
+                    </nav>
+
+                    <div class="menu-caption mt-4">CONTA</div>
+
+                    <nav class="nav flex-column sidebar-nav">
+                        <a asp-area="Admin" asp-controller="Public" asp-action="AccessDenied" class="nav-link">
+                            <i class="bi bi-shield-lock"></i>
+                            <span>Acesso e permissões</span>
+                        </a>
+                    </nav>
+                </div>
+
+                <div class="sidebar-footer">
+                    <span class="status-indicator"></span>
+                    <span>Sistema operacional</span>
+                </div>
+            </aside>
+        }
+
+        <!-- Área principal -->
+        <div class="main-panel">
+
+            <header class="topbar">
+                <div class="topbar-left">
+                    @if (isAuthenticated)
+                    {
+                        <button class="btn menu-toggle d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#adminSidebar" aria-controls="adminSidebar" aria-label="Abrir menu">
+                            <i class="bi bi-list"></i>
+                        </button>
+                    }
+
+                    <div class="page-heading">
+                        <span class="page-eyebrow">
+                            @(isAuthenticated ? "ADMINISTRAÇÃO" : "FS.STORE")
+                        </span>
+                        <h1>@(ViewData["Title"] ?? "Início")</h1>
+                    </div>
+                </div>
+
+                @if (isAuthenticated)
+                {
+                    <div class="topbar-user">
+                        <div class="user-avatar">
+                            <i class="bi bi-person"></i>
+                        </div>
+
+                        <div class="user-details">
+                            <strong>@(User.Identity?.Name ?? "Usuário")</strong>
+                            <small>Usuário autenticado</small>
+                        </div>
+
+                        <form asp-area="Admin" asp-controller="Public" asp-action="Logout" method="post" class="ms-2">
+                            <button type="submit" class="btn btn-logout" title="Sair" aria-label="Sair">
+                                <i class="bi bi-box-arrow-right"></i>
+                            </button>
+                        </form>
+                    </div>
+                }
+            </header>
+
+            <main class="page-content" role="main">
+                @RenderBody()
+            </main>
+
+            <footer class="app-footer">
+                <span>© @DateTime.Now.Year FS.Store</span>
+                <span>Gestão simples, operação eficiente.</span>
+            </footer>
+
+        </div>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - FS.Store - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
