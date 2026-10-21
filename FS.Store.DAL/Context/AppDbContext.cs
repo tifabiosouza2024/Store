@@ -11,6 +11,7 @@ namespace FS.Store.DAL.Context
         #region DbSets
         public DbSet<User> Users { get; set; } = default!;
         public DbSet<Role> Roles { get; set; } = default!;
+        public DbSet<UserRole> UserRoles { get; set; } = default!;
         #endregion
 
         #region OnModelCreating
@@ -51,11 +52,6 @@ namespace FS.Store.DAL.Context
                     baseType = baseType.BaseType;
                 }
             }
-
-            modelBuilder.Entity<User>()
-                .HasMany(u => u.Roles)
-                .WithMany(r => r.Users)
-                .UsingEntity("user_roles");
         }
         #endregion
     }

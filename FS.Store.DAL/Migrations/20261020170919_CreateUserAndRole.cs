@@ -40,6 +40,7 @@ namespace FS.Store.DAL.Migrations
                 {
                     id = table.Column<Guid>(type: "char(36)", nullable: false),
                     email = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false),
+                    name = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false),
                     password = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false),
                     is_active = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     is_beta = table.Column<bool>(type: "tinyint(1)", nullable: false),
@@ -59,21 +60,26 @@ namespace FS.Store.DAL.Migrations
                 name: "user_roles",
                 columns: table => new
                 {
-                    RolesId = table.Column<int>(type: "int", nullable: false),
-                    UsersId = table.Column<Guid>(type: "char(36)", nullable: false)
+                    id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    user_id = table.Column<Guid>(type: "char(36)", nullable: false),
+                    role_id = table.Column<int>(type: "int", nullable: false),
+                    created_at = table.Column<DateTime>(type: "datetime(0)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    updated_at = table.Column<DateTime>(type: "datetime(0)", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
+                    deleted = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_user_roles", x => new { x.RolesId, x.UsersId });
+                    table.PrimaryKey("PK_user_roles", x => x.id);
                     table.ForeignKey(
-                        name: "FK_user_roles_roles_RolesId",
-                        column: x => x.RolesId,
+                        name: "FK_user_roles_roles_role_id",
+                        column: x => x.role_id,
                         principalTable: "roles",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_user_roles_users_UsersId",
-                        column: x => x.UsersId,
+                        name: "FK_user_roles_users_user_id",
+                        column: x => x.user_id,
                         principalTable: "users",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
@@ -81,9 +87,14 @@ namespace FS.Store.DAL.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateIndex(
-                name: "IX_user_roles_UsersId",
+                name: "IX_user_roles_role_id",
                 table: "user_roles",
-                column: "UsersId");
+                column: "role_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_user_roles_user_id",
+                table: "user_roles",
+                column: "user_id");
 
 
             var hasher = new PasswordHasher<User>();
@@ -91,7 +102,11 @@ namespace FS.Store.DAL.Migrations
             var hash = hasher.HashPassword(u, "Admin123!");
             migrationBuilder.Sql("insert into roles (name, normalized_name, deleted) values ('Super', 'SUPER', false);");
             migrationBuilder.Sql("insert into roles (name, normalized_name, deleted) values ('Seller', 'SELLER', false);");
-            migrationBuilder.Sql($"insert into users (id, email, password, is_active, is_beta) values (uuid(), 'devfabiosouza@gmail.com', '{hash}', true, true);");
+            migrationBuilder.Sql($"insert into users (id, name, email, password, is_active, is_beta) values (uuid(),'Fabio', 'devfabiosouza@gmail.com', '{hash}', true, true);");
+            migrationBuilder.Sql(@"insert into user_roles (user_id, role_id)
+select 
+	(select id from users limit 1) as id,
+	(select id from roles where normalized_name = 'SUPER');");
         }
 
         /// <inheritdoc />

@@ -9,7 +9,7 @@ namespace FS.Store.Model.Entity
         [Column("id")]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
-        public IdType Id { get; set; } = default!;
+        public virtual IdType Id { get; set; } = default!;
 
         [Column("created_at", TypeName = "datetime")]
         [DataType(DataType.DateTime)]

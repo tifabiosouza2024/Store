@@ -1,4 +1,4 @@
-namespace FS.Loja.Models
+namespace FS.Store.WebAPI.Models
 {
     public class ErrorViewModel
     {

@@ -1,7 +1,8 @@
-﻿using FS.Store.Model.Entity;
+﻿using FS.Store.Core.Extension;
+using FS.Store.Model.Entity;
 using Microsoft.AspNetCore.Identity;
 
-namespace FS.Store.DAL.Helper
+namespace FS.Store.Core.Helper
 {
     public class PasswordHelper(IPasswordHasher<User> _passwordHasher)
     {
@@ -10,14 +11,15 @@ namespace FS.Store.DAL.Helper
             return _passwordHasher.HashPassword(user, password);
         }
 
-        public bool VerifyPassword(
-            User user,
-            string password)
+        public bool IsCorrectPassword(User? user, string? password)
         {
+            if (user == null || password.IsNullOrEmpty())
+                return false;
+
             var result = _passwordHasher.VerifyHashedPassword(
                 user,
                 user.Password,
-                password);
+                password!);
 
             return result != PasswordVerificationResult.Failed;
         }

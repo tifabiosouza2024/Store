@@ -9,7 +9,7 @@ namespace FS.Store.DAL.Context
 {
     public class ContextFactory : IDesignTimeDbContextFactory<AppDbContext>
     {
-        private const string ConnectionStringsNameSection = "DefaultConnection";
+        private const string ConnectionStringsNameSection = "MigrationConnection";
         public AppDbContext CreateDbContext(string[] args)
         {
             var connectionString = ConnectionString;

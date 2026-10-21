@@ -17,6 +17,6 @@ namespace FS.Store.Model.Entity
         [MaxLength(255)]
         public string NormalizedName { get; set; } = default!;
 
-        public virtual ICollection<User> Users { get; set; } = default!;
+        public virtual ICollection<UserRole> Users { get; set; } = default!;
     }
 }

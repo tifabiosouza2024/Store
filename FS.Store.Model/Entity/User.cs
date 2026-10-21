@@ -13,6 +13,11 @@ namespace FS.Store.Model.Entity
         [NotNull]
         public string Email { get; set; } = default!;
 
+        [Column("name")]
+        [MaxLength(255)]
+        [NotNull]
+        public string Name { get; set; } = default!;
+
         [Column("password")]
         [MaxLength(255)]
         [NotNull]
@@ -34,6 +39,6 @@ namespace FS.Store.Model.Entity
         [DataType(DataType.DateTime)]
         public DateTime? DtExpirationRefreshToken { get; set; }
 
-        public virtual ICollection<Role>? Roles { get; set; }
+        public virtual ICollection<UserRole>? Roles { get; set; }
     }
 }

@@ -1,8 +1,8 @@
-using FS.Loja.Models;
+using FS.Store.WebAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
-namespace FS.Loja.Controllers
+namespace FS.Store.WebAPI.Controllers
 {
     public class HomeController : Controller
     {

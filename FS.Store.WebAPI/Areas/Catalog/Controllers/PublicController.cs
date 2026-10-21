@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace FS.Store.WebAPI.Areas.Catalog.Controllers
 {
     [Area("Catalog")]
+    [AllowAnonymous]
     public class PublicController(IWebHostEnvironment _environment) : Controller
     {
         public IActionResult Index()

@@ -12,19 +12,19 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["FS.Loja/FS.Loja.csproj", "FS.Loja/"]
-RUN dotnet restore "./FS.Loja/FS.Loja.csproj"
+COPY ["FS.Store/FS.Store.csproj", "FS.Store/"]
+RUN dotnet restore "./FS.Store/FS.Store.csproj"
 COPY . .
-WORKDIR "/src/FS.Loja"
-RUN dotnet build "./FS.Loja.csproj" -c $BUILD_CONFIGURATION -o /app/build
+WORKDIR "/src/FS.Store"
+RUN dotnet build "./FS.Store.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # Esta fase é usada para publicar o projeto de serviço a ser copiado para a fase final
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./FS.Loja.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./FS.Store.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 # Esta fase é usada na produção ou quando executada no VS no modo normal (padrão quando não está usando a configuração de Depuração)
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "FS.Loja.dll"]
+ENTRYPOINT ["dotnet", "FS.Store.dll"]
