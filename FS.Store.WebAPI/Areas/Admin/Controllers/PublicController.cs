@@ -28,7 +28,7 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
 
             if (await authHelper.LoginAsync(user, model))
             {
-                return RedirectToAction("Index", "CashSession", new { Area = "Admin" });
+                return RedirectToAction("Index", "Home", new { Area = "Admin" });
             }
 
             ModelState.AddModelError(nameof(LoginViewModel.Password), "Senha Incorreta");

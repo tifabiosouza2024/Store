@@ -7,9 +7,18 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
     [Authorize(Roles = "SUPER")]
     public class CashSessionController : Controller
     {
-        public IActionResult Index()
+        public IActionResult Open()
         {
             return View();
         }
+        public IActionResult Close()
+        {
+            return View();
+        }
+        public IActionResult History()
+        {
+            return View();
+        }
+
     }
 }
