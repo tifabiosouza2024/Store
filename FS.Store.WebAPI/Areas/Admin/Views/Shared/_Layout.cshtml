@@ -1,5 +1,6 @@
 ﻿@{
     var year = DateTime.Now.Year;
+    var isAuthenticated = User.Identity?.IsAuthenticated == true;
 }
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -10,25 +11,12 @@
     <title>@ViewData["Title"] - Gestor de Loja</title>
 
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="~/css/admin/site.css" asp-append-version="true" />
-
     <link rel="stylesheet" href="~/FS.Store.styles.css" asp-append-version="true" />
 </head>
 
 <body>
-    @{
-        var isAuthenticated = User.Identity?.IsAuthenticated == true;
-        var currentArea = ViewContext.RouteData.Values["area"]?.ToString();
-        var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
-        var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
-
-        var isCashSession = currentController == "CashSession";
-        var isDashboard = currentController == "Home" && currentArea == "Admin";
-    }
 
     <div class="app-shell">
 
@@ -49,63 +37,46 @@
                         </span>
                     </a>
 
-                    <button type="button" class="btn-close d-lg-none" data-bs-dismiss="offcanvas" data-bs-target="#adminSidebar" aria-label="Fechar menu">
-                    </button>
+                    <button type="button" class="btn-close d-lg-none" data-bs-dismiss="offcanvas" data-bs-target="#adminSidebar" aria-label="Fechar menu"></button>
                 </div>
 
                 <div class="sidebar-content">
                     <div class="menu-caption">MENU PRINCIPAL</div>
                     <nav class="nav flex-column sidebar-nav">
-                        <a asp-area="Admin" asp-controller="Home" asp-action="Index" class="nav-link @(isDashboard ? "active" : "")">
+                        <a asp-area="Admin" asp-controller="Home" asp-action="Index" class="nav-link">
                             <i class="bi bi-grid-1x2"></i>
                             <span>Painel inicial</span>
                         </a>
 
-                        @{
-                            var cashActions = new[]
-                            {
-                                "Index",
-                                "Open",
-                                "Close",
-                                "Movements",
-                                "Supply",
-                                "Withdrawal",
-                                "History"
-                            };
-
-                            var isCashMenu = currentController == "CashSession" || currentController == "CashMovement";
-                            var cashMenuExpanded = isCashMenu;
-                        }
-
-                        <button class="nav-link sidebar-menu-toggle @(isCashMenu ? "active" : "")" type="button" data-bs-toggle="collapse" data-bs-target="#cashSubmenu" aria-expanded="@(cashMenuExpanded ? "true" : "false")" aria-controls="cashSubmenu">
+                        <button class="nav-link sidebar-menu-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#cashSubmenu" aria-expanded="" aria-controls="cashSubmenu">
                             <i class="bi bi-wallet2"></i>
                             <span class="flex-grow-1 text-start">Caixa</span>
                             <i class="bi bi-chevron-down submenu-chevron"></i>
                         </button>
 
-                        <div class="collapse @(cashMenuExpanded ? "show" : "")" id="cashSubmenu">
+                        <div class="collapse" id="cashSubmenu">
                             <nav class="nav flex-column sidebar-subnav">
-                                <a asp-area="Admin" asp-controller="CashSession" asp-action="Open" class="nav-link @(currentAction == "Open" ? "active" : "")">
+                                <a asp-area="Admin" asp-controller="CashSession" asp-action="Open" class="nav-link">
                                     <i class="bi bi-circle-plus"></i>
                                     <span>Abertura de caixa</span>
                                 </a>
-                                <a asp-area="Admin" asp-controller="CashMovement" asp-action="Index" class="nav-link @(currentController == "CashMovement" && currentAction == "Index" ? "active" : "")">
+                                <a asp-area="Admin" asp-controller="CashMovement" asp-action="Index" class="nav-link">
                                     <i class="bi bi-arrow-left-right"></i>
                                     <span>Movimentações</span>
                                 </a>
-                                <a asp-area="Admin" asp-controller="CashMovement" asp-action="Supply" class="nav-link @(currentAction == "Supply" ? "active" : "")">
+                                <a asp-area="Admin" asp-controller="CashMovement" asp-action="Supply" class="nav-link">
                                     <i class="bi bi-plus-circle"></i>
                                     <span>Suprimento</span>
                                 </a>
-                                <a asp-area="Admin" asp-controller="CashMovement" asp-action="Withdrawal" class="nav-link @(currentAction == "Withdrawal" ? "active" : "")">
+                                <a asp-area="Admin" asp-controller="CashMovement" asp-action="Withdrawal" class="nav-link">
                                     <i class="bi bi-dash-circle"></i>
                                     <span>Sangria</span>
                                 </a>
-                                <a asp-area="Admin" asp-controller="CashSession" asp-action="Close" class="nav-link @(currentAction == "Close" ? "active" : "")">
+                                <a asp-area="Admin" asp-controller="CashSession" asp-action="Close" class="nav-link">
                                     <i class="bi bi-clipboard-check"></i>
                                     <span>Fechamento de caixa</span>
                                 </a>
-                                <a asp-area="Admin" asp-controller="CashSession" asp-action="History" class="nav-link @(currentAction == "History" ? "active" : "")">
+                                <a asp-area="Admin" asp-controller="CashSession" asp-action="History" class="nav-link">
                                     <i class="bi bi-clock-history"></i>
                                     <span>Histórico de caixas</span>
                                 </a>
@@ -134,9 +105,9 @@
 
                     <div class="page-heading">
                         <span class="page-eyebrow">
-                            @(isAuthenticated ? "ADMINISTRAÇÃO" : "GESTOR DE LOJA")
+                            ADMINISTRAÇÃO
                         </span>
-                        <h1>@(ViewData["Title"] ?? "Início")</h1>
+                        <h1>@ViewData["Title"]</h1>
                     </div>
                 </div>
 
@@ -176,6 +147,7 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/admin/menu.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>

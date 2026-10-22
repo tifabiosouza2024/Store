@@ -1,0 +1,120 @@
+
+/* ========================================
+   Configurações globais
+======================================== */
+:root {
+    --app-bg: #f5f7fb;
+    --sidebar-bg: #172337;
+    --sidebar-text: #aebbd0;
+    --sidebar-active: #293b55;
+    --primary: #4f6bed;
+    --text-main: #202b3c;
+    --text-muted: #78869a;
+    --border-color: #e8edf4;
+    --sidebar-width: 260px;
+}
+
+html {
+    min-height: 100%;
+    font-size: 14px;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+body {
+    min-height: 100vh;
+    margin: 0;
+    background: var(--app-bg);
+    color: var(--text-main);
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    font-size: 0.94rem;
+}
+
+/* Foco acessível dos controles */
+
+.btn:focus-visible,
+.btn-link.nav-link:focus-visible,
+.form-control:focus-visible,
+.form-check-input:focus-visible,
+.form-select:focus-visible {
+    box-shadow: 0 0 0 0.15rem white, 0 0 0 0.3rem #4f6bed;
+    outline: none;
+}
+
+/* ========================================
+   Estrutura da aplicação
+======================================== */
+
+.app-shell {
+    min-height: 100vh;
+}
+
+.main-panel {
+    min-width: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.page-content {
+    flex: 1;
+    width: 100%;
+    padding: 30px 32px;
+}
+
+.app-footer {
+    padding: 18px 32px;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    color: var(--text-muted);
+    font-size: 0.76rem;
+    border-top: 1px solid var(--border-color);
+}
+
+/* Layout de autenticação */
+html,
+body.auth-layout {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}
+
+body.auth-layout {
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+.auth-layout .app-shell {
+    width: 100%;
+    height: 100vh;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.auth-layout .auth-main-panel {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.auth-layout .auth-page-content {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.auth-layout .app-footer {
+    flex: 0 0 auto;
+    margin-top: 0;
+}
