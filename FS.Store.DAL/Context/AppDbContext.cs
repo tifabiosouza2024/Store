@@ -11,7 +11,8 @@ namespace FS.Store.DAL.Context
         #region DbSets
         public DbSet<User> Users { get; set; } = default!;
         public DbSet<Role> Roles { get; set; } = default!;
-        public DbSet<UserRole> UserRoles { get; set; } = default!;
+        public DbSet<Operation> Operations { get; set; } = default!;
+        public DbSet<OperationUserRole> OperationUserRoles { get; set; } = default!;
         #endregion
 
         #region OnModelCreating
@@ -52,6 +53,34 @@ namespace FS.Store.DAL.Context
                     baseType = baseType.BaseType;
                 }
             }
+
+            modelBuilder.Entity<Operation>(entity =>
+            {
+                entity.Property(e => e.IsActive).HasDefaultValue(true);
+
+                entity.HasIndex(e => e.Email).IsUnique();
+                entity.HasIndex(e => e.Document).IsUnique();
+                entity.HasIndex(e => new { e.Document, e.Email }).IsUnique();
+            });
+
+            modelBuilder.Entity<OperationUserRole>(entity =>
+            {
+                entity.HasIndex(e => new
+                {
+                    e.UserId,
+                    e.OperationId,
+                    e.RoleId
+                }).IsUnique();
+            });
+
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.Property(e => e.RememberMe).HasDefaultValue(false);
+                entity.Property(e => e.IsBeta).HasDefaultValue(false);
+                entity.Property(e => e.IsActive).HasDefaultValue(false);
+
+                entity.HasIndex(e => e.Email).IsUnique();
+            });
         }
         #endregion
     }

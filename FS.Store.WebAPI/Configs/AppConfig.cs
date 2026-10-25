@@ -65,17 +65,21 @@ namespace FS.Store.WebAPI.Configs
 
         private static void Services(IServiceCollection services)
         {
+            services.AddTransient<IOperationService, OperationService>();
+            services.AddTransient<IOperationUserRoleService, OperationUserRoleService>();
             services.AddTransient<IUserService, UserService>();
         }
         private static void Repositories(IServiceCollection services)
         {
+            services.AddTransient<IOperationRepository, OperationRepository>();
+            services.AddTransient<IOperationUserRoleRepository, OperationUserRoleRepository>();
             services.AddTransient<IUserRepository, UserRepository>();
         }
 
         private static void Helpers(IServiceCollection services)
         {
-            services.AddTransient<PasswordHelper>();
-            services.AddTransient<AuthHelper>();
+            services.AddScoped<PasswordHelper>();
+            services.AddScoped<AuthHelper>();
         }
     }
 }

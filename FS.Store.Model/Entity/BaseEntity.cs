@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -12,17 +13,18 @@ namespace FS.Store.Model.Entity
         public virtual IdType Id { get; set; } = default!;
 
         [Column("created_at", TypeName = "datetime")]
+        [Comment("Data de criação do registro")]
         [DataType(DataType.DateTime)]
-
         public DateTime CreatedAt { get; set; }
 
         [Column("updated_at", TypeName = "datetime")]
+        [Comment("Data de atualização do registro")]
         [DataType(DataType.DateTime)]
-
         public DateTime? UpdatedAt { get; set; }
 
         [Column("deleted")]
         [DefaultValue(false)]
+        [Comment("registro deletado virtualmente")]
         public bool Deleted { get; set; }
     }
 }

@@ -1,6 +1,21 @@
-﻿@{
+﻿@model HomeViewModel
+@{
     ViewData["Title"] = "Início";
+
 }
 só acessado logado
 <br />
 Usuário: @User.Identity?.Name
+
+<br />
+Empresa: @Model?.OperationName;
+
+
+<form asp-action="ChangeOperation">
+<select asp-for="OperationId"
+        asp-items="Model.Operations"
+        class="form-select">
+    <option value="">Selecione uma loja</option>
+</select>
+<button type="submit">Enviar</button>
+</form>

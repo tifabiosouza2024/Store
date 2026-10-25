@@ -16,7 +16,7 @@ namespace FS.Store.Core.Helper
 
             var result = _passwordHasher.VerifyHashedPassword(
                 user,
-                user.Password,
+                user.PasswordHash,
                 password!);
 
             return result != PasswordVerificationResult.Failed;

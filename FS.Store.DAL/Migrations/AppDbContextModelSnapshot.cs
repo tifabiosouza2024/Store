@@ -22,6 +22,137 @@ namespace FS.Store.DAL.Migrations
                 .HasAnnotation("Proxies:LazyLoading", true)
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
+            modelBuilder.Entity("FS.Store.Model.Entity.Operation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(0)")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                        .HasComment("Data de criação do registro");
+
+                    b.Property<bool>("Deleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false)
+                        .HasColumnName("deleted")
+                        .HasComment("registro deletado virtualmente");
+
+                    b.Property<string>("Document")
+                        .IsRequired()
+                        .HasMaxLength(18)
+                        .HasColumnType("varchar(18)")
+                        .HasColumnName("document")
+                        .HasComment("CNPJ da operacao");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("email")
+                        .HasComment("E-mail da operacao");
+
+                    b.Property<bool?>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(true)
+                        .HasColumnName("is_active")
+                        .HasComment("Operacao ativa");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("name")
+                        .HasComment("Nome da operacao");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime(0)")
+                        .HasColumnName("updated_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+                        .HasComment("Data de atualização do registro");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Document")
+                        .IsUnique();
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("Document", "Email")
+                        .IsUnique();
+
+                    b.ToTable("operations", t =>
+                        {
+                            t.HasComment("Empresa/Loja Operante");
+                        });
+                });
+
+            modelBuilder.Entity("FS.Store.Model.Entity.OperationUserRole", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(0)")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                        .HasComment("Data de criação do registro");
+
+                    b.Property<bool>("Deleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false)
+                        .HasColumnName("deleted")
+                        .HasComment("registro deletado virtualmente");
+
+                    b.Property<Guid>("OperationId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("operation_id")
+                        .HasComment("Id da operacao");
+
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int")
+                        .HasColumnName("role_id")
+                        .HasComment("Id da funcao de acesso");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime(0)")
+                        .HasColumnName("updated_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+                        .HasComment("Data de atualização do registro");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("user_id")
+                        .HasComment("Id do usuario");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OperationId");
+
+                    b.HasIndex("RoleId");
+
+                    b.HasIndex("UserId", "OperationId", "RoleId")
+                        .IsUnique();
+
+                    b.ToTable("operation_user_role", t =>
+                        {
+                            t.HasComment("Relacionamento entre operacao, usuario e seus papeis");
+                        });
+                });
+
             modelBuilder.Entity("FS.Store.Model.Entity.Role", b =>
                 {
                     b.Property<int>("Id")
@@ -33,35 +164,43 @@ namespace FS.Store.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(0)")
                         .HasColumnName("created_at")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                        .HasComment("Data de criação do registro");
 
                     b.Property<bool>("Deleted")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("tinyint(1)")
                         .HasDefaultValue(false)
-                        .HasColumnName("deleted");
+                        .HasColumnName("deleted")
+                        .HasComment("registro deletado virtualmente");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)")
-                        .HasColumnName("name");
+                        .HasColumnName("name")
+                        .HasComment("Nome do papel");
 
                     b.Property<string>("NormalizedName")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)")
-                        .HasColumnName("normalized_name");
+                        .HasColumnName("normalized_name")
+                        .HasComment("Nome do papel normalizado (em uppercase)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime(0)")
                         .HasColumnName("updated_at")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP");
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+                        .HasComment("Data de atualização do registro");
 
                     b.HasKey("Id");
 
-                    b.ToTable("roles", (string)null);
+                    b.ToTable("roles", t =>
+                        {
+                            t.HasComment("Papeis de usuarios do sistema");
+                        });
                 });
 
             modelBuilder.Entity("FS.Store.Model.Entity.User", b =>
@@ -75,129 +214,127 @@ namespace FS.Store.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(0)")
                         .HasColumnName("created_at")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                        .HasComment("Data de criação do registro");
 
                     b.Property<bool>("Deleted")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("tinyint(1)")
                         .HasDefaultValue(false)
-                        .HasColumnName("deleted");
-
-                    b.Property<DateTime?>("DtExpirationRefreshToken")
-                        .HasColumnType("datetime")
-                        .HasColumnName("dt_expiration_refresh_token");
+                        .HasColumnName("deleted")
+                        .HasComment("registro deletado virtualmente");
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)")
-                        .HasColumnName("email");
+                        .HasColumnName("email")
+                        .HasComment("E-mail do usuario");
 
                     b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("tinyint(1)")
-                        .HasColumnName("is_active");
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_active")
+                        .HasComment("Usuario ativo");
 
                     b.Property<bool>("IsBeta")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("tinyint(1)")
-                        .HasColumnName("is_beta");
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_beta")
+                        .HasComment("Usuario testador de versoes beta");
+
+                    b.Property<Guid?>("LastOperationId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("last_operation_id")
+                        .HasComment("Id da ultima operacao logada");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)")
-                        .HasColumnName("name");
+                        .HasColumnName("name")
+                        .HasComment("Nome do usuario");
 
-                    b.Property<string>("Password")
+                    b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)")
-                        .HasColumnName("password");
+                        .HasColumnName("password_hash")
+                        .HasComment("Hash de senha do usuario");
 
-                    b.Property<string>("RefreshToken")
-                        .HasMaxLength(255)
-                        .HasColumnType("varchar(255)")
-                        .HasColumnName("refresh_token");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetime(0)")
-                        .HasColumnName("updated_at")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("users", (string)null);
-                });
-
-            modelBuilder.Entity("FS.Store.Model.Entity.UserRole", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("id");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(0)")
-                        .HasColumnName("created_at")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-                    b.Property<bool>("Deleted")
+                    b.Property<bool>("RememberMe")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("tinyint(1)")
                         .HasDefaultValue(false)
-                        .HasColumnName("deleted");
-
-                    b.Property<int>("RoleId")
-                        .HasColumnType("int")
-                        .HasColumnName("role_id");
+                        .HasColumnName("remember_me")
+                        .HasComment("Informa se o usuario permanece logado apos fechar o navegador");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime(0)")
                         .HasColumnName("updated_at")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("char(36)")
-                        .HasColumnName("user_id");
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+                        .HasComment("Data de atualização do registro");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RoleId");
+                    b.HasIndex("Email")
+                        .IsUnique();
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("LastOperationId");
 
-                    b.ToTable("user_roles", (string)null);
+                    b.ToTable("users", t =>
+                        {
+                            t.HasComment("Usuarios do sistema");
+                        });
                 });
 
-            modelBuilder.Entity("FS.Store.Model.Entity.UserRole", b =>
+            modelBuilder.Entity("FS.Store.Model.Entity.OperationUserRole", b =>
                 {
+                    b.HasOne("FS.Store.Model.Entity.Operation", "Operation")
+                        .WithMany("UsersRoles")
+                        .HasForeignKey("OperationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("FS.Store.Model.Entity.Role", "Role")
-                        .WithMany("Users")
+                        .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("FS.Store.Model.Entity.User", "User")
-                        .WithMany("Roles")
+                        .WithMany("Operations")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Operation");
 
                     b.Navigation("Role");
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("FS.Store.Model.Entity.Role", b =>
+            modelBuilder.Entity("FS.Store.Model.Entity.User", b =>
                 {
-                    b.Navigation("Users");
+                    b.HasOne("FS.Store.Model.Entity.Operation", "LastOperation")
+                        .WithMany()
+                        .HasForeignKey("LastOperationId");
+
+                    b.Navigation("LastOperation");
+                });
+
+            modelBuilder.Entity("FS.Store.Model.Entity.Operation", b =>
+                {
+                    b.Navigation("UsersRoles");
                 });
 
             modelBuilder.Entity("FS.Store.Model.Entity.User", b =>
                 {
-                    b.Navigation("Roles");
+                    b.Navigation("Operations");
                 });
 #pragma warning restore 612, 618
         }

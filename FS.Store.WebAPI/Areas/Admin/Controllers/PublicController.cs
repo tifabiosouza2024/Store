@@ -27,9 +27,7 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
             var user = await userService.FindByEmail(model.Email);
 
             if (await authHelper.LoginAsync(user, model))
-            {
                 return RedirectToAction("Index", "Home", new { Area = "Admin" });
-            }
 
             ModelState.AddModelError(nameof(LoginViewModel.Password), "Senha Incorreta");
 
@@ -37,6 +35,11 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
         }
 
         public IActionResult AccessDenied()
+        {
+            return View();
+        }
+
+        public new IActionResult BadRequest()
         {
             return View();
         }
