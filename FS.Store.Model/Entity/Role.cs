@@ -4,8 +4,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FS.Store.Model.Entity
 {
+    /// <summary>
+    /// Papéis de usuários no sistema
+    /// <para>
+    /// TypeId: int
+    /// </para>
+    /// </summary>
     [Table("roles")]
-    [Comment("Papeis de usuarios do sistema")]
+    [Comment("Papéis de usuários do sistema")]
     public class Role : BaseEntity<int>
     {
 

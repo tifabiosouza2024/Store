@@ -9,10 +9,16 @@ namespace FS.Store.DAL.Context
         {
         }
         #region DbSets
-        public DbSet<User> Users { get; set; } = default!;
-        public DbSet<Role> Roles { get; set; } = default!;
+        public DbSet<CashClosing> CashClosings { get; set; } = default!;
+        public DbSet<CashClosingTerminal> CashClosingTerminals { get; set; } = default!;
+        public DbSet<CashMovement> CashMovements { get; set; } = default!;
+        public DbSet<CashRegisterSession> CashRegisterSessions { get; set; } = default!;
         public DbSet<Operation> Operations { get; set; } = default!;
         public DbSet<OperationUserRole> OperationUserRoles { get; set; } = default!;
+        public DbSet<PaymentProvider> PaymentProviders { get; set; } = default!;
+        public DbSet<PaymentTerminal> PaymentTerminals { get; set; } = default!;
+        public DbSet<Role> Roles { get; set; } = default!;
+        public DbSet<User> Users { get; set; } = default!;
         #endregion
 
         #region OnModelCreating

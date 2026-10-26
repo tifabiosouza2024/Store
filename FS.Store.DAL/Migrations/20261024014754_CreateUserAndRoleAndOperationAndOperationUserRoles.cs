@@ -166,21 +166,31 @@ namespace FS.Store.DAL.Migrations
                 table: "users",
                 column: "last_operation_id");
 
-            var hasher = new PasswordHasher<User>();
+            var passwordHasher = new PasswordHasher<User>();
             var u = new User();
-            var passwordHash = hasher.HashPassword(u, "Admin123!");
+            var passwordHashed = passwordHasher.HashPassword(u, "user123!");
             migrationBuilder.Sql("INSERT INTO roles (name, normalized_name, deleted) VALUES ('Super', 'SUPER', false);");
+            migrationBuilder.Sql("INSERT INTO roles (name, normalized_name, deleted) VALUES ('Admin', 'ADMIN', false);");
+            migrationBuilder.Sql("INSERT INTO roles (name, normalized_name, deleted) VALUES ('Manager', 'MANAGER', false);");
             migrationBuilder.Sql("iNSERT INTO roles (name, normalized_name, deleted) VALUES ('Seller', 'SELLER', false);");
-            migrationBuilder.Sql($"INSERT INTO users (id, name, email, password_hash, is_active, is_beta) VALUES (uuid(),'Fabio', 'devfabiosouza@gmail.com', '{passwordHash}', true, true);");
-            migrationBuilder.Sql($"INSERT INTO operations (id, document, name, email) VALUES (uuid(),'40.953.557/0001-61', 'Fabio Presentes', 'fabiopresentes@mail.com');");
-            migrationBuilder.Sql($"INSERT INTO operations (id, document, name, email) VALUES (uuid(),'67.192.514/0001-67', 'Gi Presentes', 'gipresentes@mail.com');");
+            migrationBuilder.Sql($"INSERT INTO users (id, name, email, password_hash, is_active, is_beta) VALUES (uuid(),'Super User', 'superuser@gmail.com', '{passwordHashed}', true, true);");
+            migrationBuilder.Sql($"INSERT INTO users (id, name, email, password_hash, is_active, is_beta) VALUES (uuid(),'Seller User', 'selleruser@gmail.com', '{passwordHashed}', true, true);");
+            migrationBuilder.Sql($"INSERT INTO operations (id, document, name, email) VALUES (uuid(),'40.953.557/0001-61', 'First Gift', 'firstgift@mail.com');");
+            migrationBuilder.Sql($"INSERT INTO operations (id, document, name, email) VALUES (uuid(),'67.192.514/0001-67', 'Seccond Gift', 'seccondgift@mail.com');");
             migrationBuilder.Sql(@"
 INSERT INTO operation_user_role (user_id, role_id, operation_id)
 SELECT
-    (SELECT id FROM users ORDER BY id LIMIT 1), r.id, o.id
+    (SELECT id FROM users WHERE email like 'super%'), r.id, o.id
 FROM roles r
 CROSS JOIN operations o
 WHERE r.normalized_name = 'SUPER';");
+            migrationBuilder.Sql(@"
+INSERT INTO operation_user_role (user_id, role_id, operation_id)
+SELECT
+    (SELECT id FROM users WHERE email like 'seller%'), r.id, o.id
+FROM roles r
+CROSS JOIN operations o
+WHERE r.normalized_name = 'SELLER';");
         }
 
         /// <inheritdoc />

@@ -13,7 +13,7 @@ Empresa: @Model?.OperationName;
 
 <form asp-action="ChangeOperation">
 <select asp-for="OperationId"
-        asp-items="Model.Operations"
+        asp-items="Model?.Operations"
         class="form-select">
     <option value="">Selecione uma loja</option>
 </select>

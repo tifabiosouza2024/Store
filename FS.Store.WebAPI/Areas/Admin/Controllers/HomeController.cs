@@ -25,12 +25,12 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
             if (User.GetOperationId() != Guid.Empty)
             {
                 operation = await operationService.FindByIdAsync(User.GetOperationId());
-                vm.OperationName = operation.Name;
-                vm.OperationId = operation.Id;
+                vm.OperationName = operation?.Name;
+                vm.OperationId = operation?.Id;
             }
 
             var operationsRoles = await operationUserRoleService.FindAllByUserIdAsync(User.GetUserId());
-            vm.Operations = new SelectList(operationsRoles.Select(o => o.Operation), "Id", "Name", vm.OperationId);
+            vm.Operations = new SelectList(operationsRoles.Select(o => o?.Operation), "Id", "Name", vm.OperationId);
             return View(vm);
         }
 

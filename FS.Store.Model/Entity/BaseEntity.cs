@@ -12,12 +12,12 @@ namespace FS.Store.Model.Entity
         [Key]
         public virtual IdType Id { get; set; } = default!;
 
-        [Column("created_at", TypeName = "datetime")]
+        [Column("created_at", TypeName = "datetime(0)")]
         [Comment("Data de criação do registro")]
         [DataType(DataType.DateTime)]
         public DateTime CreatedAt { get; set; }
 
-        [Column("updated_at", TypeName = "datetime")]
+        [Column("updated_at", TypeName = "datetime(0)")]
         [Comment("Data de atualização do registro")]
         [DataType(DataType.DateTime)]
         public DateTime? UpdatedAt { get; set; }

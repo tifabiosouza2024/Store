@@ -16,11 +16,331 @@ namespace FS.Store.DAL.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.12")
+                .HasAnnotation("ProductVersion", "10.0.14")
                 .HasAnnotation("Proxies:ChangeTracking", false)
                 .HasAnnotation("Proxies:CheckEquality", false)
                 .HasAnnotation("Proxies:LazyLoading", true)
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
+
+            modelBuilder.Entity("FS.Store.Model.Entity.CashClosing", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    b.Property<decimal>("CashAmount")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("cash_amount")
+                        .HasComment("Valor total em dinheiro");
+
+                    b.Property<long>("CashRegisterSessionId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("cash_register_session_id")
+                        .HasComment("Id da sessão de Caixa");
+
+                    b.Property<DateTime>("ClosedAt")
+                        .HasColumnType("datetime(0)")
+                        .HasColumnName("closed_at")
+                        .HasComment("Data/Hora de fechamento");
+
+                    b.Property<Guid>("ClosedByUserId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("closed_by_user_id")
+                        .HasComment("Usuário que realizou o fechamento");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(0)")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                        .HasComment("Data de criação do registro");
+
+                    b.Property<bool>("Deleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false)
+                        .HasColumnName("deleted")
+                        .HasComment("registro deletado virtualmente");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("notes")
+                        .HasComment("Observações sobre o fechamento");
+
+                    b.Property<decimal>("TotalCredit")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("total_credit")
+                        .HasComment("Valor total de crédito");
+
+                    b.Property<decimal>("TotalDebit")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("total_debit")
+                        .HasComment("Valor total de débito");
+
+                    b.Property<decimal>("TotalPix")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("total_pix")
+                        .HasComment("Valor total de PIX");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime(0)")
+                        .HasColumnName("updated_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+                        .HasComment("Data de atualização do registro");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CashRegisterSessionId");
+
+                    b.HasIndex("ClosedByUserId");
+
+                    b.ToTable("cash_closing", t =>
+                        {
+                            t.HasComment("Registra o fechamento do caixa");
+                        });
+                });
+
+            modelBuilder.Entity("FS.Store.Model.Entity.CashClosingTerminal", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    b.Property<long>("CashRegisterSessionId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("cash_register_session_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(0)")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                        .HasComment("Data de criação do registro");
+
+                    b.Property<Guid>("CreatedByUserId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("created_by_user_id")
+                        .HasComment("Usuário que criou a movimentação");
+
+                    b.Property<decimal>("CreditAmount")
+                        .HasColumnType("decimal(10,2)")
+                        .HasColumnName("credit_amount")
+                        .HasComment("Valor em crédito do terminal");
+
+                    b.Property<decimal>("DebitAmount")
+                        .HasColumnType("decimal(10,2)")
+                        .HasColumnName("debit_amount")
+                        .HasComment("Valor em débito do terminal");
+
+                    b.Property<bool>("Deleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false)
+                        .HasColumnName("deleted")
+                        .HasComment("registro deletado virtualmente");
+
+                    b.Property<Guid>("PaymentTerminalId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("payment_terminal_id")
+                        .HasComment("Terminal de pagamento (maquininha)");
+
+                    b.Property<decimal>("PixAmount")
+                        .HasColumnType("decimal(10,2)")
+                        .HasColumnName("pix_amount")
+                        .HasComment("Valor em PIX do terminal");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime(0)")
+                        .HasColumnName("updated_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+                        .HasComment("Data de atualização do registro");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CashRegisterSessionId");
+
+                    b.HasIndex("CreatedByUserId");
+
+                    b.HasIndex("PaymentTerminalId");
+
+                    b.ToTable("cash_closing_terminal", t =>
+                        {
+                            t.HasComment("Armazena o valor de cada terminal (maquininha)");
+                        });
+                });
+
+            modelBuilder.Entity("FS.Store.Model.Entity.CashMovement", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(10,2)")
+                        .HasColumnName("amount")
+                        .HasComment("valor da movimentação");
+
+                    b.Property<DateTime>("CanceledAt")
+                        .HasColumnType("datetime(0)")
+                        .HasColumnName("canceled_at")
+                        .HasComment("Data/Hora em que houve o cancelamento da movimentação");
+
+                    b.Property<Guid?>("CanceledByUserId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("canceled_by_user_id")
+                        .HasComment("Usuário que realizou o cancelamento da movimentação");
+
+                    b.Property<string>("CancellationReason")
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("cancellation_reason")
+                        .HasComment("Motivo do cancelamento");
+
+                    b.Property<int>("CashMovementType")
+                        .HasMaxLength(20)
+                        .HasColumnType("int")
+                        .HasColumnName("cash_movement_type")
+                        .HasComment("Tipo de movimentação (suprimento, sangria, despesa)");
+
+                    b.Property<long>("CashRegisterSessionId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("cash_register_session_id")
+                        .HasComment("Sessão de Caixa");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(0)")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                        .HasComment("Data de criação do registro");
+
+                    b.Property<Guid>("CreatedByUserId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("created_by_user_id")
+                        .HasComment("Usuário que criou a movimentação");
+
+                    b.Property<bool>("Deleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false)
+                        .HasColumnName("deleted")
+                        .HasComment("registro deletado virtualmente");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("description")
+                        .HasComment("Descrição");
+
+                    b.Property<DateTime>("OccurredAt")
+                        .HasColumnType("datetime(0)")
+                        .HasColumnName("occurred_at")
+                        .HasComment("Data/Hora em que ocorreu a movimentação");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime(0)")
+                        .HasColumnName("updated_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+                        .HasComment("Data de atualização do registro");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CanceledByUserId");
+
+                    b.HasIndex("CashRegisterSessionId");
+
+                    b.HasIndex("CreatedByUserId");
+
+                    b.ToTable("cash_movement", t =>
+                        {
+                            t.HasComment("Registra as movimentações financeiras");
+                        });
+                });
+
+            modelBuilder.Entity("FS.Store.Model.Entity.CashRegisterSession", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    b.Property<int>("CashRegisterStatus")
+                        .HasColumnType("int")
+                        .HasColumnName("cash_register_status")
+                        .HasComment("Status da abertura de caixa");
+
+                    b.Property<DateTime?>("ClosedAt")
+                        .HasColumnType("datetime(0)")
+                        .HasColumnName("closed_at")
+                        .HasComment("Data/Hora de fechamento");
+
+                    b.Property<Guid>("ClosedByUserId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("closed_by_user_id")
+                        .HasComment("ID do Usuário que fechou o caixa");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(0)")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                        .HasComment("Data de criação do registro");
+
+                    b.Property<bool>("Deleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false)
+                        .HasColumnName("deleted")
+                        .HasComment("registro deletado virtualmente");
+
+                    b.Property<DateTime>("OpenedAt")
+                        .HasColumnType("datetime(0)")
+                        .HasColumnName("opened_at")
+                        .HasComment("Data/Hora de abertura");
+
+                    b.Property<Guid>("OpenedByUserId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("opened_by_user_id")
+                        .HasComment("ID do Usuário que abriu o caixa");
+
+                    b.Property<decimal>("OpeningAmount")
+                        .HasColumnType("decimal(10,2)")
+                        .HasColumnName("opening_amount")
+                        .HasComment("Valor em espécie do total da abertura de caixa");
+
+                    b.Property<Guid>("OperationId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("operation_id")
+                        .HasComment("ID da Operação");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime(0)")
+                        .HasColumnName("updated_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+                        .HasComment("Data de atualização do registro");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClosedByUserId");
+
+                    b.HasIndex("OpenedByUserId");
+
+                    b.HasIndex("OperationId");
+
+                    b.ToTable("cash_register_session", t =>
+                        {
+                            t.HasComment("controle de abertura e fechamento de caixa");
+                        });
+                });
 
             modelBuilder.Entity("FS.Store.Model.Entity.Operation", b =>
                 {
@@ -48,28 +368,28 @@ namespace FS.Store.DAL.Migrations
                         .HasMaxLength(18)
                         .HasColumnType("varchar(18)")
                         .HasColumnName("document")
-                        .HasComment("CNPJ da operacao");
+                        .HasComment("CNPJ da Operação");
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)")
                         .HasColumnName("email")
-                        .HasComment("E-mail da operacao");
+                        .HasComment("E-mail da Operação");
 
                     b.Property<bool?>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("tinyint(1)")
                         .HasDefaultValue(true)
                         .HasColumnName("is_active")
-                        .HasComment("Operacao ativa");
+                        .HasComment("Operação ativa");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)")
                         .HasColumnName("name")
-                        .HasComment("Nome da operacao");
+                        .HasComment("Nome da Operação");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .ValueGeneratedOnAddOrUpdate()
@@ -119,12 +439,12 @@ namespace FS.Store.DAL.Migrations
                     b.Property<Guid>("OperationId")
                         .HasColumnType("char(36)")
                         .HasColumnName("operation_id")
-                        .HasComment("Id da operacao");
+                        .HasComment("Id da Operação");
 
                     b.Property<int>("RoleId")
                         .HasColumnType("int")
                         .HasColumnName("role_id")
-                        .HasComment("Id da funcao de acesso");
+                        .HasComment("Id do papel do Usuário na Operação");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .ValueGeneratedOnAddOrUpdate()
@@ -136,7 +456,7 @@ namespace FS.Store.DAL.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("char(36)")
                         .HasColumnName("user_id")
-                        .HasComment("Id do usuario");
+                        .HasComment("Id do Usuário");
 
                     b.HasKey("Id");
 
@@ -149,7 +469,107 @@ namespace FS.Store.DAL.Migrations
 
                     b.ToTable("operation_user_role", t =>
                         {
-                            t.HasComment("Relacionamento entre operacao, usuario e seus papeis");
+                            t.HasComment("Relacionamento entre Operação, Usuário e seus papeis");
+                        });
+                });
+
+            modelBuilder.Entity("FS.Store.Model.Entity.PaymentProvider", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(0)")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                        .HasComment("Data de criação do registro");
+
+                    b.Property<bool>("Deleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false)
+                        .HasColumnName("deleted")
+                        .HasComment("registro deletado virtualmente");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("name")
+                        .HasComment("Empresa da maquininha de cartão");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime(0)")
+                        .HasColumnName("updated_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+                        .HasComment("Data de atualização do registro");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("provider", t =>
+                        {
+                            t.HasComment("Armazena os fornecedores dos terminais");
+                        });
+                });
+
+            modelBuilder.Entity("FS.Store.Model.Entity.PaymentTerminal", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(0)")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                        .HasComment("Data de criação do registro");
+
+                    b.Property<bool>("Deleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false)
+                        .HasColumnName("deleted")
+                        .HasComment("registro deletado virtualmente");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("name")
+                        .HasComment("Nome do terminal");
+
+                    b.Property<Guid>("OperationId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("operation_id")
+                        .HasComment("Id da operação");
+
+                    b.Property<int>("PaymentProviderId")
+                        .HasColumnType("int")
+                        .HasColumnName("payment_provider_id")
+                        .HasComment("Id do fornecedor do terminal");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime(0)")
+                        .HasColumnName("updated_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+                        .HasComment("Data de atualização do registro");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OperationId");
+
+                    b.HasIndex("PaymentProviderId");
+
+                    b.ToTable("payment_terminal", t =>
+                        {
+                            t.HasComment("Armazena os terminais (maquininhas) de pagamento");
                         });
                 });
 
@@ -199,7 +619,7 @@ namespace FS.Store.DAL.Migrations
 
                     b.ToTable("roles", t =>
                         {
-                            t.HasComment("Papeis de usuarios do sistema");
+                            t.HasComment("Papéis de usuários do sistema");
                         });
                 });
 
@@ -229,47 +649,47 @@ namespace FS.Store.DAL.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)")
                         .HasColumnName("email")
-                        .HasComment("E-mail do usuario");
+                        .HasComment("E-mail do usuário");
 
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("tinyint(1)")
                         .HasDefaultValue(false)
                         .HasColumnName("is_active")
-                        .HasComment("Usuario ativo");
+                        .HasComment("Usuário ativo");
 
                     b.Property<bool>("IsBeta")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("tinyint(1)")
                         .HasDefaultValue(false)
                         .HasColumnName("is_beta")
-                        .HasComment("Usuario testador de versoes beta");
+                        .HasComment("Usuário testador de versões beta");
 
                     b.Property<Guid?>("LastOperationId")
                         .HasColumnType("char(36)")
                         .HasColumnName("last_operation_id")
-                        .HasComment("Id da ultima operacao logada");
+                        .HasComment("Id da última operação logada");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)")
                         .HasColumnName("name")
-                        .HasComment("Nome do usuario");
+                        .HasComment("Nome do usuário");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)")
                         .HasColumnName("password_hash")
-                        .HasComment("Hash de senha do usuario");
+                        .HasComment("Hash de senha");
 
                     b.Property<bool>("RememberMe")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("tinyint(1)")
                         .HasDefaultValue(false)
                         .HasColumnName("remember_me")
-                        .HasComment("Informa se o usuario permanece logado apos fechar o navegador");
+                        .HasComment("Informa se o usuário permanece logado após fechar o navegador");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .ValueGeneratedOnAddOrUpdate()
@@ -287,8 +707,106 @@ namespace FS.Store.DAL.Migrations
 
                     b.ToTable("users", t =>
                         {
-                            t.HasComment("Usuarios do sistema");
+                            t.HasComment("Usuários do sistema");
                         });
+                });
+
+            modelBuilder.Entity("FS.Store.Model.Entity.CashClosing", b =>
+                {
+                    b.HasOne("FS.Store.Model.Entity.CashRegisterSession", "CashRegisterSession")
+                        .WithMany()
+                        .HasForeignKey("CashRegisterSessionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FS.Store.Model.Entity.User", "ClosedByUser")
+                        .WithMany()
+                        .HasForeignKey("ClosedByUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CashRegisterSession");
+
+                    b.Navigation("ClosedByUser");
+                });
+
+            modelBuilder.Entity("FS.Store.Model.Entity.CashClosingTerminal", b =>
+                {
+                    b.HasOne("FS.Store.Model.Entity.CashRegisterSession", "CashRegisterSession")
+                        .WithMany()
+                        .HasForeignKey("CashRegisterSessionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FS.Store.Model.Entity.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FS.Store.Model.Entity.PaymentTerminal", "PaymentTerminal")
+                        .WithMany()
+                        .HasForeignKey("PaymentTerminalId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CashRegisterSession");
+
+                    b.Navigation("CreatedByUser");
+
+                    b.Navigation("PaymentTerminal");
+                });
+
+            modelBuilder.Entity("FS.Store.Model.Entity.CashMovement", b =>
+                {
+                    b.HasOne("FS.Store.Model.Entity.User", "CanceledByUser")
+                        .WithMany()
+                        .HasForeignKey("CanceledByUserId");
+
+                    b.HasOne("FS.Store.Model.Entity.CashRegisterSession", "CashRegisterSession")
+                        .WithMany()
+                        .HasForeignKey("CashRegisterSessionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FS.Store.Model.Entity.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CanceledByUser");
+
+                    b.Navigation("CashRegisterSession");
+
+                    b.Navigation("CreatedByUser");
+                });
+
+            modelBuilder.Entity("FS.Store.Model.Entity.CashRegisterSession", b =>
+                {
+                    b.HasOne("FS.Store.Model.Entity.User", "ClosedByUser")
+                        .WithMany()
+                        .HasForeignKey("ClosedByUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FS.Store.Model.Entity.User", "OpenedByUser")
+                        .WithMany()
+                        .HasForeignKey("OpenedByUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FS.Store.Model.Entity.Operation", "Operation")
+                        .WithMany()
+                        .HasForeignKey("OperationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ClosedByUser");
+
+                    b.Navigation("OpenedByUser");
+
+                    b.Navigation("Operation");
                 });
 
             modelBuilder.Entity("FS.Store.Model.Entity.OperationUserRole", b =>
@@ -316,6 +834,25 @@ namespace FS.Store.DAL.Migrations
                     b.Navigation("Role");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("FS.Store.Model.Entity.PaymentTerminal", b =>
+                {
+                    b.HasOne("FS.Store.Model.Entity.Operation", "Operation")
+                        .WithMany()
+                        .HasForeignKey("OperationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FS.Store.Model.Entity.PaymentProvider", "PaymentProvider")
+                        .WithMany()
+                        .HasForeignKey("PaymentProviderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Operation");
+
+                    b.Navigation("PaymentProvider");
                 });
 
             modelBuilder.Entity("FS.Store.Model.Entity.User", b =>
