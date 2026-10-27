@@ -10,9 +10,11 @@ namespace FS.Store.Core.Interfaces
 
         Task<int> CountAsync(Expression<Func<Entity, bool>>? filter = null);
 
+        Task<bool> ExistsAsync(Expression<Func<Entity, bool>> filter);
+
         Task<Entity?> FindByIdAsync(Id id);
 
-        Task<Entity?> FirstOrDefaultAsync(Expression<Func<Entity, bool>> predicate);
+        Task<Entity?> FirstOrDefaultAsync(Expression<Func<Entity, bool>> filter);
 
         Task<IEnumerable<Entity?>> GetAllAsync(Expression<Func<Entity, bool>> filter
             , Func<IQueryable<Entity>, IQueryable<Entity>>? orderBy = null

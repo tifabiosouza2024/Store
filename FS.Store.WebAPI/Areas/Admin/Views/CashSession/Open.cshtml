@@ -1,4 +1,105 @@
-﻿@{
+﻿@model CashSessionOpenViewModel
+
+@{
     ViewData["Title"] = "Abertura de Caixa";
 }
-Abertura
+
+<div class="container py-4">
+
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <div class="bg-primary bg-opacity-10 text-primary rounded-3 p-3">
+            <i class="bi bi-cash-stack fs-3"></i>
+        </div>
+
+        <div>
+            <h2 class="mb-1">Abertura de Caixa</h2>
+            <p class="text-muted mb-0">
+                Registre o valor inicial disponível no caixa da operação.
+            </p>
+        </div>
+    </div>
+
+    @if (Model.CashSessionAlreadyExists)
+    {
+        <div class="alert alert-warning border-0 shadow-sm mb-4" role="alert">
+            <div class="d-flex align-items-start gap-3">
+                <i class="bi bi-exclamation-triangle-fill fs-3"></i>
+                <div class="flex-grow-1">
+                    <h5 class="alert-heading mb-2">
+                        Já existe um caixa aberto
+                    </h5>
+
+                    <p class="mb-3">
+                        A operação <strong>@Model.OperationName</strong> já possui um caixa aberto. Deseja realizar uma nova abertura mesmo assim?
+                    </p>
+
+                    <div class="d-flex flex-wrap gap-2">
+                        <button type="button" class="btn btn-warning" onclick="ShowForm()">
+                            <i class="bi bi-plus-circle me-1"></i>
+                            Abrir novo caixa
+                        </button>
+
+                        <a asp-action="Index" asp-controller="CashSession" asp-area="Admin" class="btn btn-outline-secondary">
+                            <i class="bi bi-list-ul me-1"></i>
+                            Ver caixas abertos
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="card border-0 shadow-sm" id="cashSessionCard">
+
+        <div class="card-header bg-body border-0 pt-4 px-4">
+            <h5 class="mb-1">
+                <i class="bi bi-shop me-2 text-primary"></i>
+                Dados da abertura
+            </h5>
+
+            <p class="text-muted small mb-0">
+                Operação: <strong>@Model.OperationName</strong>
+            </p>
+        </div>
+
+        <div class="card-body p-4">
+            <form method="post" id="frm" class="@(Model.CashSessionAlreadyExists ? "d-none" : "")">
+                <div class="mb-4">
+                    <label asp-for="Amount" class="form-label fw-semibold">
+                        Valor inicial em caixa
+                    </label>
+                    <div class="input-group input-group-lg">
+                        <span class="input-group-text">R$</span>
+                        <input type="text" asp-for="Amount" class="form-control price" inputmode="numeric" autocomplete="off" value="0,00" />
+                        <span asp-validation-for="Amount" class="text-danger small"></span>
+                    </div>                    
+                    <div id="amountHelp" class="form-text">
+                        Informe o valor total em dinheiro disponível no início da operação.
+                    </div>
+                </div>
+                <hr class="my-4" />
+
+                    @{
+                        var fab = new FloatingButtonDto
+                        {
+                            MainIcon = "bi bi-save",
+                            IsSubmit = true
+                        };
+                    }
+
+                    <partial name="_FloatingButtons" model="fab" />
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function ShowForm() {
+            const form = document.getElementById('frm');
+            form.classList.remove('d-none');
+            document.getElementById('cashSessionCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            form.querySelector('#AmountDisplay').focus();
+        }
+    </script>
+}

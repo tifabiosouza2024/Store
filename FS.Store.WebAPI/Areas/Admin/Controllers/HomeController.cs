@@ -39,7 +39,7 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
         {
             var user = await userService.FindByIdAsync(User.GetUserId());
             if (user == null)
-                return this.RedirectAdminToBadRequest();
+                return this.RedirectAdminToBadRequest("Você não está autenticado para realizar esta operação.");
 
             await authHelper.AssignPermissionsAsync(user, operationId);
             user.LastOperationId = operationId;

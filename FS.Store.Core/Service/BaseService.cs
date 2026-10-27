@@ -14,6 +14,8 @@ namespace FS.Store.Core.Service
         public async Task<int> CountAsync(Expression<Func<Entity, bool>>? filter = null)
             => await repository.CountAsync(filter);
 
+        public async Task<bool> ExistsAsync(Expression<Func<Entity, bool>> filter)
+            => await repository.ExistsAsync(filter);
         public async Task<Entity?> FindByIdAsync(Id id)
             => await repository.FindByIdAsync(id);
 

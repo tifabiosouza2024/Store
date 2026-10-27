@@ -1,4 +1,5 @@
 using FS.Store.WebAPI.Configs;
+using Microsoft.AspNetCore.DataProtection;
 
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
@@ -6,6 +7,12 @@ var services = builder.Services;
 // Add services to the container.
 services.AddControllersWithViews()
     .AddRazorRuntimeCompilation();
+
+services
+    .AddDataProtection()
+    .PersistKeysToFileSystem(
+        new DirectoryInfo("/app/keys"))
+    .SetApplicationName("FS.Store");
 
 services.ConfigureDatabase(builder.Configuration);
 
@@ -15,6 +22,9 @@ services.AddAuthorization();
 services.DependencyInjections();
 
 services.AddHttpContextAccessor();
+
+services.ApplyMigrationDatabase(builder.Environment);
+services.ConfigureLocalization();
 
 var app = builder.Build();
 
@@ -37,6 +47,8 @@ if (!app.Environment.IsDevelopment())
             .OrderBy(x => x.Route);
     });
 }
+
+app.ConfigureLocalization();
 
 app.UseHttpsRedirection();
 

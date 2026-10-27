@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FS.Store.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20261026004810_CreateCashEntities")]
+    [Migration("20261026220616_CreateCashEntities")]
     partial class CreateCashEntities
     {
         /// <inheritdoc />
@@ -285,7 +285,7 @@ namespace FS.Store.DAL.Migrations
                         .HasColumnName("closed_at")
                         .HasComment("Data/Hora de fechamento");
 
-                    b.Property<Guid>("ClosedByUserId")
+                    b.Property<Guid?>("ClosedByUserId")
                         .HasColumnType("char(36)")
                         .HasColumnName("closed_by_user_id")
                         .HasComment("ID do Usuário que fechou o caixa");
@@ -305,8 +305,10 @@ namespace FS.Store.DAL.Migrations
                         .HasComment("registro deletado virtualmente");
 
                     b.Property<DateTime>("OpenedAt")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(0)")
                         .HasColumnName("opened_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP")
                         .HasComment("Data/Hora de abertura");
 
                     b.Property<Guid>("OpenedByUserId")
@@ -789,9 +791,7 @@ namespace FS.Store.DAL.Migrations
                 {
                     b.HasOne("FS.Store.Model.Entity.User", "ClosedByUser")
                         .WithMany()
-                        .HasForeignKey("ClosedByUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ClosedByUserId");
 
                     b.HasOne("FS.Store.Model.Entity.User", "OpenedByUser")
                         .WithMany()

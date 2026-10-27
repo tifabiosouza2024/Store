@@ -57,6 +57,10 @@ namespace FS.Store.DAL.Repository
 
         public async Task<int> CountAsync(Expression<Func<Entity, bool>>? filter = null)
             => await Queryable(filter).CountAsync();
+
+        public async Task<bool> ExistsAsync(Expression<Func<Entity, bool>> filter)
+            => await Queryable(filter).AnyAsync();
+
         public async Task<Entity?> FindByIdAsync(Id id)
             => await FirstOrDefaultAsync(u => id!.Equals(u.Id));
 

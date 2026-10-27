@@ -19,6 +19,9 @@
             if (user == null || !user.IsActive || !passwordHelper.IsCorrectPassword(user, model.Password))
                 return false;
 
+            if (user.LastOperationId is null && 1 == user.Operations?.Count)
+                user.LastOperationId = user.Operations?.First().OperationId;
+
             await AssignPermissionsAsync(user, user.LastOperationId);
 
             user.RememberMe = model.RememberMe;

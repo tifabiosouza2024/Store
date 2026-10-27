@@ -1,0 +1,57 @@
+﻿@model FloatingButtonDto
+
+<div class="fab-container">
+    @if (Model.Buttons.Any())
+    {
+        <div class="fab-menu">
+            @foreach (var btn in Model.Buttons)
+            {
+                if (!string.IsNullOrEmpty(btn.Url))
+                {
+                    <a href="@btn.Url"
+                       class="btn @btn.Color rounded-circle shadow fab-item d-flex align-items-center justify-content-center"
+                       title="@btn.Title"
+                       id="@btn.BtnId">
+                        <i class="@btn.Icon"></i>
+                    </a>
+                }
+                else
+                {
+                    <button class="btn @btn.Color rounded-circle rounded-circle shadow fab-main d-flex align-items-center justify-content-center"
+                            onclick="@btn.OnClick"
+                            title="@btn.Title"
+                            id="@btn.BtnId">
+                        <i class="@btn.Icon"></i>
+                    </button>
+                }
+            }
+        </div>
+    }
+    @if (!string.IsNullOrEmpty(Model.MainUrl))
+    {
+        <a href="@Model.MainUrl"
+           class="btn @Model.MainColor rounded-circle shadow fab-item d-flex align-items-center justify-content-center"
+           title="@Model.MainTitle"
+           id="@Model.MainBtnId">
+            <i class="@Model.MainIcon"></i>
+        </a>
+    }
+    else if (@Model.IsSubmit)
+    {
+        <button class="btn @Model.MainColor rounded-circle shadow fab-main"
+                type="submit"
+                title="@Model.MainTitle"
+                id="@Model.MainBtnId">
+            <i class="@Model.MainIcon"></i>
+        </button>
+    }
+    else
+    {
+        <button class="btn @Model.MainColor rounded-circle shadow fab-main"
+                onclick="@Model.MainOnClick"
+                title="@Model.MainTitle"
+                id="@Model.MainBtnId">
+            <i class="@Model.MainIcon"></i>
+        </button>
+    }
+</div>

@@ -8,6 +8,7 @@ services:
       TZ: America/Sao_Paulo
     volumes:
       - C:/Projetos/Particular/Presentations:/app/wwwroot/img/presentation
+      - ./keys:/app/keys
 
   db:
     container_name: store_db

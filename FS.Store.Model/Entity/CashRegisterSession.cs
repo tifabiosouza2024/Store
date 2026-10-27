@@ -48,7 +48,7 @@ namespace FS.Store.Model.Entity
         [Column("closed_by_user_id")]
         [ForeignKey("closed_by_user_id")]
         [Comment("ID do Usuário que fechou o caixa")]
-        public Guid ClosedByUserId { get; set; }
+        public Guid? ClosedByUserId { get; set; }
         public virtual User? ClosedByUser { get; set; }
     }
 }

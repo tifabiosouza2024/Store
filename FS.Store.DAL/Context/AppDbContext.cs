@@ -60,6 +60,14 @@ namespace FS.Store.DAL.Context
                 }
             }
 
+            modelBuilder.Entity<CashRegisterSession>(entity =>
+            {
+                entity.Property(e => e.OpenedAt)
+                    .HasColumnType("datetime(0)")
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                    .ValueGeneratedOnAdd();
+            });
+
             modelBuilder.Entity<Operation>(entity =>
             {
                 entity.Property(e => e.IsActive).HasDefaultValue(true);

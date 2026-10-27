@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 using MySql.EntityFrameworkCore.Metadata;
 
 #nullable disable
@@ -17,13 +18,13 @@ namespace FS.Store.DAL.Migrations
                 {
                     id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
-                    opened_at = table.Column<DateTime>(type: "datetime(0)", nullable: false, comment: "Data/Hora de abertura"),
+                    opened_at = table.Column<DateTime>(type: "datetime(0)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP", comment: "Data/Hora de abertura"),
                     closed_at = table.Column<DateTime>(type: "datetime(0)", nullable: true, comment: "Data/Hora de fechamento"),
                     opening_amount = table.Column<decimal>(type: "decimal(10,2)", nullable: false, comment: "Valor em espécie do total da abertura de caixa"),
                     cash_register_status = table.Column<int>(type: "int", nullable: false, comment: "Status da abertura de caixa"),
                     operation_id = table.Column<Guid>(type: "char(36)", nullable: false, comment: "ID da Operação"),
                     opened_by_user_id = table.Column<Guid>(type: "char(36)", nullable: false, comment: "ID do Usuário que abriu o caixa"),
-                    closed_by_user_id = table.Column<Guid>(type: "char(36)", nullable: false, comment: "ID do Usuário que fechou o caixa"),
+                    closed_by_user_id = table.Column<Guid>(type: "char(36)", nullable: true, comment: "ID do Usuário que fechou o caixa"),
                     created_at = table.Column<DateTime>(type: "datetime(0)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP", comment: "Data de criação do registro"),
                     updated_at = table.Column<DateTime>(type: "datetime(0)", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP", comment: "Data de atualização do registro"),
                     deleted = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: false, comment: "registro deletado virtualmente")
@@ -41,8 +42,7 @@ namespace FS.Store.DAL.Migrations
                         name: "FK_cash_register_session_users_closed_by_user_id",
                         column: x => x.closed_by_user_id,
                         principalTable: "users",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "id");
                     table.ForeignKey(
                         name: "FK_cash_register_session_users_opened_by_user_id",
                         column: x => x.opened_by_user_id,
@@ -287,11 +287,6 @@ namespace FS.Store.DAL.Migrations
                 name: "IX_payment_terminal_payment_provider_id",
                 table: "payment_terminal",
                 column: "payment_provider_id");
-
-            migrationBuilder.Sql(@"
-INSERT INTO provider (name) VALUES 
-('Stone'),
-('InfinitePay');");
         }
 
         /// <inheritdoc />

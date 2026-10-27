@@ -8,7 +8,10 @@ using FS.Store.Model.Entity;
 using FS.Store.WebAPI.Helpers;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using System.Globalization;
 
 namespace FS.Store.WebAPI.Configs
 {
@@ -48,7 +51,7 @@ namespace FS.Store.WebAPI.Configs
                     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                     options.Cookie.SameSite = SameSiteMode.Lax;
 
-                    options.ExpireTimeSpan = TimeSpan.FromMinutes(10);
+                    options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
                     options.SlidingExpiration = true;
                 });
             return services;
@@ -65,12 +68,14 @@ namespace FS.Store.WebAPI.Configs
 
         private static void Services(IServiceCollection services)
         {
+            services.AddTransient<ICashRegisterSessionService, CashRegisterSessionService>();
             services.AddTransient<IOperationService, OperationService>();
             services.AddTransient<IOperationUserRoleService, OperationUserRoleService>();
             services.AddTransient<IUserService, UserService>();
         }
         private static void Repositories(IServiceCollection services)
         {
+            services.AddTransient<ICashRegisterSessionRepository, CashRegisterSessionRepository>();
             services.AddTransient<IOperationRepository, OperationRepository>();
             services.AddTransient<IOperationUserRoleRepository, OperationUserRoleRepository>();
             services.AddTransient<IUserRepository, UserRepository>();
@@ -80,6 +85,39 @@ namespace FS.Store.WebAPI.Configs
         {
             services.AddScoped<PasswordHelper>();
             services.AddScoped<AuthHelper>();
+        }
+
+        public static void ApplyMigrationDatabase(this IServiceCollection services, IWebHostEnvironment env)
+        {
+            if (!env.IsProduction())
+            {
+                var serviceProvider = services.BuildServiceProvider();
+                using var scope = serviceProvider.CreateScope();
+
+                var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                dbContext.Database.Migrate();
+            }
+        }
+
+        public static void ConfigureLocalization(this IServiceCollection services)
+        {
+            var culture = new CultureInfo("pt-BR");
+
+            services.Configure<RequestLocalizationOptions>(options =>
+            {
+                options.DefaultRequestCulture = new RequestCulture(culture);
+                options.SupportedCultures = [culture];
+                options.SupportedUICultures = [culture];
+            });
+        }
+
+        public static void ConfigureLocalization(this WebApplication app)
+        {
+            var localizationOptions = app.Services
+                .GetRequiredService<IOptions<RequestLocalizationOptions>>()
+                .Value;
+
+            app.UseRequestLocalization(localizationOptions);
         }
     }
 }
