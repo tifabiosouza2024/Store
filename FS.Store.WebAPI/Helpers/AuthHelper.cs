@@ -1,10 +1,10 @@
 ﻿namespace FS.Store.WebAPI.Helpers
 {
+    using FS.Store.Core.Extension;
     using FS.Store.Core.Helper;
     using FS.Store.Core.Interfaces;
     using FS.Store.Model.Entity;
     using FS.Store.WebAPI.Areas.Admin.ViewModels;
-    using FS.Store.WebAPI.Extensions;
     using Microsoft.AspNetCore.Authentication;
     using Microsoft.AspNetCore.Authentication.Cookies;
     using System.Security.Claims;
@@ -12,6 +12,7 @@
     public class AuthHelper(PasswordHelper passwordHelper
         , IHttpContextAccessor httpContextAccessor
         , IUserService userService
+        , IOperationService operationService
         , ILogger<AuthHelper> logger)
     {
         public async Task<bool> LoginAsync(User? user, LoginViewModel model)
@@ -38,8 +39,12 @@
                 new(ClaimTypes.Email, user.Email)
             ];
 
-            if (operationId.GetValueOrDefault() != Guid.Empty)
-                claims.Add(new(ClaimTypesExtensions.Operation, operationId.GetValueOrDefault().ToString()));
+            var operation = await operationService.FindByIdAsync(operationId.GetValueOrDefault());
+            if (operation != null)
+            {
+                claims.Add(new(ClaimTypesExtensions.OperationId, operation.Id.ToString()));
+                claims.Add(new(ClaimTypesExtensions.OperationName, operation.Name.ToString()));
+            }
 
             var operationRoles = user.Operations?.Where(o => o.OperationId == operationId);
             if (operationRoles is not null)

@@ -1,21 +1,145 @@
 ﻿@model HomeViewModel
+
 @{
     ViewData["Title"] = "Início";
-
 }
-só acessado logado
-<br />
-Usuário: @User.Identity?.Name
 
-<br />
-Empresa: @Model?.OperationName;
+@section Styles {
+    <link rel="stylesheet" href="~/css/admin/home-index.css" />
+}
+<div class="dashboard">
 
+    <!-- Cabeçalho -->
+    <section class="dashboard-header">
+        <div>
+            <span class="dashboard-eyebrow">GESTÃO DE LOJA</span>
+            <h1>Olá, @User.Identity?.Name!</h1>
+            <p>Selecione sua operação e acesse as funcionalidades do sistema.</p>
+        </div>
 
-<form asp-action="ChangeOperation">
-<select asp-for="OperationId"
-        asp-items="Model?.Operations"
-        class="form-select">
-    <option value="">Selecione uma loja</option>
-</select>
-<button type="submit">Enviar</button>
-</form>
+        <div class="dashboard-user-icon">
+            <i class="bi bi-person-workspace"></i>
+        </div>
+    </section>
+
+    @if (Model.Operations.Count() > 1)
+    {
+        <!-- Seleção de operação -->
+        <section class="dashboard-section">
+            <div class="section-heading">
+                <div>
+                    <h2>Onde você vai trabalhar?</h2>
+                    <p>Selecione a loja para definir sua operação atual.</p>
+                </div>
+                <i class="bi bi-shop section-heading-icon"></i>
+            </div>
+
+        
+            <form asp-action="ChangeOperation" method="post" id="operationForm">
+                @Html.AntiForgeryToken()
+
+                <div class="operation-grid">
+                    @foreach (var operation in Model.Operations)
+                    {
+                        var isCurrent = operation.Value == Model.OperationId?.ToString();
+
+                        <button type="submit" name="OperationId" value="@operation.Value" class="operation-card @(isCurrent ? "selected" : "")" aria-current="@(isCurrent ? "true" : null)" title="@(isCurrent ? "Operação atual" : $"Acessar {operation.Text}")" @(isCurrent ? "disabled" : null)>
+
+                            <span class="operation-card-icon">
+                                <i class="bi bi-shop-window"></i>
+                            </span>
+
+                            <span class="operation-card-content">
+                                <strong>@operation.Text</strong>
+                                <small>
+                                    @(isCurrent ? "Operação atual" : "Clique para acessar")
+                                </small>
+                            </span>
+
+                            <span class="operation-card-check">
+                                <i class="bi @(isCurrent ? "bi-check-circle-fill" : "bi-arrow-right-circle")"></i>
+                            </span>
+                        </button>
+                    }
+                </div>
+            </form>
+
+        </section>        
+    }
+
+    <!-- Atalhos -->
+    <section class="dashboard-section">
+        <div class="section-heading">
+            <div>
+                <h2>Acesso rápido</h2>
+                <p>Encontre rapidamente o que precisa fazer.</p>
+            </div>
+        </div>
+
+        <div class="shortcut-grid">
+
+            <a asp-area="Admin" asp-controller="CashSession" asp-action="Index" class="shortcut-card">
+                <span class="shortcut-icon shortcut-purple">
+                    <i class="bi bi-wallet2"></i>
+                </span>
+                <strong>Caixas abertos</strong>
+                <span>Consulte as sessões de caixa em andamento.</span>
+                <i class="bi bi-arrow-up-right shortcut-arrow"></i>
+            </a>
+
+            <a asp-area="Admin" asp-controller="CashSession" asp-action="Open" class="shortcut-card">
+                <span class="shortcut-icon shortcut-green">
+                    <i class="bi bi-plus-circle"></i>
+                </span>
+                <strong>Abertura de caixa</strong>
+                <span>Inicie uma nova sessão de caixa.</span>
+                <i class="bi bi-arrow-up-right shortcut-arrow"></i>
+            </a>
+
+            <a asp-area="Admin" asp-controller="CashMovement" asp-action="Index" class="shortcut-card">
+                <span class="shortcut-icon shortcut-blue">
+                    <i class="bi bi-arrow-left-right"></i>
+                </span>
+                <strong>Movimentações</strong>
+                <span>Consulte entradas e saídas de valores.</span>
+                <i class="bi bi-arrow-up-right shortcut-arrow"></i>
+            </a>
+
+            <a asp-area="Admin" asp-controller="CashMovement" asp-action="Supply" class="shortcut-card">
+                <span class="shortcut-icon shortcut-green">
+                    <i class="bi bi-cash-coin"></i>
+                </span>
+                <strong>Suprimento</strong>
+                <span>Registre a entrada de dinheiro no caixa.</span>
+                <i class="bi bi-arrow-up-right shortcut-arrow"></i>
+            </a>
+
+            <a asp-area="Admin" asp-controller="CashMovement" asp-action="Withdrawal" class="shortcut-card">
+                <span class="shortcut-icon shortcut-orange">
+                    <i class="bi bi-box-arrow-up-right"></i>
+                </span>
+                <strong>Sangria</strong>
+                <span>Registre a retirada de dinheiro do caixa.</span>
+                <i class="bi bi-arrow-up-right shortcut-arrow"></i>
+            </a>
+
+            <a asp-area="Admin" asp-controller="PaymentTerminal" asp-action="Index" class="shortcut-card">
+                <span class="shortcut-icon shortcut-red">
+                    <i class="bi bi-clipboard-check"></i>
+                </span>
+                <strong>Maquininhas</strong>
+                <span>Cadastro de Fornecedores de Maquininhas.</span>
+                <i class="bi bi-arrow-up-right shortcut-arrow"></i>
+            </a>
+
+            <a asp-area="Admin" asp-controller="CashSession" asp-action="History" class="shortcut-card">
+                <span class="shortcut-icon shortcut-blue">
+                    <i class="bi bi-clock-history"></i>
+                </span>
+                <strong>Histórico de caixas</strong>
+                <span>Consulte sessões anteriores.</span>
+                <i class="bi bi-arrow-up-right shortcut-arrow"></i>
+            </a>
+        </div>
+    </section>
+</div>

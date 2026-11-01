@@ -16,7 +16,7 @@ namespace FS.Store.Core.Interfaces
 
         Task<Entity?> FirstOrDefaultAsync(Expression<Func<Entity, bool>> filter);
 
-        Task<IEnumerable<Entity?>> GetAllAsync(Expression<Func<Entity, bool>> filter
+        Task<IEnumerable<Entity>?> GetAllAsync(Expression<Func<Entity, bool>>? filter = null
             , Func<IQueryable<Entity>, IQueryable<Entity>>? orderBy = null
             , Dictionary<string, string>? dynamicSorts = null);
 

@@ -68,23 +68,31 @@ namespace FS.Store.WebAPI.Configs
 
         private static void Services(IServiceCollection services)
         {
+            services.AddTransient<ICashClosingService, CashClosingService>();
             services.AddTransient<ICashRegisterSessionService, CashRegisterSessionService>();
             services.AddTransient<IOperationService, OperationService>();
             services.AddTransient<IOperationUserRoleService, OperationUserRoleService>();
+            services.AddTransient<IPaymentProviderService, PaymentProviderService>();
+            services.AddTransient<IPaymentTerminalService, PaymentTerminalService>();
             services.AddTransient<IUserService, UserService>();
         }
         private static void Repositories(IServiceCollection services)
         {
+            services.AddTransient<ICashClosingRepository, CashClosingRepository>();
             services.AddTransient<ICashRegisterSessionRepository, CashRegisterSessionRepository>();
             services.AddTransient<IOperationRepository, OperationRepository>();
             services.AddTransient<IOperationUserRoleRepository, OperationUserRoleRepository>();
+            services.AddTransient<IPaymentProviderRepository, PaymentProviderRepository>();
+            services.AddTransient<IPaymentTerminalRepository, PaymentTerminalRepository>();
             services.AddTransient<IUserRepository, UserRepository>();
         }
 
         private static void Helpers(IServiceCollection services)
         {
-            services.AddScoped<PasswordHelper>();
             services.AddScoped<AuthHelper>();
+            services.AddScoped<CashSessionHelper>();
+            services.AddScoped<CurrentUserHelper>();
+            services.AddScoped<PasswordHelper>();
         }
 
         public static void ApplyMigrationDatabase(this IServiceCollection services, IWebHostEnvironment env)

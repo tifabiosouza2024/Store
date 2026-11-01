@@ -10,8 +10,7 @@ services.AddControllersWithViews()
 
 services
     .AddDataProtection()
-    .PersistKeysToFileSystem(
-        new DirectoryInfo("/app/keys"))
+    .PersistKeysToFileSystem(new DirectoryInfo("/app/keys"))
     .SetApplicationName("FS.Store");
 
 services.ConfigureDatabase(builder.Configuration);

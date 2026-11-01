@@ -17,7 +17,7 @@ namespace FS.Store.DAL.Repository
         #region Queryable
         private IQueryable<Entity> Queryable(Expression<Func<Entity, bool>>? filter = null
             , Func<IQueryable<Entity>, IQueryable<Entity>>? orderBy = null
-            , Dictionary<string, string>? dynamicSorts = null)
+            , Dictionary<string, string>? dynamicSorts = null, Guid? operationId = null)
         {
             var query = entities.AsQueryable().Where(e => !e.Deleted);
             if (filter is not null)
@@ -67,7 +67,7 @@ namespace FS.Store.DAL.Repository
         public async Task<Entity?> FirstOrDefaultAsync(Expression<Func<Entity, bool>> filter)
             => await Queryable(filter).FirstOrDefaultAsync();
 
-        public async Task<IEnumerable<Entity?>> GetAllAsync(Expression<Func<Entity, bool>> filter
+        public async Task<IEnumerable<Entity>?> GetAllAsync(Expression<Func<Entity, bool>>? filter = null
             , Func<IQueryable<Entity>, IQueryable<Entity>>? orderBy = null
             , Dictionary<string, string>? dynamicSorts = null)
             => await Queryable(filter: filter, dynamicSorts: dynamicSorts).ToListAsync();

@@ -1,4 +1,5 @@
-﻿using FS.Store.Core.Interfaces;
+﻿using FS.Store.Core.Extension;
+using FS.Store.Core.Interfaces;
 using FS.Store.Model.Dtos.API;
 using FS.Store.Model.Dtos.Operations;
 using FS.Store.Model.Extensions;

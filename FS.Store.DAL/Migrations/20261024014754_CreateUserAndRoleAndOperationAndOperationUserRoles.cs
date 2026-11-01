@@ -180,17 +180,27 @@ namespace FS.Store.DAL.Migrations
             migrationBuilder.Sql(@"
 INSERT INTO operation_user_role (user_id, role_id, operation_id)
 SELECT
-    (SELECT id FROM users WHERE email like 'super%'), r.id, o.id
+    (SELECT id FROM users WHERE email like 'superuser%'), r.id, o.id
 FROM roles r
 CROSS JOIN operations o
 WHERE r.normalized_name = 'SUPER';");
             migrationBuilder.Sql(@"
 INSERT INTO operation_user_role (user_id, role_id, operation_id)
 SELECT
-    (SELECT id FROM users WHERE email like 'seller%'), r.id, o.id
+    (SELECT id FROM users WHERE email like 'selleruser%'), r.id, o.id
 FROM roles r
 CROSS JOIN operations o
 WHERE r.normalized_name = 'SELLER';");
+
+            migrationBuilder.Sql($"INSERT INTO users (id, name, email, password_hash, is_active, is_beta) VALUES (uuid(),'Super Alone', 'superalone@gmail.com', '{passwordHashed}', true, true);");
+            migrationBuilder.Sql($"INSERT INTO operations (id, document, name, email) VALUES (uuid(),'93.176.710/0001-58', 'Third Gift', 'thirdgift@mail.com');");
+            migrationBuilder.Sql(@"
+INSERT INTO operation_user_role (user_id, role_id, operation_id)
+SELECT
+    (SELECT id FROM users WHERE email like 'superalone%'), r.id, o.id
+FROM roles r
+cross JOIN operations o
+WHERE r.normalized_name = 'ADMIN' AND o.email LIKE 'third%';");
         }
 
         /// <inheritdoc />

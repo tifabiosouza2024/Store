@@ -1,7 +1,356 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model CashClosingViewModel
+
 @{
-    ViewData["Title"] = "Fechamento";
+    ViewData["Title"] = "Fechamento de Caixa";
 }
-Fechamento
+
+<div class="container-fluid">
+    <form asp-action="Close" asp-controller="CashSession" method="post" id="closingForm">
+        <input type="hidden" asp-for="CashRegisterSessionId" />
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="mb-1">
+                    <i class="bi bi-cash-stack me-2"></i>
+                    Fechamento de Caixa
+                </h3>
+                <p class="text-muted mb-0">
+                    Confira os valores e informe a apuração do caixa.
+                </p>
+            </div>
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i>
+                Voltar
+            </a>
+        </div>
+
+        <!-- Informações da sessão -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-4 mb-3 mb-md-0">
+                        <small class="text-muted d-block">Sessão de caixa</small>
+                        <strong>#@Model.CashRegisterSessionId</strong>
+                    </div>
+                    <div class="col-md-4 mb-3 mb-md-0">
+                        <small class="text-muted d-block">Abertura</small>
+                        <strong>
+                            @Model.OpenedAt.ToString("dd/MM/yyyy HH:mm")
+                        </strong>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-muted d-block">Valor inicial</small>
+                        <h4 class="mb-0 text-primary">
+                            @Model.OpeningAmount.ToString("C")
+                        </h4>
+                        <input type="hidden" asp-for="OpeningAmount" />
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Coluna principal -->
+            <div class="col-lg-8">
+                <!-- Dinheiro -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0">
+                            <i class="bi bi-cash me-2 text-success"></i>
+                            Conferência de dinheiro
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-light border mb-3">
+                            <small class="text-muted d-block">
+                                Valor informado na abertura de caixa:
+                            </small>
+                            <strong class="fs-5">
+                                @Model.OpeningAmount.ToString("C")
+                            </strong>
+                        </div>
+                        <label asp-for="CashAmount" class="form-label fw-semibold">
+                            Dinheiro encontrado no caixa no momento do fechamento:
+                        </label>
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text">R$</span>
+
+                            <input asp-for="CashAmount" class="form-control price" inputmode="decimal" placeholder="0,00" autocomplete="off" />
+                        </div>
+                        <div class="form-text">
+                            Informe o valor total contado fisicamente no caixa.
+                        </div>
+                        <span asp-validation-for="CashAmount" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- Terminais -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-1">
+                            <i class="bi bi-credit-card me-2 text-primary"></i>
+                            Conferência dos terminais
+                        </h5>
+                        <small class="text-muted">
+                            Informe os valores apurados em cada terminal.
+                        </small>
+                    </div>
+                    <div class="card-body">
+                        @if (Model.Terminals.Any())
+                        {
+                            @for (int i = 0; i < Model.Terminals.Count; i++)
+                            {
+                                <div class="terminal-item border rounded-3 p-3 mb-3">
+                                    <input type="hidden" asp-for="Terminals[i].PaymentTerminalId" />
+                                    <input type="hidden" asp-for="Terminals[i].TerminalName" />
+                                    <input type="hidden" asp-for="Terminals[i].ProviderName" />
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="rounded-circle bg-primary-subtle text-primary p-2 me-3">
+                                            <i class="bi bi-credit-card-2-front fs-5"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0">
+                                                @Model.Terminals[i].TerminalName
+                                            </h6>
+                                            <small class="text-muted">
+                                                @Model.Terminals[i].ProviderName
+                                            </small>
+                                        </div>
+                                    </div>
+                                    <div class="row g-3">
+                                        <div class="col-md-4">
+                                            <label class="form-label">
+                                                Crédito
+                                            </label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">R$</span>
+
+                                                <input asp-for="Terminals[i].CreditAmount" class="form-control price terminal-value" inputmode="decimal" autocomplete="off" />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">
+                                                Débito
+                                            </label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">R$</span>
+
+                                                <input asp-for="Terminals[i].DebitAmount" class="form-control price terminal-value" inputmode="decimal" autocomplete="off" />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">
+                                                Pix
+                                            </label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">R$</span>
+
+                                                <input asp-for="Terminals[i].PixAmount" class="form-control price terminal-value" inputmode="decimal" autocomplete="off" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="text-center py-4">
+                                <i class="bi bi-credit-card fs-1 text-muted"></i>
+
+                                <p class="text-muted mt-2 mb-0">
+                                    Nenhum terminal cadastrado nesta operação.
+                                </p>
+                                <a asp-action="Create" asp-controller="PaymentTerminal" class="btn btn-primary">
+                                    <i class="bi bi-plus"></i> Novo
+                                </a>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Observações -->
+                <div class="card border-0 shadow-sm mb-4">
+
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0">
+                            <i class="bi bi-chat-left-text me-2"></i>
+                            Observações
+                            <small class="text-muted fw-normal">(opcional)</small>
+                        </h5>
+                    </div>
+
+                    <div class="card-body">
+                        <textarea asp-for="Notes" class="form-control" rows="3" maxlength="255" placeholder="Registre alguma ocorrência ou observação sobre o fechamento..."></textarea>
+                        <span asp-validation-for="Notes" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resumo -->
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm position-sticky" style="top: 20px;">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0">
+                            <i class="bi bi-calculator me-2"></i>
+                            Resumo do fechamento
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <small class="text-muted d-block">
+                                Dinheiro
+                            </small>
+                            <strong id="summaryCash" class="fs-5">
+                                R$ 0,00
+                            </strong>
+                        </div>
+                        <div class="mb-3">
+                            <small class="text-muted d-block">
+                                Crédito
+                            </small>
+                            <strong id="summaryCredit">
+                                R$ 0,00
+                            </strong>
+                        </div>
+                        <div class="mb-3">
+                            <small class="text-muted d-block">
+                                Débito
+                            </small>
+                            <strong id="summaryDebit">
+                                R$ 0,00
+                            </strong>
+                        </div>
+                        <div class="mb-3">
+                            <small class="text-muted d-block">
+                                Pix
+                            </small>
+                            <strong id="summaryPix">
+                                R$ 0,00
+                            </strong>
+                        </div>
+                        <hr />
+                        <small class="text-muted d-block">
+                            Total informado
+                        </small>
+                        <h3 class="text-primary mb-0" id="summaryTotal">
+                            R$ 0,00
+                        </h3>
+                    </div>
+
+                    <div class="card-footer bg-white p-3">
+                        <button type="button" class="btn btn-success btn-lg w-100" data-bs-toggle="modal" data-bs-target="#confirmClosingModal">
+                            <i class="bi bi-check-circle me-2"></i>
+                            Confirmar fechamento
+                        </button>
+                        <small class="text-muted d-block text-center mt-2">
+                            Confira os valores antes de finalizar.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de confirmação -->
+        <div class="modal fade" id="confirmClosingModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            Confirmar fechamento?
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal">
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="mb-0">
+                            Ao confirmar, a sessão será encerrada e não poderá
+                            mais receber movimentações.
+                        </p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                            Revisar valores
+                        </button>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-lg me-1"></i>
+                            Sim, fechar caixa
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('closingForm');
+
+            const currency = new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            });
+
+            function parseValue(value) {
+                if (!value) return 0;
+
+                const normalized = value
+                    .replace(/[^\d,.-]/g, '')
+                    .replace(/\./g, '')
+                    .replace(',', '.');
+
+                const result = Number(normalized);
+
+                return Number.isFinite(result) ? result : 0;
+            }
+
+            function sum(selector) {
+                return [...form.querySelectorAll(selector)]
+                    .reduce((total, input) => {
+                        return total + parseValue(input.value);
+                    }, 0);
+            }
+
+            function updateSummary() {
+                const cash = parseValue(
+                    form.querySelector('[id="CashAmount"]').value
+                );
+
+                const credit = sum('[id$="_CreditAmount"]');
+                const debit = sum('[id$="_DebitAmount"]');
+                const pix = sum('[id$="_PixAmount"]');
+
+                document.getElementById('summaryCash').textContent = currency.format(cash);
+
+                document.getElementById('summaryCredit').textContent = currency.format(credit);
+
+                document.getElementById('summaryDebit').textContent = currency.format(debit);
+
+                document.getElementById('summaryPix').textContent = currency.format(pix);
+
+                document.getElementById('summaryTotal').textContent = currency.format(cash + credit + debit + pix);
+            }
+
+            // Escuta as atualizações realizadas pela máscara monetária.
+            form.addEventListener('price:updated', updateSummary);
+
+            // Atualiza o resumo caso os valores já estejam preenchidos.
+            updateSummary();
+        });
+    </script>
+    <script>
+        document.getElementById('closingForm').addEventListener('submit', function () {
+            const data = new FormData(this);
+
+            console.table(
+                [...data.entries()].map(([name, value]) => ({
+                    Campo: name,
+                    Valor: value
+                }))
+            );
+        });
+    </script>
+}

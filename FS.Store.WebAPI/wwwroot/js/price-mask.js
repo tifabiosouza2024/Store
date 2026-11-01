@@ -19,6 +19,15 @@ document.addEventListener('DOMContentLoaded', () => {
         // Evita enviar o campo visível junto com o hidden.
         input.removeAttribute('name');
 
+        // Remove os data-attributes dos criados hiddens:
+        input.removeAttribute('data-val');
+        input.removeAttribute('data-val-number');
+        input.removeAttribute('data-val-required');
+        input.removeAttribute('data-val-range');
+        input.removeAttribute('data-val-min');
+        input.removeAttribute('data-val-max');
+        input.removeAttribute('data-val-length');
+        input.removeAttribute('data-val-regex');
         // Mantém a máscara baseada em dígitos.
         let digits = '0';
 
@@ -39,6 +48,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const cents = padded.slice(-2);
 
             hidden.value = integer + ',' + cents;
+
+            input.dispatchEvent(new Event('price:updated', {
+                bubbles: true
+            }));
         }
 
         input.addEventListener('focus', () => {

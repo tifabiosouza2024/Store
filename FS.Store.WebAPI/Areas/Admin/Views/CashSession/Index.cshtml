@@ -89,6 +89,7 @@
 
                     <thead class="table-light">
                         <tr>
+                            <th class="pe-4"></th>
                             <th class="ps-4 text-nowrap">Aberto em</th>
                             <th class="text-end text-nowrap">Valor inicial</th>
                             <th class="text-nowrap">Status</th>
@@ -101,6 +102,12 @@
                         @foreach (var session in sessions!)
                         {
                             <tr>
+                                <td>
+                                    <i class="bi bi-finance_chip"></i>
+                                    <a class="btn btn-success" asp-action="Close" asp-route-id="@session.Id">
+                                        Fechar
+                                    </a>
+                                </td>
                                 <td class="ps-4 text-nowrap">
                                     <div class="fw-medium">
                                         @session.OpenedAt.ToString("dd/MM/yyyy")

@@ -1,4 +1,5 @@
-﻿using FS.Store.Core.Interfaces;
+﻿using FS.Store.Core.Extension;
+using FS.Store.Core.Interfaces;
 using FS.Store.Model.Entity;
 using FS.Store.WebAPI.Areas.Admin.ViewModels;
 using FS.Store.WebAPI.Extensions;
@@ -9,8 +10,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace FS.Store.WebAPI.Areas.Admin.Controllers
 {
-    [Authorize]
     [Area("Admin")]
+    [Authorize]
     public class HomeController(AuthHelper authHelper
         , IOperationService operationService
         , IOperationUserRoleService operationUserRoleService
@@ -29,7 +30,7 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
                 vm.OperationId = operation?.Id;
             }
 
-            var operationsRoles = await operationUserRoleService.FindAllByUserIdAsync(User.GetUserId());
+            var operationsRoles = await operationUserRoleService.FindAllByUserIdAsync();
             vm.Operations = new SelectList(operationsRoles.Select(o => o?.Operation), "Id", "Name", vm.OperationId);
             return View(vm);
         }

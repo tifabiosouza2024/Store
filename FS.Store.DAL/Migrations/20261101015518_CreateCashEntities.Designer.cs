@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FS.Store.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20261026220616_CreateCashEntities")]
+    [Migration("20261101015518_CreateCashEntities")]
     partial class CreateCashEntities
     {
         /// <inheritdoc />
@@ -113,6 +113,9 @@ namespace FS.Store.DAL.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("id");
 
+                    b.Property<long?>("CashClosingId")
+                        .HasColumnType("bigint");
+
                     b.Property<long>("CashRegisterSessionId")
                         .HasColumnType("bigint")
                         .HasColumnName("cash_register_session_id");
@@ -164,6 +167,8 @@ namespace FS.Store.DAL.Migrations
                         .HasComment("Data de atualização do registro");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CashClosingId");
 
                     b.HasIndex("CashRegisterSessionId");
 
@@ -515,7 +520,7 @@ namespace FS.Store.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("provider", t =>
+                    b.ToTable("payment_provider", t =>
                         {
                             t.HasComment("Armazena os fornecedores dos terminais");
                         });
@@ -737,6 +742,10 @@ namespace FS.Store.DAL.Migrations
 
             modelBuilder.Entity("FS.Store.Model.Entity.CashClosingTerminal", b =>
                 {
+                    b.HasOne("FS.Store.Model.Entity.CashClosing", null)
+                        .WithMany("Terminals")
+                        .HasForeignKey("CashClosingId");
+
                     b.HasOne("FS.Store.Model.Entity.CashRegisterSession", "CashRegisterSession")
                         .WithMany()
                         .HasForeignKey("CashRegisterSessionId")
@@ -842,7 +851,7 @@ namespace FS.Store.DAL.Migrations
             modelBuilder.Entity("FS.Store.Model.Entity.PaymentTerminal", b =>
                 {
                     b.HasOne("FS.Store.Model.Entity.Operation", "Operation")
-                        .WithMany()
+                        .WithMany("PaymentTerminals")
                         .HasForeignKey("OperationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -867,8 +876,15 @@ namespace FS.Store.DAL.Migrations
                     b.Navigation("LastOperation");
                 });
 
+            modelBuilder.Entity("FS.Store.Model.Entity.CashClosing", b =>
+                {
+                    b.Navigation("Terminals");
+                });
+
             modelBuilder.Entity("FS.Store.Model.Entity.Operation", b =>
                 {
+                    b.Navigation("PaymentTerminals");
+
                     b.Navigation("UsersRoles");
                 });
 

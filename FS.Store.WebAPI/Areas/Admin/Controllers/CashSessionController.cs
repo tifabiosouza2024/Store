@@ -1,5 +1,9 @@
-﻿using FS.Store.Core.Interfaces;
+﻿using FS.Store.Core.Extension;
+using FS.Store.Core.Helper;
+using FS.Store.Core.Interfaces;
+using FS.Store.Model.Dtos;
 using FS.Store.Model.Entity;
+using FS.Store.Model.Extensions;
 using FS.Store.WebAPI.Areas.Admin.ViewModels;
 using FS.Store.WebAPI.Extensions;
 using Microsoft.AspNetCore.Authorization;
@@ -8,13 +12,15 @@ using Microsoft.AspNetCore.Mvc;
 namespace FS.Store.WebAPI.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "SUPER")]
+    [Authorize]
     public class CashSessionController(ICashRegisterSessionService cashRegisterSessionService
-        , IOperationService operationService) : Controller
+        , IOperationService operationService
+        , ICashClosingService cashClosingService
+        , CashSessionHelper cashSessionHelper) : Controller
     {
         public async Task<IActionResult> Index()
         {
-            IEnumerable<CashRegisterSession> cashSessions = await cashRegisterSessionService.GetCashRegisterSessionOpenedAsync(User.GetOperationId());
+            IEnumerable<CashRegisterSession> cashSessions = await cashRegisterSessionService.GetCashRegisterSessionOpenedAsync();
             CashSessionIndexViewModel vm = new()
             {
                 CashRegisterSessionsOpened = cashSessions
@@ -32,7 +38,7 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
             CashSessionOpenViewModel session = new()
             {
                 OperationName = operation?.Name,
-                CashSessionAlreadyExists = await cashRegisterSessionService.AlreadyOpened(operation!.Id)
+                CashSessionAlreadyExists = await cashRegisterSessionService.AlreadyOpened()
             };
             return View(session);
         }
@@ -61,9 +67,56 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
             return RedirectToAction("Index");
         }
 
-        public IActionResult Close()
+        public async Task<IActionResult> Close(long? id)
         {
-            return View();
+            var session = await cashRegisterSessionService.GetToClose(id);
+            if (session == null)
+                return this.RedirectAdminToBadRequest("Este caixa não está disponível para ser fechado.");
+            CashClosingViewModel sessionVM = new();
+            await GetCashCloseSessionViewModel(sessionVM, session);
+
+            return View(sessionVM);
+        }
+
+        private async Task GetCashCloseSessionViewModel(CashClosingViewModel sessionVM, CashRegisterSession session)
+        {
+            var operation = await operationService.FindByIdAsync(User.GetOperationId());
+
+            sessionVM.OperationName = operation?.Name;
+            sessionVM.OpeningAmount = session.OpeningAmount;
+            sessionVM.CashRegisterSessionId = session.Id;
+            sessionVM.OpenedAt = session.OpenedAt;
+            if (operation?.PaymentTerminals != null)
+            {
+                foreach (var terminal in operation.PaymentTerminals)
+                {
+                    sessionVM.Terminals.Add(new CashClosingTerminalViewModel()
+                    {
+                        PaymentTerminalId = terminal.Id,
+                        TerminalName = terminal.Name,
+                        ProviderName = terminal.PaymentProvider?.Name,
+                    });
+                }
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Close(CashClosingViewModel sessionVM)
+        {
+            if (!ModelState.IsValid)
+            {
+                var session = await cashRegisterSessionService.GetToClose(sessionVM.CashRegisterSessionId);
+                if (session == null)
+                    return this.RedirectAdminToBadRequest("Este caixa não está disponível para ser fechado.");
+
+                await GetCashCloseSessionViewModel(sessionVM, session);
+
+                return View(sessionVM);
+            }
+
+            await cashSessionHelper.CloseSessionAsync(sessionVM.ToDto<CashClosingDto>());
+
+            return RedirectToAction("Index");
         }
 
         public IActionResult History()

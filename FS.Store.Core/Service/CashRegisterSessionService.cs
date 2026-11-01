@@ -1,23 +1,33 @@
-﻿using FS.Store.Core.Interfaces;
+﻿using FS.Store.Core.Helper;
+using FS.Store.Core.Interfaces;
 using FS.Store.DAL.Interfaces;
 using FS.Store.Model.Entity;
+using FS.Store.Model.Enums;
 
 namespace FS.Store.Core.Service
 {
-    public class CashRegisterSessionService(ICashRegisterSessionRepository repository) : BaseService<CashRegisterSession, long>(repository), ICashRegisterSessionService
+    public class CashRegisterSessionService(ICashRegisterSessionRepository repository
+        , CurrentUserHelper currentUserHelper) : BaseService<CashRegisterSession, long>(repository), ICashRegisterSessionService
     {
-        public async Task<IEnumerable<CashRegisterSession>> GetCashRegisterSessionOpenedAsync(Guid operationId)
+        public async Task<IEnumerable<CashRegisterSession>> GetCashRegisterSessionOpenedAsync()
         {
+
             var result = await GetAllAsync(c
-                => c.OperationId == operationId
-                && c.CashRegisterStatus == Model.Enums.CashRegisterStatusEnum.Open);
+                => c.OperationId == currentUserHelper.CurrentOperationId
+                && c.CashRegisterStatus == CashRegisterStatusEnum.Open);
 
             return result!;
         }
 
-        public async Task<bool> AlreadyOpened(Guid operationId)
+        public async Task<bool> AlreadyOpened()
             => await ExistsAsync(e
-                => e.OperationId == operationId
-                && e.CashRegisterStatus == Model.Enums.CashRegisterStatusEnum.Open);
+                => e.OperationId == currentUserHelper.CurrentOperationId
+                && e.CashRegisterStatus == CashRegisterStatusEnum.Open);
+
+        public async Task<CashRegisterSession?> GetToClose(long? id)
+            => await FirstOrDefaultAsync(c
+                => c.Id == id
+                && c.OperationId == currentUserHelper.CurrentOperationId
+                && c.CashRegisterStatus == CashRegisterStatusEnum.Open);
     }
 }

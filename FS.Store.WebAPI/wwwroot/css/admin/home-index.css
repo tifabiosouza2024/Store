@@ -1,0 +1,345 @@
+﻿
+/* Painel inicial */
+
+.dashboard {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 8px 0 32px;
+    color: #202938;
+}
+
+.dashboard-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 32px;
+    padding: 28px 32px;
+    background: linear-gradient(120deg, #ffffff, #f0f5ff);
+    border: 1px solid #e4eaf4;
+    border-radius: 20px;
+}
+
+.dashboard-eyebrow {
+    display: inline-block;
+    margin-bottom: 8px;
+    color: #4569d4;
+    font-size: .75rem;
+    font-weight: 700;
+    letter-spacing: 1.4px;
+}
+
+.dashboard-header h1 {
+    margin: 0 0 8px;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 750;
+    letter-spacing: -.7px;
+}
+
+.dashboard-header p,
+.section-heading p {
+    margin: 0;
+    color: #718096;
+    font-size: .95rem;
+}
+
+.dashboard-user-icon {
+    display: grid;
+    flex-shrink: 0;
+    width: 64px;
+    height: 64px;
+    place-items: center;
+    color: #4263c7;
+    background: #e4ebff;
+    border-radius: 18px;
+    font-size: 1.8rem;
+}
+
+.dashboard-section {
+    margin-bottom: 32px;
+}
+
+.section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+    .section-heading h2 {
+        margin: 0 0 6px;
+        font-size: 1.2rem;
+        font-weight: 750;
+    }
+
+.section-heading-icon {
+    color: #8b9ac0;
+    font-size: 1.6rem;
+}
+
+/* Cartões de operação */
+
+.operation-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+    gap: 14px;
+}
+
+.operation-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+    padding: 18px;
+    background: #fff;
+    border: 1px solid #e0e6ef;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: border-color .2s, box-shadow .2s, background .2s;
+    width: 100%;
+    text-align: left;
+    font: inherit;
+    color: inherit;
+}
+
+    .operation-card:hover {
+        border-color: #9aafea;
+        box-shadow: 0 5px 18px rgb(30 55 100 / 6%);
+    }
+
+    .operation-card.selected,
+    .operation-card:has(input:checked) {
+        background: #f5f8ff;
+        border-color: #5476dc;
+        box-shadow: 0 0 0 1px #5476dc;
+    }
+
+    .operation-card input[type="radio"] {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        opacity: 0;
+    }
+
+    .operation-card:focus-within {
+        outline: 3px solid rgb(84 118 220 / 25%);
+        outline-offset: 3px;
+    }
+    
+    .operation-card:disabled {
+        cursor: default;
+        opacity: 1;
+    }
+    .operation-card:not(:disabled):hover {
+        background: #f8faff;
+    }
+        .operation-card:not(:disabled):hover .operation-card-check {
+            opacity: 1;
+        }
+
+            .operation-card:not(:disabled):hover .operation-card-check i {
+                color: #5274d8;
+            }
+
+.operation-card-icon {
+    display: grid;
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    place-items: center;
+    color: #4569d4;
+    background: #e8eeff;
+    border-radius: 13px;
+    font-size: 1.35rem;
+}
+
+.operation-card-content {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+}
+
+    .operation-card-content strong {
+        overflow-wrap: anywhere;
+        font-size: .95rem;
+        font-weight: 700;
+    }
+
+    .operation-card-content small {
+        color: #7b8798;
+        font-size: .8rem;
+    }
+
+.operation-card-check {
+    color: #5274d8;
+    font-size: 1.25rem;
+    opacity: 0;
+    transition: opacity .2s;
+}
+
+.operation-card:has(input:checked) .operation-card-check {
+    opacity: 1;
+}
+
+.operation-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 18px;
+}
+
+.operation-hint {
+    color: #7b8798;
+    font-size: .82rem;
+}
+
+    .operation-hint i {
+        margin-right: 5px;
+    }
+
+.btn-change-operation {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    min-height: 44px;
+    padding: 10px 20px;
+    border-radius: 11px;
+    font-weight: 650;
+}
+
+/* Atalhos */
+
+.shortcut-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 225px), 1fr));
+    gap: 16px;
+}
+
+.shortcut-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 0;
+    min-height: 190px;
+    padding: 22px;
+    color: #202938;
+    text-decoration: none;
+    background: #fff;
+    border: 1px solid #e4e9f1;
+    border-radius: 17px;
+    transition: transform .2s, box-shadow .2s, border-color .2s;
+}
+
+    .shortcut-card:hover {
+        color: #202938;
+        border-color: #c5d2f2;
+        box-shadow: 0 10px 28px rgb(30 55 100 / 8%);
+        transform: translateY(-3px);
+    }
+
+    .shortcut-card:focus-visible {
+        outline: 3px solid #8da8f7;
+        outline-offset: 3px;
+    }
+
+.shortcut-icon {
+    display: grid;
+    width: 46px;
+    height: 46px;
+    margin-bottom: 18px;
+    place-items: center;
+    border-radius: 13px;
+    font-size: 1.35rem;
+}
+
+.shortcut-purple {
+    color: #7555c8;
+    background: #f0eaff;
+}
+
+.shortcut-green {
+    color: #16845b;
+    background: #e3f7ed;
+}
+
+.shortcut-blue {
+    color: #2868c7;
+    background: #e5efff;
+}
+
+.shortcut-orange {
+    color: #b96b17;
+    background: #fff0dd;
+}
+
+.shortcut-red {
+    color: #c34753;
+    background: #ffeaec;
+}
+
+.shortcut-card strong {
+    margin-bottom: 8px;
+    padding-right: 14px;
+    font-size: .98rem;
+    font-weight: 750;
+}
+
+.shortcut-card > span:not(.shortcut-icon) {
+    max-width: 95%;
+    color: #778397;
+    font-size: .84rem;
+    line-height: 1.55;
+}
+
+.shortcut-arrow {
+    position: absolute;
+    top: 22px;
+    right: 20px;
+    color: #9aa6b7;
+    font-size: 1rem;
+    transition: transform .2s;
+}
+
+.shortcut-card:hover .shortcut-arrow {
+    color: #4263c7;
+    transform: translate(2px, -2px);
+}
+
+@media (max-width: 575.98px) {
+    .dashboard-header {
+        padding: 22px 18px;
+        border-radius: 16px;
+    }
+
+    .dashboard-user-icon {
+        width: 46px;
+        height: 46px;
+        border-radius: 13px;
+        font-size: 1.35rem;
+    }
+
+    .operation-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .btn-change-operation {
+        width: 100%;
+    }
+
+    .shortcut-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .shortcut-card {
+        min-height: 165px;
+    }
+}

@@ -8,10 +8,10 @@ namespace FS.Store.Model.Entity
     /// <summary>
     /// Armazena os fornecedores de terminais
     /// <para>
-    /// TypeId: long
+    /// TypeId: int
     /// </para>
     /// </summary>
-    [Table("provider")]
+    [Table("payment_provider")]
     [Comment("Armazena os fornecedores dos terminais")]
     public class PaymentProvider : BaseEntity<int>
     {

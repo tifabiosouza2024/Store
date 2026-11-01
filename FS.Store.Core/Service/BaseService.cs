@@ -19,10 +19,10 @@ namespace FS.Store.Core.Service
         public async Task<Entity?> FindByIdAsync(Id id)
             => await repository.FindByIdAsync(id);
 
-        public async Task<Entity?> FirstOrDefaultAsync(Expression<Func<Entity, bool>> predicate)
-            => await repository.FirstOrDefaultAsync(predicate);
+        public async Task<Entity?> FirstOrDefaultAsync(Expression<Func<Entity, bool>> filter)
+            => await repository.FirstOrDefaultAsync(filter);
 
-        public Task<IEnumerable<Entity?>> GetAllAsync(Expression<Func<Entity, bool>> filter
+        public Task<IEnumerable<Entity>?> GetAllAsync(Expression<Func<Entity, bool>>? filter = null
             , Func<IQueryable<Entity>, IQueryable<Entity>>? orderBy = null
             , Dictionary<string, string>? dynamicSorts = null)
             => repository.GetAllAsync(filter, orderBy, dynamicSorts);

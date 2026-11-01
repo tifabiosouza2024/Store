@@ -14,6 +14,10 @@ namespace FS.Store.Model.Entity
     [Comment("Registra o fechamento do caixa")]
     public class CashClosing : BaseEntity<long>
     {
+        public CashClosing()
+        {
+            this.Terminals = [];
+        }
         [Column("closed_at", TypeName = "datetime(0)")]
         [Comment("Data/Hora de fechamento")]
         [DataType(DataType.DateTime)]
@@ -51,5 +55,7 @@ namespace FS.Store.Model.Entity
         [Comment("Usuário que realizou o fechamento")]
         public Guid ClosedByUserId { get; set; }
         public virtual User? ClosedByUser { get; set; }
+
+        public virtual ICollection<CashClosingTerminal>? Terminals { get; set; }
     }
 }

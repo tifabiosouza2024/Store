@@ -38,5 +38,7 @@ namespace FS.Store.Model.Entity
         public bool? IsActive { get; set; }
 
         public virtual ICollection<OperationUserRole>? UsersRoles { get; set; }
+
+        public virtual ICollection<PaymentTerminal>? PaymentTerminals { get; set; }
     }
 }

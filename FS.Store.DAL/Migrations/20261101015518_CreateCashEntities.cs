@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 using MySql.EntityFrameworkCore.Metadata;
 
 #nullable disable
@@ -54,7 +53,7 @@ namespace FS.Store.DAL.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "provider",
+                name: "payment_provider",
                 columns: table => new
                 {
                     id = table.Column<int>(type: "int", nullable: false)
@@ -66,7 +65,7 @@ namespace FS.Store.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_provider", x => x.id);
+                    table.PrimaryKey("PK_payment_provider", x => x.id);
                 },
                 comment: "Armazena os fornecedores dos terminais")
                 .Annotation("MySQL:Charset", "utf8mb4");
@@ -173,9 +172,9 @@ namespace FS.Store.DAL.Migrations
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_payment_terminal_provider_payment_provider_id",
+                        name: "FK_payment_terminal_payment_provider_payment_provider_id",
                         column: x => x.payment_provider_id,
-                        principalTable: "provider",
+                        principalTable: "payment_provider",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 },
@@ -194,6 +193,7 @@ namespace FS.Store.DAL.Migrations
                     payment_terminal_id = table.Column<Guid>(type: "char(36)", nullable: false, comment: "Terminal de pagamento (maquininha)"),
                     cash_register_session_id = table.Column<long>(type: "bigint", nullable: false),
                     created_by_user_id = table.Column<Guid>(type: "char(36)", nullable: false, comment: "Usuário que criou a movimentação"),
+                    CashClosingId = table.Column<long>(type: "bigint", nullable: true),
                     created_at = table.Column<DateTime>(type: "datetime(0)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP", comment: "Data de criação do registro"),
                     updated_at = table.Column<DateTime>(type: "datetime(0)", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP", comment: "Data de atualização do registro"),
                     deleted = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: false, comment: "registro deletado virtualmente")
@@ -201,6 +201,11 @@ namespace FS.Store.DAL.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_cash_closing_terminal", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_cash_closing_terminal_cash_closing_CashClosingId",
+                        column: x => x.CashClosingId,
+                        principalTable: "cash_closing",
+                        principalColumn: "id");
                     table.ForeignKey(
                         name: "FK_cash_closing_terminal_cash_register_session_cash_register_se~",
                         column: x => x.cash_register_session_id,
@@ -237,6 +242,11 @@ namespace FS.Store.DAL.Migrations
                 name: "IX_cash_closing_terminal_cash_register_session_id",
                 table: "cash_closing_terminal",
                 column: "cash_register_session_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_cash_closing_terminal_CashClosingId",
+                table: "cash_closing_terminal",
+                column: "CashClosingId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_cash_closing_terminal_created_by_user_id",
@@ -287,19 +297,24 @@ namespace FS.Store.DAL.Migrations
                 name: "IX_payment_terminal_payment_provider_id",
                 table: "payment_terminal",
                 column: "payment_provider_id");
+
+            migrationBuilder.Sql(@"
+INSERT INTO payment_provider (name) values
+('InfinitePay'), ('Stone');");
+
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "cash_closing");
-
-            migrationBuilder.DropTable(
                 name: "cash_closing_terminal");
 
             migrationBuilder.DropTable(
                 name: "cash_movement");
+
+            migrationBuilder.DropTable(
+                name: "cash_closing");
 
             migrationBuilder.DropTable(
                 name: "payment_terminal");
@@ -308,7 +323,7 @@ namespace FS.Store.DAL.Migrations
                 name: "cash_register_session");
 
             migrationBuilder.DropTable(
-                name: "provider");
+                name: "payment_provider");
         }
     }
 }
