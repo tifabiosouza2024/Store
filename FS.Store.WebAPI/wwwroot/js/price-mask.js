@@ -1,5 +1,4 @@
-﻿
-document.addEventListener('DOMContentLoaded', () => {
+﻿document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('input.price').forEach(input => {
         const originalName = input.name;
 
@@ -8,18 +7,20 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Cria automaticamente o campo oculto que será enviado ao servidor.
+        // Preserva o valor original antes de modificar o input.
+        const initialValue = input.value;
+
+        // Cria automaticamente o campo oculto.
         const hidden = document.createElement('input');
         hidden.type = 'hidden';
         hidden.name = originalName;
-        hidden.value = '0.00';
 
         input.insertAdjacentElement('afterend', hidden);
 
         // Evita enviar o campo visível junto com o hidden.
         input.removeAttribute('name');
 
-        // Remove os data-attributes dos criados hiddens:
+        // Remove os data-attributes dos criados hiddens.
         input.removeAttribute('data-val');
         input.removeAttribute('data-val-number');
         input.removeAttribute('data-val-required');
@@ -28,8 +29,11 @@ document.addEventListener('DOMContentLoaded', () => {
         input.removeAttribute('data-val-max');
         input.removeAttribute('data-val-length');
         input.removeAttribute('data-val-regex');
-        // Mantém a máscara baseada em dígitos.
-        let digits = '0';
+
+        // Inicializa os dígitos com o valor existente.
+        let digits = initialValue
+            .replace(/\D/g, '')
+            .replace(/^0+(?=\d)/, '') || '0';
 
         function formatPrice() {
             const padded = digits.padStart(3, '0');
@@ -53,6 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 bubbles: true
             }));
         }
+
 
         input.addEventListener('focus', () => {
             input.select();

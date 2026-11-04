@@ -5,6 +5,7 @@ using FS.Store.DAL.Interfaces;
 using FS.Store.Model.Elements;
 using FS.Store.Model.Entity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using System.Linq.Expressions;
 
 namespace FS.Store.DAL.Repository
@@ -16,17 +17,25 @@ namespace FS.Store.DAL.Repository
 
         #region Queryable
         private IQueryable<Entity> Queryable(Expression<Func<Entity, bool>>? filter = null
+            , Func<IQueryable<Entity>, IIncludableQueryable<Entity, object?>>? includeProperties = null
             , Func<IQueryable<Entity>, IQueryable<Entity>>? orderBy = null
-            , Dictionary<string, string>? dynamicSorts = null, Guid? operationId = null)
+            , Dictionary<string, string>? dynamicSorts = null
+            , bool asNoTracking = false)
         {
             var query = entities.AsQueryable().Where(e => !e.Deleted);
             if (filter is not null)
                 query = query.Where(filter);
 
+            if (includeProperties is not null)
+                query = includeProperties(query);
+
             if (dynamicSorts is not null && dynamicSorts.Count > 0)
                 query.ApplySortingDynamic(dynamicSorts);
             else if (orderBy is not null)
                 query = orderBy(query);
+
+            if (asNoTracking)
+                query = query.AsNoTracking();
 
             return query;
 
@@ -61,21 +70,34 @@ namespace FS.Store.DAL.Repository
         public async Task<bool> ExistsAsync(Expression<Func<Entity, bool>> filter)
             => await Queryable(filter).AnyAsync();
 
-        public async Task<Entity?> FindByIdAsync(Id id)
-            => await FirstOrDefaultAsync(u => id!.Equals(u.Id));
+        public async Task<Entity?> FindByIdAsync(Id id
+            , Func<IQueryable<Entity>, IIncludableQueryable<Entity, object?>>? includeProperties = null)
+            => await FirstOrDefaultAsync(u => id!.Equals(u.Id), includeProperties: includeProperties);
 
-        public async Task<Entity?> FirstOrDefaultAsync(Expression<Func<Entity, bool>> filter)
-            => await Queryable(filter).FirstOrDefaultAsync();
+        public async Task<Entity?> FirstOrDefaultAsync(Expression<Func<Entity, bool>> filter
+            , Func<IQueryable<Entity>, IIncludableQueryable<Entity, object?>>? includeProperties = null
+            , bool asNoTracking = false)
+            => await Queryable(filter: filter
+                , includeProperties: includeProperties
+                , asNoTracking: asNoTracking).FirstOrDefaultAsync();
 
         public async Task<IEnumerable<Entity>?> GetAllAsync(Expression<Func<Entity, bool>>? filter = null
+            , Func<IQueryable<Entity>, IIncludableQueryable<Entity, object?>>? includeProperties = null
             , Func<IQueryable<Entity>, IQueryable<Entity>>? orderBy = null
-            , Dictionary<string, string>? dynamicSorts = null)
-            => await Queryable(filter: filter, dynamicSorts: dynamicSorts).ToListAsync();
+            , Dictionary<string, string>? dynamicSorts = null
+            , bool asNoTracking = false)
+            => await Queryable(filter: filter
+                , includeProperties: includeProperties
+                , orderBy: orderBy
+                , dynamicSorts: dynamicSorts
+                , asNoTracking: asNoTracking).ToListAsync();
 
         public async Task<Pagination<Entity>> GetAllPagedAsync(int? currentPage, int? qttPerPage
             , Expression<Func<Entity, bool>>? filter = null
+            , Func<IQueryable<Entity>, IIncludableQueryable<Entity, object?>>? includeProperties = null
             , Func<IQueryable<Entity>, IQueryable<Entity>>? orderBy = null
-            , Dictionary<string, string>? dynamicSorts = null)
+            , Dictionary<string, string>? dynamicSorts = null
+            , bool asNoTracking = false)
         {
             if (qttPerPage is null || qttPerPage <= 0)
                 qttPerPage = 10;
@@ -88,7 +110,11 @@ namespace FS.Store.DAL.Repository
             var pagination = new Pagination<Entity>() { QttPerPage = qttPerPage.GetValueOrDefault() };
             pagination.CurrentPage = currentPage.GetValueOrDefault();
             pagination.TotalItems = qtt;
-            pagination.Data = await Queryable(filter: filter, dynamicSorts: dynamicSorts).ToListAsync();
+            pagination.Data = await Queryable(filter: filter
+                , includeProperties: includeProperties
+                , orderBy: orderBy
+                , dynamicSorts: dynamicSorts
+                , asNoTracking: asNoTracking).ToListAsync();
 
             return pagination;
         }

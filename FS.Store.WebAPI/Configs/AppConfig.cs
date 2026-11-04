@@ -69,6 +69,7 @@ namespace FS.Store.WebAPI.Configs
         private static void Services(IServiceCollection services)
         {
             services.AddTransient<ICashClosingService, CashClosingService>();
+            services.AddTransient<ICashMovementService, CashMovementService>();
             services.AddTransient<ICashRegisterSessionService, CashRegisterSessionService>();
             services.AddTransient<IOperationService, OperationService>();
             services.AddTransient<IOperationUserRoleService, OperationUserRoleService>();
@@ -79,6 +80,7 @@ namespace FS.Store.WebAPI.Configs
         private static void Repositories(IServiceCollection services)
         {
             services.AddTransient<ICashClosingRepository, CashClosingRepository>();
+            services.AddTransient<ICashMovementRepository, CashMovementRepository>();
             services.AddTransient<ICashRegisterSessionRepository, CashRegisterSessionRepository>();
             services.AddTransient<IOperationRepository, OperationRepository>();
             services.AddTransient<IOperationUserRoleRepository, OperationUserRoleRepository>();

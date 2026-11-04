@@ -15,6 +15,10 @@ namespace FS.Store.Model.Entity
     [Comment("controle de abertura e fechamento de caixa")]
     public class CashRegisterSession : BaseEntity<long>
     {
+        public CashRegisterSession()
+        {
+            CashMovements = [];
+        }
         [Column("opened_at", TypeName = "datetime(0)")]
         [Comment("Data/Hora de abertura")]
         [DataType(DataType.DateTime)]
@@ -30,8 +34,11 @@ namespace FS.Store.Model.Entity
         public decimal OpeningAmount { get; set; }
 
         [Column("cash_register_status")]
-        [Comment("Status da abertura de caixa")]
+        [Comment("Status da abertura de caixa (1 - aberto, 2 - fechado, 3 - cancelado)")]
         public CashRegisterStatusEnum CashRegisterStatus { get; set; }
+
+        [Column("cash_session_number")]
+        public int CashSessionNumber { get; set; }
 
         [Column("operation_id")]
         [ForeignKey("operation_id")]
@@ -50,5 +57,13 @@ namespace FS.Store.Model.Entity
         [Comment("ID do Usuário que fechou o caixa")]
         public Guid? ClosedByUserId { get; set; }
         public virtual User? ClosedByUser { get; set; }
+
+        [Column("changed_by_user_id")]
+        [ForeignKey("changed_by_user_id")]
+        [Comment("ID do Usuário que alterou o caixa")]
+        public Guid? ChangedByUserId { get; set; }
+        public virtual User? ChangedByUser { get; set; }
+
+        public virtual ICollection<CashMovement> CashMovements { get; set; }
     }
 }

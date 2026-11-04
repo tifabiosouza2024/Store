@@ -30,8 +30,8 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
                 vm.OperationId = operation?.Id;
             }
 
-            var operationsRoles = await operationUserRoleService.FindAllByUserIdAsync();
-            vm.Operations = new SelectList(operationsRoles.Select(o => o?.Operation), "Id", "Name", vm.OperationId);
+            var operations = await operationUserRoleService.FindAllOperationsByUserIdAsync();
+            vm.Operations = new SelectList(operations, "Id", "Name", vm.OperationId);
             return View(vm);
         }
 
@@ -44,7 +44,7 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
 
             await authHelper.AssignPermissionsAsync(user, operationId);
             user.LastOperationId = operationId;
-            await userService.AddOrUpdateAsync(user);
+            await userService.SaveChangesAsync();
             return RedirectToAction("Index");
         }
     }

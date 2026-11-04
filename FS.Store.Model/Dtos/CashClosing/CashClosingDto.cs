@@ -1,6 +1,4 @@
-﻿using FS.Store.Model.Dtos.CashClosing;
-
-namespace FS.Store.Model.Dtos
+﻿namespace FS.Store.Model.Dtos.CashClosing
 {
     public class CashClosingDto
     {

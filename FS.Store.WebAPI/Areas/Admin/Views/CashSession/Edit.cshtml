@@ -1,0 +1,289 @@
+﻿@model CashRegisterSessionEditViewModel
+
+@{
+    ViewData["Title"] = "Editar Sessão de Caixa";
+
+    var isClosed = Model.WasClosed;
+    var isCancelled = Model.CashRegisterStatus == CashRegisterStatusEnum.Canceled;
+}
+
+<div class="container-fluid">
+    <!-- Cabeçalho -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="mb-1">
+                <i class="bi bi-pencil-square me-2"></i>
+                Editar Sessão de Caixa
+            </h4>
+            <p class="text-muted mb-0">
+                Consulte e altere os dados da sessão.
+            </p>
+        </div>
+
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i>
+            Voltar
+        </a>
+
+    </div>
+
+    <form asp-action="Edit" method="post">
+
+        @Html.AntiForgeryToken()
+
+        <input asp-for="Id" type="hidden" />
+        <input asp-for="WasClosed" type="hidden" />
+        <input asp-for="ChangedByUserName" type="hidden" />
+        <input asp-for="ClosedByUserName" type="hidden" />
+        <input asp-for="ClosedAt" type="hidden" />
+        <input asp-for="OpenedByUserName" type="hidden" />
+        <input asp-for="UpdatedAt" type="hidden" />
+
+        <!-- Exclusão virtual -->
+        <input asp-for="Deleted" type="hidden" id="Deleted" />
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+        <div class="row g-4">
+
+            <!-- Dados da sessão -->
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0">
+                            <i class="bi bi-info-circle me-2"></i>
+                            Identificação da sessão
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-12 col-md-4">
+                                <label asp-for="CashSessionNumber" class="form-label fw-semibold">
+                                    Número da sessão
+                                </label>
+                                <input asp-for="CashSessionNumber" class="form-control" />
+                                <span asp-validation-for="CashSessionNumber" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-12 col-md-4">
+                                <label asp-for="OperationId" class="form-label fw-semibold">
+                                    Operação
+                                </label>
+
+                                <select asp-for="OperationId" asp-items="Model.Operations" class="form-select">
+                                    @if (Model.Operations.Count() > 1)
+                                    {
+                                        <option value="">Selecione...</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="OperationId" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-12 col-md-4">
+                                <label asp-for="CashRegisterStatus" class="form-label fw-semibold">
+                                    Status
+                                </label>
+                                <select asp-for="CashRegisterStatus" asp-items="Model.StatusOptions" class="form-select"></select>
+                                <span asp-validation-for="CashRegisterStatus" class="text-danger small"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Abertura -->
+            <div class="col-12 col-lg-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0">
+                            <i class="bi bi-box-arrow-in-right text-success me-2"></i>
+                            Dados da abertura
+                        </h5>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label asp-for="OpenedAt" class="form-label fw-semibold">
+                                Data e hora da abertura
+                            </label>
+                            <input asp-for="OpenedAt" asp-format="{0:yyyy-MM-ddTHH:mm}" type="datetime-local" class="form-control" type="datetime-local" max="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
+                            <span asp-validation-for="OpenedAt" class="text-danger small"></span>
+                        </div>
+                        <div class="mb-4">
+                            <label asp-for="OpeningAmount" class="form-label fw-semibold">
+                                Valor de abertura
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">R$</span>
+                                <input asp-for="OpeningAmount" type="text" class="form-control price" inputmode="decimal" />
+                            </div>
+                            <span asp-validation-for="OpeningAmount" class="text-danger small"></span>
+                        </div>
+                        <hr />
+                        <div>
+                            <small class="text-muted d-block mb-1">
+                                Aberto por
+                            </small>
+                            <div class="fw-semibold">
+                                <i class="bi bi-person me-1"></i>
+                                @(Model.OpenedByUserName ?? "Não informado")
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fechamento -->
+            @if (Model.CashRegisterStatus == CashRegisterStatusEnum.Close)
+            {
+                <div class="col-12 col-lg-6">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-header bg-white py-3">
+                            <h5 class="mb-0">
+                                <i class="bi bi-box-arrow-right text-danger me-2"></i>
+                                Dados do fechamento
+                            </h5>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="mb-4">
+                                <label asp-for="ClosedAt" class="form-label fw-semibold">
+                                    Data e hora do fechamento
+                                </label>
+                                <input asp-for="ClosedAt" asp-format="{0:yyyy-MM-ddTHH:mm}" type="datetime-local" class="form-control" disabled="@(!isClosed)" type="datetime-local" max="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
+                                @if (!isClosed)
+                                {
+                                    <small class="text-muted">
+                                        Disponível somente para sessões que já foram fechadas.
+                                    </small>
+                                }
+                                <span asp-validation-for="ClosedAt" class="text-danger small"></span>
+                            </div>
+                            <hr />
+                            <div>
+                                <small class="text-muted d-block mb-1">
+                                    Fechado por
+                                </small>
+
+                                <div class="fw-semibold">
+                                    <i class="bi bi-person me-1"></i>
+                                    @(Model.ClosedByUserName ?? "Não informado")
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            }
+            <!-- Auditoria -->
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0">
+                            <i class="bi bi-clock-history me-2"></i>
+                            Auditoria
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <small class="text-muted d-block">
+                                    Última alteração realizada por
+                                </small>
+                                <strong>
+                                    @(Model.ChangedByUserName ?? "Nenhuma alteração registrada")
+                                </strong>
+                            </div>
+                            <div class="col-md-6">
+                                <small class="text-muted d-block">
+                                    Data da última alteração
+                                </small>
+                                <strong>
+                                    @(Model.UpdatedAt?.ToString("dd/MM/yyyy HH:mm") ?? "Não informado")
+                                </strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exclusão virtual -->
+            <div class="col-12" id="deletedWarning" style="display:@(Model.Deleted ? "block" : "none")">
+                <div class="alert alert-warning mb-0">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <strong>Exclusão virtual pendente.</strong>
+                    Esta sessão será marcada como excluída quando você salvar as alterações.
+                </div>
+            </div>
+
+            <!-- Ações -->
+            <div class="col-12">
+                <div class="d-flex flex-wrap justify-content-between gap-2">
+                    <div>
+                        @if (!Model.Deleted)
+                        {
+                            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                <i class="bi bi-trash me-1"></i>
+                                Excluir sessão
+                            </button>
+                        }
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg me-1"></i>
+                            Salvar alterações
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Modal de confirmação -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-exclamation-triangle text-danger me-2"></i>
+                    Excluir sessão
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <p>
+                    Tem certeza de que deseja marcar esta sessão como excluída?
+                </p>
+                <div class="alert alert-warning mb-0">
+                    A exclusão será virtual. Os dados não serão removidos do banco de dados.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    Voltar
+                </button>
+                <button type="button" class="btn btn-danger" id="confirmDelete">
+                    Confirmar exclusão
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.getElementById('confirmDelete').addEventListener('click', function () {
+            document.getElementById('Deleted').value = 'true';
+            document.getElementById('deletedWarning').style.display = 'block';
+            const modalElement = document.getElementById('deleteModal');
+            bootstrap.Modal.getOrCreateInstance(modalElement).hide();
+            this.blur();
+            document.querySelector('[data-bs-target="#deleteModal"]')?.remove();
+        });
+    </script>
+}

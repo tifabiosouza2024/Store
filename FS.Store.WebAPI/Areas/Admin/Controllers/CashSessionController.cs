@@ -1,13 +1,15 @@
 ﻿using FS.Store.Core.Extension;
 using FS.Store.Core.Helper;
 using FS.Store.Core.Interfaces;
-using FS.Store.Model.Dtos;
+using FS.Store.Model.Dtos.CashClosing;
 using FS.Store.Model.Entity;
+using FS.Store.Model.Enums;
 using FS.Store.Model.Extensions;
 using FS.Store.WebAPI.Areas.Admin.ViewModels;
 using FS.Store.WebAPI.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace FS.Store.WebAPI.Areas.Admin.Controllers
 {
@@ -15,7 +17,7 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
     [Authorize]
     public class CashSessionController(ICashRegisterSessionService cashRegisterSessionService
         , IOperationService operationService
-        , ICashClosingService cashClosingService
+        , IOperationUserRoleService operationUserRoleService
         , CashSessionHelper cashSessionHelper) : Controller
     {
         public async Task<IActionResult> Index()
@@ -53,16 +55,77 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
                 return View(session);
             }
 
+            // Realizar a conversão do model para entity
             var registerSession = new CashRegisterSession()
             {
                 CashRegisterStatus = Model.Enums.CashRegisterStatusEnum.Open,
                 OpenedAt = DateTime.Now,
                 OpenedByUserId = User.GetUserId(),
                 OpeningAmount = session.Amount,
+                CashSessionNumber = session.CashSessionNumber,
                 OperationId = User.GetOperationId()
             };
 
             await cashRegisterSessionService.AddOrUpdateAsync(registerSession);
+
+            return RedirectToAction("Index");
+        }
+        public async Task<IActionResult> Edit(long id)
+        {
+            var session = await cashRegisterSessionService.GetByIdAsync(id);
+            if (session == null)
+                return this.RedirectAdminToBadRequest("Sessão inexistente para esta operação");
+
+
+            var vm = new CashRegisterSessionEditViewModel();
+
+            var operations = await operationUserRoleService.FindAllOperationsByUserIdAsync();
+            if (operations == null || !operations.Any())
+                return this.RedirectAdminToBadRequest("Você não tem permissão para editar esta sessão de caixa.");
+
+            vm.CashSessionNumber = session.CashSessionNumber;
+            vm.CashRegisterStatus = session.CashRegisterStatus;
+            vm.ChangedByUserName = session.ChangedByUser?.Name;
+            vm.UpdatedAt = session.UpdatedAt;
+            vm.ClosedAt = session.ClosedAt;
+            vm.ClosedByUserName = session.ClosedByUser?.Name;
+            vm.Deleted = session.Deleted;
+            vm.Id = session.Id;
+            vm.OpenedAt = session.OpenedAt;
+            vm.OpenedByUserName = session.OpenedByUser?.Name;
+            vm.OpeningAmount = session.OpeningAmount;
+            vm.OperationId = session.OperationId;
+            vm.StatusOptions = session.CashRegisterStatus.ToSelectListItemsInEditView();
+            vm.WasClosed = session.CashRegisterStatus == CashRegisterStatusEnum.Close;
+            vm.Operations = [.. operations.Select(o => new SelectListItem { Text = o.Name, Value = o.Id.ToString(), Selected = o.Id == session.OperationId })];
+            return View(vm);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(long id, CashRegisterSessionEditViewModel sessionVM)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(sessionVM);
+            }
+
+            if (sessionVM.Id != id)
+                return this.RedirectAdminToBadRequest("Sessão inexistente para esta operação");
+
+            var session = await cashRegisterSessionService.GetByIdAsync(id);
+            if (session == null)
+                return this.RedirectAdminToBadRequest("Sessão inexistente para esta operação");
+
+            session.OperationId = sessionVM.OperationId;
+            session.CashSessionNumber = sessionVM.CashSessionNumber;
+            session.OpeningAmount = sessionVM.OpeningAmount;
+            session.OpenedAt = sessionVM.OpenedAt;
+            session.ClosedAt = sessionVM.ClosedAt;
+            session.CashRegisterStatus = sessionVM.CashRegisterStatus;
+            session.ChangedByUserId = User.GetUserId();
+            session.Deleted = sessionVM.Deleted;
+
+            await cashRegisterSessionService.SaveChangesAsync();
 
             return RedirectToAction("Index");
         }
@@ -76,6 +139,25 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
             await GetCashCloseSessionViewModel(sessionVM, session);
 
             return View(sessionVM);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Close(CashClosingViewModel sessionVM)
+        {
+            if (!ModelState.IsValid)
+            {
+                var session = await cashRegisterSessionService.GetToClose(sessionVM.CashRegisterSessionId);
+                if (session == null)
+                    return this.RedirectAdminToBadRequest("Este caixa não está disponível para ser fechado.");
+
+                await GetCashCloseSessionViewModel(sessionVM, session);
+
+                return View(sessionVM);
+            }
+
+            await cashSessionHelper.CloseSessionAsync(sessionVM.ToDto<CashClosingDto>());
+
+            return RedirectToAction("Index");
         }
 
         private async Task GetCashCloseSessionViewModel(CashClosingViewModel sessionVM, CashRegisterSession session)
@@ -98,25 +180,6 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
                     });
                 }
             }
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Close(CashClosingViewModel sessionVM)
-        {
-            if (!ModelState.IsValid)
-            {
-                var session = await cashRegisterSessionService.GetToClose(sessionVM.CashRegisterSessionId);
-                if (session == null)
-                    return this.RedirectAdminToBadRequest("Este caixa não está disponível para ser fechado.");
-
-                await GetCashCloseSessionViewModel(sessionVM, session);
-
-                return View(sessionVM);
-            }
-
-            await cashSessionHelper.CloseSessionAsync(sessionVM.ToDto<CashClosingDto>());
-
-            return RedirectToAction("Index");
         }
 
         public IActionResult History()

@@ -191,7 +191,7 @@ namespace FS.Store.DAL.Migrations
                         .HasColumnName("amount")
                         .HasComment("valor da movimentação");
 
-                    b.Property<DateTime>("CanceledAt")
+                    b.Property<DateTime?>("CanceledAt")
                         .HasColumnType("datetime(0)")
                         .HasColumnName("canceled_at")
                         .HasComment("Data/Hora em que houve o cancelamento da movimentação");
@@ -208,10 +208,9 @@ namespace FS.Store.DAL.Migrations
                         .HasComment("Motivo do cancelamento");
 
                     b.Property<int>("CashMovementType")
-                        .HasMaxLength(20)
                         .HasColumnType("int")
                         .HasColumnName("cash_movement_type")
-                        .HasComment("Tipo de movimentação (suprimento, sangria, despesa)");
+                        .HasComment("Tipo de movimentação (1 - suprimento, 2 - sangria, 3 - despesa)");
 
                     b.Property<long>("CashRegisterSessionId")
                         .HasColumnType("bigint")
@@ -238,7 +237,6 @@ namespace FS.Store.DAL.Migrations
                         .HasComment("registro deletado virtualmente");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)")
                         .HasColumnName("description")
@@ -280,7 +278,16 @@ namespace FS.Store.DAL.Migrations
                     b.Property<int>("CashRegisterStatus")
                         .HasColumnType("int")
                         .HasColumnName("cash_register_status")
-                        .HasComment("Status da abertura de caixa");
+                        .HasComment("Status da abertura de caixa (1 - aberto, 2 - fechado, 3 - cancelado)");
+
+                    b.Property<int>("CashSessionNumber")
+                        .HasColumnType("int")
+                        .HasColumnName("cash_session_number");
+
+                    b.Property<Guid?>("ChangedByUserId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("changed_by_user_id")
+                        .HasComment("ID do Usuário que alterou o caixa");
 
                     b.Property<DateTime?>("ClosedAt")
                         .HasColumnType("datetime(0)")
@@ -336,6 +343,8 @@ namespace FS.Store.DAL.Migrations
                         .HasComment("Data de atualização do registro");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ChangedByUserId");
 
                     b.HasIndex("ClosedByUserId");
 
@@ -775,7 +784,7 @@ namespace FS.Store.DAL.Migrations
                         .HasForeignKey("CanceledByUserId");
 
                     b.HasOne("FS.Store.Model.Entity.CashRegisterSession", "CashRegisterSession")
-                        .WithMany()
+                        .WithMany("CashMovements")
                         .HasForeignKey("CashRegisterSessionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -795,6 +804,10 @@ namespace FS.Store.DAL.Migrations
 
             modelBuilder.Entity("FS.Store.Model.Entity.CashRegisterSession", b =>
                 {
+                    b.HasOne("FS.Store.Model.Entity.User", "ChangedByUser")
+                        .WithMany()
+                        .HasForeignKey("ChangedByUserId");
+
                     b.HasOne("FS.Store.Model.Entity.User", "ClosedByUser")
                         .WithMany()
                         .HasForeignKey("ClosedByUserId");
@@ -810,6 +823,8 @@ namespace FS.Store.DAL.Migrations
                         .HasForeignKey("OperationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("ChangedByUser");
 
                     b.Navigation("ClosedByUser");
 
@@ -876,6 +891,11 @@ namespace FS.Store.DAL.Migrations
             modelBuilder.Entity("FS.Store.Model.Entity.CashClosing", b =>
                 {
                     b.Navigation("Terminals");
+                });
+
+            modelBuilder.Entity("FS.Store.Model.Entity.CashRegisterSession", b =>
+                {
+                    b.Navigation("CashMovements");
                 });
 
             modelBuilder.Entity("FS.Store.Model.Entity.Operation", b =>

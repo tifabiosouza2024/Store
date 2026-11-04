@@ -1,6 +1,7 @@
 ﻿using FS.Store.Core.Exceptions;
 using FS.Store.Core.Interfaces;
-using FS.Store.Model.Dtos;
+using FS.Store.Model.Dtos.CashClosing;
+using FS.Store.Model.Dtos.CashMovement;
 using FS.Store.Model.Entity;
 using FS.Store.Model.Enums;
 
@@ -8,6 +9,7 @@ namespace FS.Store.Core.Helper
 {
     public class CashSessionHelper(ICashClosingService cashClosingService
         , ICashRegisterSessionService cashRegisterSessionService
+        , ICashMovementService cashMovementService
         , CurrentUserHelper currentUserHelper)
     {
         public async Task CloseSessionAsync(CashClosingDto sessionVM)
@@ -44,6 +46,28 @@ namespace FS.Store.Core.Helper
             session.CashRegisterStatus = CashRegisterStatusEnum.Close;
             session.ClosedAt = now;
             await cashClosingService.SaveChangesAsync();
+        }
+
+        public async Task RegisterCashInflows(long cashSessionId, CashMovementDto dto, CashMovementTypeEnum type)
+        {
+            var userId = currentUserHelper.UserId.GetValueOrDefault();
+            var now = DateTime.Now;
+            var session = await cashRegisterSessionService.GetToClose(cashSessionId);
+
+            ServiceException.ThrowIfNull(session, "Sessão de caixa não localizada para registro de entrada de dinheiro");
+
+            var cashMovement = new CashMovement
+            {
+                Amount = dto.Amount,
+                Description = dto.Description,
+                CashRegisterSessionId = cashSessionId,
+                CreatedByUserId = userId,
+                OccurredAt = now,
+                CashMovementType = type
+
+            };
+
+            await cashMovementService.AddOrUpdateAsync(cashMovement);
         }
     }
 }

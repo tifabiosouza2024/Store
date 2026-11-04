@@ -20,10 +20,12 @@ namespace FS.Store.DAL.Migrations
                     opened_at = table.Column<DateTime>(type: "datetime(0)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP", comment: "Data/Hora de abertura"),
                     closed_at = table.Column<DateTime>(type: "datetime(0)", nullable: true, comment: "Data/Hora de fechamento"),
                     opening_amount = table.Column<decimal>(type: "decimal(10,2)", nullable: false, comment: "Valor em espécie do total da abertura de caixa"),
-                    cash_register_status = table.Column<int>(type: "int", nullable: false, comment: "Status da abertura de caixa"),
+                    cash_register_status = table.Column<int>(type: "int", nullable: false, comment: "Status da abertura de caixa (1 - aberto, 2 - fechado, 3 - cancelado)"),
+                    cash_session_number = table.Column<int>(type: "int", nullable: false),
                     operation_id = table.Column<Guid>(type: "char(36)", nullable: false, comment: "ID da Operação"),
                     opened_by_user_id = table.Column<Guid>(type: "char(36)", nullable: false, comment: "ID do Usuário que abriu o caixa"),
                     closed_by_user_id = table.Column<Guid>(type: "char(36)", nullable: true, comment: "ID do Usuário que fechou o caixa"),
+                    changed_by_user_id = table.Column<Guid>(type: "char(36)", nullable: true, comment: "ID do Usuário que alterou o caixa"),
                     created_at = table.Column<DateTime>(type: "datetime(0)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP", comment: "Data de criação do registro"),
                     updated_at = table.Column<DateTime>(type: "datetime(0)", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP", comment: "Data de atualização do registro"),
                     deleted = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: false, comment: "registro deletado virtualmente")
@@ -37,6 +39,11 @@ namespace FS.Store.DAL.Migrations
                         principalTable: "operations",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_cash_register_session_users_changed_by_user_id",
+                        column: x => x.changed_by_user_id,
+                        principalTable: "users",
+                        principalColumn: "id");
                     table.ForeignKey(
                         name: "FK_cash_register_session_users_closed_by_user_id",
                         column: x => x.closed_by_user_id,
@@ -113,11 +120,11 @@ namespace FS.Store.DAL.Migrations
                 {
                     id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
-                    cash_movement_type = table.Column<int>(type: "int", maxLength: 20, nullable: false, comment: "Tipo de movimentação (suprimento, sangria, despesa)"),
+                    cash_movement_type = table.Column<int>(type: "int", nullable: false, comment: "Tipo de movimentação (1 - suprimento, 2 - sangria, 3 - despesa)"),
                     amount = table.Column<decimal>(type: "decimal(10,2)", nullable: false, comment: "valor da movimentação"),
-                    description = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Descrição"),
+                    description = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: true, comment: "Descrição"),
                     occurred_at = table.Column<DateTime>(type: "datetime(0)", nullable: false, comment: "Data/Hora em que ocorreu a movimentação"),
-                    canceled_at = table.Column<DateTime>(type: "datetime(0)", nullable: false, comment: "Data/Hora em que houve o cancelamento da movimentação"),
+                    canceled_at = table.Column<DateTime>(type: "datetime(0)", nullable: true, comment: "Data/Hora em que houve o cancelamento da movimentação"),
                     cancellation_reason = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: true, comment: "Motivo do cancelamento"),
                     created_by_user_id = table.Column<Guid>(type: "char(36)", nullable: false, comment: "Usuário que criou a movimentação"),
                     canceled_by_user_id = table.Column<Guid>(type: "char(36)", nullable: true, comment: "Usuário que realizou o cancelamento da movimentação"),
@@ -272,6 +279,11 @@ namespace FS.Store.DAL.Migrations
                 name: "IX_cash_movement_created_by_user_id",
                 table: "cash_movement",
                 column: "created_by_user_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_cash_register_session_changed_by_user_id",
+                table: "cash_register_session",
+                column: "changed_by_user_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_cash_register_session_closed_by_user_id",

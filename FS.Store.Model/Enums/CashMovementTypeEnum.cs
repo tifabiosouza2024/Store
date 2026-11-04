@@ -3,18 +3,18 @@
 namespace FS.Store.Model.Enums
 {
     /// <summary>
-    /// Tipo de movimentação do caixa sendo:</br>
-    /// Suprimento: Entrada em dinheiro que não é oriunda de venda, como aporte para troco.</br>
-    /// Sangria: Retirada de dinheiro que nao esta relacionado a despesas.</br>
-    /// Despesas: Retirada de dinheiro relacionado a despesas.
+    /// Tipo de movimentação do caixa sendo:<br />
+    /// 1 . Suprimento: Entrada em dinheiro que não é oriunda de venda, como aporte para troco.<br />
+    /// 2 . Sangria: Retirada de dinheiro que nao esta relacionado a despesas.<br />
+    /// 3. Despesas: Retirada de dinheiro relacionado a despesas.
     /// </summary>
     public enum CashMovementTypeEnum
     {
         [Comment("Suprimento (Entrada de dinheiro)")]
-        Supply = 0,
+        Supply = 1,
         [Comment("Sangria")]
-        Withdrawal = 1,
+        Withdrawal = 2,
         [Comment("Despesa")]
-        Expense = 2
+        Expense = 3
     }
 }

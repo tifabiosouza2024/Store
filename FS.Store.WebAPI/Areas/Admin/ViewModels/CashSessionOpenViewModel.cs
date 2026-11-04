@@ -9,6 +9,7 @@ namespace FS.Store.WebAPI.Areas.Admin.ViewModels
         [Range(0.01, double.MaxValue, ErrorMessage = "é necessario um valor positivo para abertura de caixa.")]
         public decimal Amount { get; set; }
 
+        public int CashSessionNumber { get; set; }
         public bool CashSessionAlreadyExists { get; set; }
     }
 }

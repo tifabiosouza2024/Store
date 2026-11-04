@@ -9,7 +9,7 @@ namespace FS.Store.Model.Entity
     /// Registra as movimentações financeiras de acordo com o tipo: Sangria, Suprimento e Despesas
     /// <see cref="CashMovementTypeEnum"/> para maiores informações dos tipos.
     /// <para>
-    /// TypeId: long</br>
+    /// TypeId: long<br/>
     /// </para>
     /// </summary>
     [Table("cash_movement")]
@@ -17,8 +17,7 @@ namespace FS.Store.Model.Entity
     public class CashMovement : BaseEntity<long>
     {
         [Column("cash_movement_type")]
-        [StringLength(20)]
-        [Comment("Tipo de movimentação (suprimento, sangria, despesa)")]
+        [Comment("Tipo de movimentação (1 - suprimento, 2 - sangria, 3 - despesa)")]
         public CashMovementTypeEnum CashMovementType { get; set; }
 
         [Column("amount", TypeName = "decimal(10,2)")]
@@ -28,7 +27,7 @@ namespace FS.Store.Model.Entity
         [Column("description")]
         [Comment("Descrição")]
         [StringLength(255)]
-        public string Description { get; set; } = default!;
+        public string? Description { get; set; }
 
         [Column("occurred_at", TypeName = "datetime(0)")]
         [Comment("Data/Hora em que ocorreu a movimentação")]
@@ -38,7 +37,7 @@ namespace FS.Store.Model.Entity
         [Column("canceled_at", TypeName = "datetime(0)")]
         [Comment("Data/Hora em que houve o cancelamento da movimentação")]
         [DataType(DataType.DateTime)]
-        public DateTime CanceledAt { get; set; }
+        public DateTime? CanceledAt { get; set; }
 
         [Column("cancellation_reason")]
         [Comment("Motivo do cancelamento")]
