@@ -6,6 +6,7 @@ using FS.Store.Model.Enums;
 using FS.Store.Model.Extensions;
 using FS.Store.WebAPI.Areas.Admin.ViewModels;
 using FS.Store.WebAPI.Extensions;
+using FS.Store.WebAPI.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,8 +15,8 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
     [Area("Admin")]
     [Authorize]
     public class CashMovementController(CashSessionHelper cashSessionHelper
-        , ICashRegisterSessionService cashRegisterSessionService
-        , ICashMovementService cashMovementService) : Controller
+        , ICurrentCashSessionService currentCashSessionService
+        , ICashRegisterSessionService cashRegisterSessionService) : Controller
     {
         public async Task<IActionResult> Index(long? cashSessionId, CashMovementTypeEnum? type = null)
         {
@@ -24,9 +25,7 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
                 return this.RedirectAdminToBadRequest("Sessão de caixa não localizada para registro de entrada de dinheiro");
 
             CashMovementListViewModel vm = new();
-            //PeriodDto period = new() { StartDate = startDate, EndDate = endDate };
 
-            //var result = await cashMovementService.GetAllAsync(cashSessionId.GetValueOrDefault(), type, period);
             var result = session.CashMovements.Where(cm => type == null || cm.CashMovementType == type).ToList();
             if (result == null)
                 return this.RedirectAdminToBadRequest("Sessão de caixa não localizada para registro de entrada de dinheiro");
@@ -36,7 +35,7 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
 
             vm.CashSessionId = cashSessionId.GetValueOrDefault();
             vm.OpeningAmount = session.OpeningAmount;
-            vm.TotalSupply = vm.Items.Where(i => i.CashMovementType == CashMovementTypeEnum.Supply).Sum(i => i.Amount);
+            vm.TotalSupply = vm.Items.Where(i => i.CashMovementType == CashMovementTypeEnum.CashInflows).Sum(i => i.Amount);
             vm.TotalWithdrawal = vm.Items.Where(i => i.CashMovementType == CashMovementTypeEnum.Withdrawal).Sum(i => i.Amount);
             vm.TotalExpense = vm.Items.Where(i => i.CashMovementType == CashMovementTypeEnum.Expense).Sum(i => i.Amount);
             vm.TotalRecords = vm.Items.Count;
@@ -56,8 +55,8 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
                 CashSessionId = cashSessionId,
                 CashSessionNumber = session.CashSessionNumber,
                 AvailableBalance = session.OpeningAmount
-                    + session.CashMovements.Where(m => m.CashMovementType == CashMovementTypeEnum.Supply).Sum(m => m.Amount)
-                    - session.CashMovements.Where(m => m.CashMovementType != CashMovementTypeEnum.Supply).Sum(m => m.Amount)
+                    + session.CashMovements.Where(m => m.CashMovementType == CashMovementTypeEnum.CashInflows).Sum(m => m.Amount)
+                    - session.CashMovements.Where(m => m.CashMovementType != CashMovementTypeEnum.CashInflows).Sum(m => m.Amount)
             };
 
             return View(model);
@@ -112,7 +111,7 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
 
             try
             {
-                await cashSessionHelper.RegisterCashInflows(cashSessionId, model.ToDto<CashMovementDto>(), CashMovementTypeEnum.Supply);
+                await cashSessionHelper.RegisterCashInflows(cashSessionId, model.ToDto<CashMovementDto>(), CashMovementTypeEnum.CashInflows);
             }
             catch (ServiceException e)
             {
@@ -133,8 +132,8 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
                 CashSessionId = cashSessionId,
                 CashSessionNumber = session.CashSessionNumber,
                 AvailableBalance = session.OpeningAmount
-                    + session.CashMovements.Where(m => m.CashMovementType == CashMovementTypeEnum.Supply).Sum(m => m.Amount)
-                    - session.CashMovements.Where(m => m.CashMovementType != CashMovementTypeEnum.Supply).Sum(m => m.Amount)
+                    + session.CashMovements.Where(m => m.CashMovementType == CashMovementTypeEnum.CashInflows).Sum(m => m.Amount)
+                    - session.CashMovements.Where(m => m.CashMovementType != CashMovementTypeEnum.CashInflows).Sum(m => m.Amount)
             };
 
             return View(model);

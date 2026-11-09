@@ -66,6 +66,7 @@ namespace FS.Store.DAL.Migrations
                     id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
                     name = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false, comment: "Empresa da maquininha de cartão"),
+                    logo_icon = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: true, comment: "Ícone do logo do fornecedor"),
                     created_at = table.Column<DateTime>(type: "datetime(0)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP", comment: "Data de criação do registro"),
                     updated_at = table.Column<DateTime>(type: "datetime(0)", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP", comment: "Data de atualização do registro"),
                     deleted = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: false, comment: "registro deletado virtualmente")
@@ -311,8 +312,8 @@ namespace FS.Store.DAL.Migrations
                 column: "payment_provider_id");
 
             migrationBuilder.Sql(@"
-INSERT INTO payment_provider (name) values
-('InfinitePay'), ('Stone');");
+INSERT INTO payment_provider (name, logo_icon) values
+('InfinitePay', 'bank-icons/infinitepay.webp'), ('Stone', 'bank-icons/stone.png');");
 
         }
 

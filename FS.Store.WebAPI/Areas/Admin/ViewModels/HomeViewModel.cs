@@ -7,5 +7,6 @@ namespace FS.Store.WebAPI.Areas.Admin.ViewModels
         public Guid? OperationId { get; set; }
         public string? OperationName { get; set; }
         public IEnumerable<SelectListItem> Operations { get; set; } = [];
+        public long? CashSessionId { get; set; }
     }
 }

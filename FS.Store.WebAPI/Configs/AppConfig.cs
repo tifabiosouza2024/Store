@@ -6,6 +6,8 @@ using FS.Store.DAL.Interfaces;
 using FS.Store.DAL.Repository;
 using FS.Store.Model.Entity;
 using FS.Store.WebAPI.Helpers;
+using FS.Store.WebAPI.Services;
+using FS.Store.WebAPI.Services.Interface;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
@@ -71,6 +73,7 @@ namespace FS.Store.WebAPI.Configs
             services.AddTransient<ICashClosingService, CashClosingService>();
             services.AddTransient<ICashMovementService, CashMovementService>();
             services.AddTransient<ICashRegisterSessionService, CashRegisterSessionService>();
+            services.AddTransient<ICurrentCashSessionService, CurrentCashSessionService>();
             services.AddTransient<IOperationService, OperationService>();
             services.AddTransient<IOperationUserRoleService, OperationUserRoleService>();
             services.AddTransient<IPaymentProviderService, PaymentProviderService>();

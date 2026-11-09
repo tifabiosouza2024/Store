@@ -21,5 +21,9 @@ namespace FS.Store.Model.Entity
         [Comment("Empresa da maquininha de cartão")]
         public string Name { get; set; } = default!;
 
+        [Column("logo_icon")]
+        [StringLength(255)]
+        [Comment("Ícone do logo do fornecedor")]
+        public string? LogoIcon { get; set; }
     }
 }

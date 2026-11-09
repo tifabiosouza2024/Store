@@ -7,6 +7,7 @@ using FS.Store.Model.Enums;
 using FS.Store.Model.Extensions;
 using FS.Store.WebAPI.Areas.Admin.ViewModels;
 using FS.Store.WebAPI.Extensions;
+using FS.Store.WebAPI.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -18,6 +19,7 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
     public class CashSessionController(ICashRegisterSessionService cashRegisterSessionService
         , IOperationService operationService
         , IOperationUserRoleService operationUserRoleService
+        , ICurrentCashSessionService currentCashSessionService
         , CashSessionHelper cashSessionHelper) : Controller
     {
         public async Task<IActionResult> Index()
@@ -68,6 +70,7 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
 
             await cashRegisterSessionService.AddOrUpdateAsync(registerSession);
 
+            currentCashSessionService.Set(registerSession.Id);
             return RedirectToAction("Index");
         }
         public async Task<IActionResult> Edit(long id)
@@ -157,6 +160,7 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
 
             await cashSessionHelper.CloseSessionAsync(sessionVM.ToDto<CashClosingDto>());
 
+            currentCashSessionService.Clear();
             return RedirectToAction("Index");
         }
 
@@ -177,9 +181,11 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
                         PaymentTerminalId = terminal.Id,
                         TerminalName = terminal.Name,
                         ProviderName = terminal.PaymentProvider?.Name,
+                        ProviderLogo = terminal.PaymentProvider?.LogoIcon
                     });
                 }
             }
+            sessionVM.CashMovements = [.. session.CashMovements];
         }
 
         public IActionResult History()

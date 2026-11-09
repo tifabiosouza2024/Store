@@ -510,6 +510,12 @@ namespace FS.Store.DAL.Migrations
                         .HasColumnName("deleted")
                         .HasComment("registro deletado virtualmente");
 
+                    b.Property<string>("LogoIcon")
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("logo_icon")
+                        .HasComment("Ícone do logo do fornecedor");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)

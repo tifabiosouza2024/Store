@@ -4,6 +4,7 @@ using FS.Store.Model.Entity;
 using FS.Store.WebAPI.Areas.Admin.ViewModels;
 using FS.Store.WebAPI.Extensions;
 using FS.Store.WebAPI.Helpers;
+using FS.Store.WebAPI.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -14,6 +15,7 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
     [Authorize]
     public class HomeController(AuthHelper authHelper
         , IOperationService operationService
+        , ICurrentCashSessionService currentCashSessionService
         , IOperationUserRoleService operationUserRoleService
         , IUserService userService) : Controller
     {
@@ -32,6 +34,7 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
 
             var operations = await operationUserRoleService.FindAllOperationsByUserIdAsync();
             vm.Operations = new SelectList(operations, "Id", "Name", vm.OperationId);
+            vm.CashSessionId = await currentCashSessionService.GetOrResolveAsync();
             return View(vm);
         }
 

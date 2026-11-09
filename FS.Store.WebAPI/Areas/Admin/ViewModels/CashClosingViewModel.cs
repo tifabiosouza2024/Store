@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using FS.Store.Model.Entity;
+using System.ComponentModel.DataAnnotations;
 
 namespace FS.Store.WebAPI.Areas.Admin.ViewModels
 {
@@ -19,5 +20,10 @@ namespace FS.Store.WebAPI.Areas.Admin.ViewModels
         public string? Notes { get; set; }
 
         public List<CashClosingTerminalViewModel> Terminals { get; set; } = [];
+        public List<CashMovement> CashMovements { get; set; } = [];
+
+        public decimal Withdrawals => CashMovements.Where(c => c.CashMovementType == Model.Enums.CashMovementTypeEnum.Withdrawal).Sum(c => c.Amount);
+        public decimal Expenses => CashMovements.Where(c => c.CashMovementType == Model.Enums.CashMovementTypeEnum.Expense).Sum(c => c.Amount);
+        public decimal Supplys => CashMovements.Where(c => c.CashMovementType == Model.Enums.CashMovementTypeEnum.CashInflows).Sum(c => c.Amount);
     }
 }

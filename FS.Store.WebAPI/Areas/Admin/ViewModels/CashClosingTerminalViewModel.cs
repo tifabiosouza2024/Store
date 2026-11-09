@@ -7,6 +7,7 @@
         public string? TerminalName { get; set; }
 
         public string? ProviderName { get; set; }
+        public string? ProviderLogo { get; set; }
 
         public decimal CreditAmount { get; set; }
 

@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FS.Store.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20261104012458_CreateCashEntities")]
+    [Migration("20261109033807_CreateCashEntities")]
     partial class CreateCashEntities
     {
         /// <inheritdoc />
@@ -512,6 +512,12 @@ namespace FS.Store.DAL.Migrations
                         .HasDefaultValue(false)
                         .HasColumnName("deleted")
                         .HasComment("registro deletado virtualmente");
+
+                    b.Property<string>("LogoIcon")
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("logo_icon")
+                        .HasComment("Ícone do logo do fornecedor");
 
                     b.Property<string>("Name")
                         .IsRequired()

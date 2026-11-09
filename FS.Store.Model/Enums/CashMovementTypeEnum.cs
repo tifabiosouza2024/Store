@@ -11,7 +11,7 @@ namespace FS.Store.Model.Enums
     public enum CashMovementTypeEnum
     {
         [Comment("Suprimento (Entrada de dinheiro)")]
-        Supply = 1,
+        CashInflows = 1,
         [Comment("Sangria")]
         Withdrawal = 2,
         [Comment("Despesa")]

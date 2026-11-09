@@ -49,7 +49,7 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-
+            HttpContext.Session.Clear();
             return RedirectToAction("Login", "Public", new { Area = "Admin" });
         }
     }

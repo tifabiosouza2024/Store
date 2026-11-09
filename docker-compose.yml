@@ -9,6 +9,7 @@ services:
     volumes:
       - C:/Projetos/Particular/Presentations:/app/wwwroot/img/presentation
       - ./keys:/app/keys
+      - C:\Users\tifab\Downloads\bank-icons\:/app/wwwroot/img/bank-icons/
 
   db:
     container_name: store_db
