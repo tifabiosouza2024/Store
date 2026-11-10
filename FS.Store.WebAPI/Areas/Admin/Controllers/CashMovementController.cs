@@ -6,7 +6,6 @@ using FS.Store.Model.Enums;
 using FS.Store.Model.Extensions;
 using FS.Store.WebAPI.Areas.Admin.ViewModels;
 using FS.Store.WebAPI.Extensions;
-using FS.Store.WebAPI.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,10 +14,9 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
     [Area("Admin")]
     [Authorize]
     public class CashMovementController(CashSessionHelper cashSessionHelper
-        , ICurrentCashSessionService currentCashSessionService
         , ICashRegisterSessionService cashRegisterSessionService) : Controller
     {
-        public async Task<IActionResult> Index(long? cashSessionId, CashMovementTypeEnum? type = null)
+        public async Task<IActionResult> Index(long? cashSessionId)
         {
             var session = await cashRegisterSessionService.GetToClose(cashSessionId);
             if (session == null)
@@ -26,7 +24,7 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
 
             CashMovementListViewModel vm = new();
 
-            var result = session.CashMovements.Where(cm => type == null || cm.CashMovementType == type).ToList();
+            var result = session.CashMovements.Where(c => !c.Deleted).ToList();
             if (result == null)
                 return this.RedirectAdminToBadRequest("Sessão de caixa não localizada para registro de entrada de dinheiro");
 

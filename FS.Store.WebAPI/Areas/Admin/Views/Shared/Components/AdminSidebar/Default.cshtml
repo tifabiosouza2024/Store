@@ -65,19 +65,26 @@
                                 <i class="bi bi-clipboard-check"></i>
                                 <span>Fechamento de caixa</span>
                             </a>
-                            <a asp-area="Admin" asp-controller="CashSession" asp-action="Edit" asp-route-id="@Model.CashSessionId" class="nav-link">
-                                <i class="bi bi-clipboard-check"></i>
-                                <span>Editar Abertura de caixa</span>
+                            @if (User.IsManagerOrGreater())
+                            {
+                                <a asp-area="Admin" asp-controller="CashSession" asp-action="Edit" asp-route-id="@Model.CashSessionId" class="nav-link">
+                                    <i class="bi bi-clipboard-check"></i>
+                                    <span>Editar Abertura de caixa</span>
+                                </a>
+                            }
+                        }
+                        @if (User.IsManagerOrGreater())
+                        {
+                            <a asp-area="Admin" asp-controller="CashSession" asp-action="History" class="nav-link">
+                                <i class="bi bi-clock-history"></i>
+                                <span>Histórico de caixas</span>
                             </a>
                         }
-                        <a asp-area="Admin" asp-controller="CashSession" asp-action="History" class="nav-link">
-                            <i class="bi bi-clock-history"></i>
-                            <span>Histórico de caixas</span>
-                        </a>
-
                     </nav>
                 </div>
             }
+            @if (User.IsManagerOrGreater())
+            {
             <a asp-area="Admin" asp-controller="PaymentTerminal" asp-action="Index" class="nav-link">
                 <svg xmlns="http://www.w3.org/2000/svg"
                      width="24"
@@ -107,6 +114,7 @@
                 </svg>
                 <span>Terminais/Maquininhas</span>
             </a>
+            }
         </nav>
     </div>
 

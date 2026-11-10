@@ -43,7 +43,7 @@ namespace FS.Store.Core.Helper
                 });
             }
             session!.ClosedByUserId = userId;
-            session.CashRegisterStatus = CashRegisterStatusEnum.Close;
+            session.CashRegisterStatus = CashRegisterStatusEnum.Closed;
             session.ClosedAt = now;
             await cashClosingService.SaveChangesAsync();
         }

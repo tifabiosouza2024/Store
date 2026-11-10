@@ -77,7 +77,7 @@
                             <label asp-for="Description" class="form-label fw-semibold">
                                 Descrição
                             </label>
-                            <textarea asp-for="Description" class="form-control" rows="3" maxlength="500" placeholder="Informe o motivo da despesa..." required></textarea>
+                            <textarea asp-for="Description" class="form-control" rows="3" maxlength="500" placeholder="Informe o motivo da despesa..." required data-val="true" data-val-required="Informe o motivo da despesa."></textarea>
                             <span asp-validation-for="Description" class="text-danger small"></span>
                         </div>
                         <hr class="my-4" />

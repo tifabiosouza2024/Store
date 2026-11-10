@@ -18,6 +18,7 @@ namespace FS.Store.DAL.Repository
         #region Queryable
         private IQueryable<Entity> Queryable(Expression<Func<Entity, bool>>? filter = null
             , Func<IQueryable<Entity>, IIncludableQueryable<Entity, object?>>? includeProperties = null
+            , Pagination<Entity> pagination = null
             , Func<IQueryable<Entity>, IQueryable<Entity>>? orderBy = null
             , Dictionary<string, string>? dynamicSorts = null
             , bool asNoTracking = false)
@@ -30,9 +31,12 @@ namespace FS.Store.DAL.Repository
                 query = includeProperties(query);
 
             if (dynamicSorts is not null && dynamicSorts.Count > 0)
-                query.ApplySortingDynamic(dynamicSorts);
+                query = query.ApplySortingDynamic(dynamicSorts);
             else if (orderBy is not null)
                 query = orderBy(query);
+
+            if (pagination is not null)
+                query = query.Skip(pagination.Skip).Take(pagination.QttPerPage);
 
             if (asNoTracking)
                 query = query.AsNoTracking();
@@ -112,6 +116,7 @@ namespace FS.Store.DAL.Repository
             pagination.TotalItems = qtt;
             pagination.Data = await Queryable(filter: filter
                 , includeProperties: includeProperties
+                , pagination: pagination
                 , orderBy: orderBy
                 , dynamicSorts: dynamicSorts
                 , asNoTracking: asNoTracking).ToListAsync();

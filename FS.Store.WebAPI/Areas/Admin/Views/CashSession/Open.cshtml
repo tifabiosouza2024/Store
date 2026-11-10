@@ -26,11 +26,11 @@
                 <i class="bi bi-exclamation-triangle-fill fs-3"></i>
                 <div class="flex-grow-1">
                     <h5 class="alert-heading mb-2">
-                        Já existe um caixa aberto
+                        Já existe caixa aberto
                     </h5>
 
                     <p class="mb-3">
-                        A operação <strong>@Model.OperationName</strong> já possui um caixa aberto. Deseja realizar uma nova abertura mesmo assim?
+                        A operação <strong>@Model.OperationName</strong> já possui ao menos um caixa aberto. Deseja realizar uma nova abertura mesmo assim?
                     </p>
 
                     <div class="d-flex flex-wrap gap-2">
@@ -68,10 +68,10 @@
                     <label asp-for="Amount" class="form-label fw-semibold">
                         Número do Caixa
                     </label>
-                    <div class="input-group input-group-lg">
-                        <input type="text" asp-for="CashSessionNumber" class="form-control" inputmode="numeric" autocomplete="off" value="1" />
-                        <span asp-validation-for="CashSessionNumber" class="text-danger small"></span>
+                    <div class="input-group input-group-lg w-25">
+                        <input type="text" asp-for="CashSessionNumber" class="form-control" inputmode="numeric" autocomplete="off" />
                     </div>
+                    <span asp-validation-for="CashSessionNumber" class="text-danger small"></span>
                     <div id="amountHelp" class="form-text">
                         Informe o número do caixa que está sendo aberto.
                     </div>
@@ -80,11 +80,11 @@
                     <label asp-for="Amount" class="form-label fw-semibold">
                         Valor inicial em caixa
                     </label>
-                    <div class="input-group input-group-lg">
+                    <div class="input-group input-group-lg w-25">
                         <span class="input-group-text">R$</span>
                         <input type="text" asp-for="Amount" class="form-control price" inputmode="numeric" autocomplete="off" value="0,00" />
-                        <span asp-validation-for="Amount" class="text-danger small"></span>
                     </div>
+                    <span asp-validation-for="Amount" class="text-danger small"></span>
                     <div id="amountHelp" class="form-text">
                         Informe o valor total em dinheiro disponível no início da operação.
                     </div>

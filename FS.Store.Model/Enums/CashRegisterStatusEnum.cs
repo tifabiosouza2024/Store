@@ -14,7 +14,7 @@ namespace FS.Store.Model.Enums
         [Comment("Aberto")]
         Open = 1,
         [Comment("Fechado")]
-        Close = 2,
+        Closed = 2,
         [Comment("Cancelado")]
         Canceled = 3
     }

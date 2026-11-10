@@ -1,7 +1,170 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model Pagination<CashRegisterSession>
+
 @{
-    ViewData["Title"] = "Histórico";
+    ViewData["Title"] = "Histórico de caixas";
 }
-Histórico
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/admin/table.css" asp-append-version="true" />
+}
+
+<div class="container-fluid">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+
+        <div>
+            <h4 class="mb-1">Histórico de caixas</h4>
+            <p class="text-muted mb-0">
+                Consulte as aberturas e os fechamentos de caixa.
+            </p>
+        </div>
+
+        <a asp-action="Open" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i>
+            Abrir caixa
+        </a>
+
+    </div>
+
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-header bg-white border-bottom py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-semibold">
+                    <i class="bi bi-clock-history me-2"></i>
+                    Movimentações de caixa
+                </h6>
+
+                <span class="text-muted small">
+                    @Model.TotalItems registros
+                </span>
+            </div>
+        </div>
+
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th table-header-ordered field="CashSessionNumber" header-text="Número do Caixa" is-number></th>
+                            <th table-header-ordered field="OpenedAt" header-text="Data de abertura"></th>
+                            <th table-header-ordered field="ClosedAt" header-text="Data de fechamento"></th>
+                            <th table-header-ordered field="OpenedByUser.Name" header-text="Responsável"></th>
+                            <th table-header-ordered field="OpeningAmount" header-text="Valor inicial" is-number class="text-end"></th>
+                            <th table-header-ordered field="CashRegisterStatus" header-text="Status" class="text-center"></th>
+                            <th class="text-end pe-3">Ações</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @if (Model.Data.Any())
+                        {
+                            foreach (var item in Model.Data)
+                            {
+                                if (item == null)
+                                    continue;
+
+                                <tr>
+                                    <td class="ps-3 fw-semibold">
+                                        #@item.CashSessionNumber
+                                    </td>
+
+                                    <td>
+                                        @item.OpenedAt.ToString("dd/MM/yyyy")
+                                        <div class="text-muted small">
+                                            @item.OpenedAt.ToString("HH:mm")
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        @if (item.ClosedAt.HasValue)
+                                        {
+                                            @item.ClosedAt.Value.ToString("dd/MM/yyyy")
+                                            <div class="text-muted small">
+                                                @item.ClosedAt.Value.ToString("HH:mm")
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">—</span>
+                                        }
+                                    </td>
+
+                                    <td>
+                                        @item.OpenedByUser?.Name
+                                    </td>
+
+                                    <td class="text-end">
+                                        @item.OpeningAmount.ToString("C2")
+                                    </td>
+
+                                    <td class="text-center">
+                                        @switch (item.CashRegisterStatus)
+                                        {
+                                            case CashRegisterStatusEnum.Open:
+                                                <span class="badge rounded-pill text-bg-success">
+                                                    Aberto
+                                                </span>
+                                                break;
+
+                                            case CashRegisterStatusEnum.Closed:
+                                                <span class="badge rounded-pill text-bg-secondary">
+                                                    Fechado
+                                                </span>
+                                                break;
+
+                                            case CashRegisterStatusEnum.Canceled:
+                                                <span class="badge rounded-pill text-bg-danger">
+                                                    Cancelado
+                                                </span>
+                                                break;
+                                        }
+                                    </td>
+
+                                    <td class="text-end pe-3">
+                                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-light" title="Visualizar">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="7" class="text-center py-5">
+                                    <i class="bi bi-inbox fs-2 text-muted"></i>
+
+                                    <p class="fw-semibold mt-2 mb-1">
+                                        Nenhum registro encontrado
+                                    </p>
+
+                                    <span class="text-muted small">
+                                        Não existem caixas para exibir.
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card-footer bg-white border-0 py-3">
+            <partial name="_Pagination"
+                     model="@(new PaginationViewModel
+                     {
+                         TotalItems = Model.TotalItems,
+                         QttPerPage = Model.QttPerPage,
+                         CurrentPage = Model.CurrentPage
+                     })" />
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    <script src="~/js/admin/table.js" asp-append-version="true"></script>
+}

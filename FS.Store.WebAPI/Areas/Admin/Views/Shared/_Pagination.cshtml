@@ -1,0 +1,107 @@
+﻿@model PaginationViewModel
+
+@{
+    var queryParameters = Context.Request.Query
+        .Where(q =>
+            !string.Equals(q.Key, "page", StringComparison.OrdinalIgnoreCase) &&
+            !string.Equals(q.Key, "qttPerPage", StringComparison.OrdinalIgnoreCase))
+        .ToDictionary(
+            q => q.Key,
+            q => q.Value.ToString()
+        );
+
+    Dictionary<string, string> GetRouteValues(int page)
+    {
+        var values = new Dictionary<string, string>(queryParameters)
+        {
+            ["page"] = page.ToString(),
+            ["qttPerPage"] = Model.QttPerPage.ToString()
+        };
+
+        return values;
+    }
+}
+
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+
+    <!-- Informações -->
+    <div class="text-muted small text-nowrap">
+        Exibindo
+        <strong>@Model.FirstItem</strong> a
+        <strong>@Model.LastItem</strong>
+        de <strong>@Model.TotalItems</strong> registros
+    </div>
+
+    <!-- Navegação -->
+    <nav aria-label="Navegação de páginas">
+        <ul class="pagination pagination-sm mb-0">
+
+            <li class="page-item @(!Model.HasPreviousPage ? "disabled" : "")">
+                <a class="page-link" asp-all-route-data="@GetRouteValues(@Model.FirstPage)">
+                    <i class="bi bi-chevron-double-left"></i>
+                </a>
+            </li>
+
+            <li class="page-item @(!Model.HasPreviousPage ? "disabled" : "")">
+                <a class="page-link" asp-all-route-data="@GetRouteValues(@Model.PreviousPage)">
+                    <i class="bi bi-chevron-left"></i>
+                </a>
+            </li>
+
+            @foreach (var pageNumber in Model.PreviousPages())
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-all-route-data="@GetRouteValues(@pageNumber)">
+                        @pageNumber
+                    </a>
+                </li>
+            }
+
+            <li class="page-item active" aria-current="page">
+                <span class="page-link">@Model.CurrentPage</span>
+            </li>
+
+            @foreach (var pageNumber in Model.NextPages())
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-all-route-data="@GetRouteValues(@pageNumber)">
+                        @pageNumber
+                    </a>
+                </li>
+            }
+
+            <li class="page-item @(!Model.HasNextPage ? "disabled" : "")">
+                <a class="page-link" asp-all-route-data="@GetRouteValues(@Model.NextPage)">
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </li>
+
+            <li class="page-item @(!Model.HasNextPage ? "disabled" : "")">
+                <a class="page-link" asp-all-route-data="@GetRouteValues(@Model.LastPage)">
+                    <i class="bi bi-chevron-double-right"></i>
+                </a>
+            </li>
+
+        </ul>
+    </nav>
+
+    <!-- Quantidade por página -->
+    <form method="get" class="d-flex align-items-center gap-2">
+        @foreach (var parameter in queryParameters)
+        {
+            <input type="hidden" name="@parameter.Key" value="@parameter.Value" />
+        }
+
+        <input type="hidden" name="page" value="1" />
+        <span class="text-muted small">Registros:</span>
+        <select class="form-select form-select-sm" style="width: auto;" name="qttPerPage" onchange="this.form.submit()">
+            @foreach (var quantity in new[] { 5, 10, 50, 100 })
+            {
+                <option value="@quantity"
+                        selected="@(Model.QttPerPage == quantity)">
+                    @quantity
+                </option>
+            }
+        </select>
+    </form>
+</div>

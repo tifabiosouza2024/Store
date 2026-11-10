@@ -2,6 +2,7 @@
 using FS.Store.Core.Helper;
 using FS.Store.Core.Interfaces;
 using FS.Store.Model.Dtos.CashClosing;
+using FS.Store.Model.Elements;
 using FS.Store.Model.Entity;
 using FS.Store.Model.Enums;
 using FS.Store.Model.Extensions;
@@ -16,7 +17,8 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize]
-    public class CashSessionController(ICashRegisterSessionService cashRegisterSessionService
+    public class CashSessionController(ILogger<CashSessionController> logger
+        , ICashRegisterSessionService cashRegisterSessionService
         , IOperationService operationService
         , IOperationUserRoleService operationUserRoleService
         , ICurrentCashSessionService currentCashSessionService
@@ -39,10 +41,14 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
             {
                 return this.RedirectAdminToBadRequest("Você não tem operação selecionada para continuar.");
             }
+            var qtt = await cashRegisterSessionService.Count();
+            if (logger.IsEnabled(LogLevel.Debug))
+                logger.LogDebug("Quantidade de caixas abertos: {}", qtt);
             CashSessionOpenViewModel session = new()
             {
                 OperationName = operation?.Name,
-                CashSessionAlreadyExists = await cashRegisterSessionService.AlreadyOpened()
+                CashSessionAlreadyExists = await cashRegisterSessionService.AlreadyOpened(),
+                CashSessionNumber = qtt + 1
             };
             return View(session);
         }
@@ -99,7 +105,7 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
             vm.OpeningAmount = session.OpeningAmount;
             vm.OperationId = session.OperationId;
             vm.StatusOptions = session.CashRegisterStatus.ToSelectListItemsInEditView();
-            vm.WasClosed = session.CashRegisterStatus == CashRegisterStatusEnum.Close;
+            vm.WasClosed = session.CashRegisterStatus == CashRegisterStatusEnum.Closed;
             vm.Operations = [.. operations.Select(o => new SelectListItem { Text = o.Name, Value = o.Id.ToString(), Selected = o.Id == session.OperationId })];
             return View(vm);
         }
@@ -188,9 +194,11 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
             sessionVM.CashMovements = [.. session.CashMovements];
         }
 
-        public IActionResult History()
+        public async Task<IActionResult> History(int page, int qttPerPage)
         {
-            return View();
+            var sorting = this.GetSorting();
+            Pagination<CashRegisterSession> result = await cashRegisterSessionService.GetAllPagedAsync(page, qttPerPage, sorting);
+            return View(result);
         }
 
     }

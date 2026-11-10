@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace FS.Store.Model.Enums
 {
@@ -11,10 +12,13 @@ namespace FS.Store.Model.Enums
     public enum CashMovementTypeEnum
     {
         [Comment("Suprimento (Entrada de dinheiro)")]
+        [Display(Name = "Suprimento")]
         CashInflows = 1,
         [Comment("Sangria")]
+        [Display(Name = "Sangria")]
         Withdrawal = 2,
         [Comment("Despesa")]
+        [Display(Name = "Despesas")]
         Expense = 3
     }
 }

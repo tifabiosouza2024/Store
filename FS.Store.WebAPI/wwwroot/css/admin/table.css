@@ -1,0 +1,62 @@
+﻿/* Tabela */
+.table {
+    --bs-table-hover-bg: rgba(0, 0, 0, .025);
+}
+
+    .table > thead > tr > th {
+        font-size: .8rem;
+        font-weight: 600;
+        color: var(--bs-secondary-color);
+        text-transform: uppercase;
+        white-space: nowrap;
+        padding: 1rem .75rem;
+        border-bottom-width: 1px;
+    }
+
+    .table > tbody > tr > td {
+        padding: .9rem .75rem;
+        font-size: .875rem;
+    }
+
+/* Cabeçalho ordenável */
+th[data-field] {
+    cursor: pointer;
+    user-select: none;
+}
+
+    th[data-field]:hover {
+        color: var(--bs-primary);
+    }
+
+.order-by {
+    margin-left: .35rem;
+    font-size: .8rem;
+    opacity: .65;
+}
+
+/* Paginação */
+.pagination {
+    gap: .2rem;
+}
+
+    .pagination .page-link {
+        border-radius: .375rem !important;
+        border: 0;
+        color: var(--bs-secondary-color);
+        min-width: 2rem;
+        text-align: center;
+    }
+
+    .pagination .page-item.active .page-link {
+        background-color: var(--bs-primary);
+        color: white;
+    }
+
+    .pagination .page-item:not(.active):not(.disabled) .page-link:hover {
+        background-color: var(--bs-tertiary-bg);
+    }
+
+    .pagination .page-item.disabled .page-link {
+        background-color: transparent;
+        opacity: .4;
+    }

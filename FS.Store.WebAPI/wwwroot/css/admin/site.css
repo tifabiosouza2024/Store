@@ -427,3 +427,27 @@ body {
             background: rgb(79 107 237 / 20%);
             box-shadow: inset 2px 0 0 var(--primary);
         }
+
+/* Campos com erro de validação */
+.input-validation-error {
+    border-color: var(--bs-form-invalid-border-color) !important;
+}
+
+    .input-validation-error:focus {
+        border-color: var(--bs-form-invalid-border-color) !important;
+        box-shadow: 0 0 0 .25rem rgba(var(--bs-danger-rgb), .15) !important;
+    }
+
+/* Mensagem de validação */
+.field-validation-error {
+    display: block;
+    color: var(--bs-danger);
+    font-size: .8rem;
+    margin-top: .35rem;
+}
+
+.input-group:has(.input-validation-error) .input-group-text {
+    border-color: var(--bs-form-invalid-border-color);
+    color: var(--bs-danger);
+    background-color: rgba(var(--bs-danger-rgb), .05);
+}
