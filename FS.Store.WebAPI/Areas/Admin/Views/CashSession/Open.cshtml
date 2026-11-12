@@ -68,7 +68,7 @@
                     <label asp-for="Amount" class="form-label fw-semibold">
                         Número do Caixa
                     </label>
-                    <div class="input-group input-group-lg w-25">
+                    <div class="input-group input-group-lg w-100 w-md-25">
                         <input type="text" asp-for="CashSessionNumber" class="form-control" inputmode="numeric" autocomplete="off" />
                     </div>
                     <span asp-validation-for="CashSessionNumber" class="text-danger small"></span>
@@ -80,7 +80,7 @@
                     <label asp-for="Amount" class="form-label fw-semibold">
                         Valor inicial em caixa
                     </label>
-                    <div class="input-group input-group-lg w-25">
+                    <div class="input-group input-group-lg w-100 w-md-25">
                         <span class="input-group-text">R$</span>
                         <input type="text" asp-for="Amount" class="form-control price" inputmode="numeric" autocomplete="off" value="0,00" />
                     </div>

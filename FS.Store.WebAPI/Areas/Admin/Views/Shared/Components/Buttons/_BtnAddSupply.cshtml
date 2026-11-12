@@ -1,0 +1,25 @@
+﻿@model ButtonsViewModels
+@{
+    string btnName = "Adicionar suprimento";
+
+}
+@if (Model.IsDropdown)
+{
+    <a class="dropdown-item" asp-action="Supply" asp-controller="CashMovement" asp-route-cashSessionId="@Model.Attribute">
+        <i class="bi bi-arrow-up-circle text-success me-2"></i>
+        @btnName
+    </a>
+}
+else if (Model.HasText)
+{
+    <a asp-action="Supply" asp-controller="CashMovement" asp-route-cashSessionId="@Model.Attribute" class="btn btn-success">
+        <i class="bi bi-arrow-up-circle me-1"></i>
+        @btnName
+    </a>
+}
+else
+{
+    <a class="btn btn-sm btn-outline-success" asp-action="Supply" asp-controller="CashMovement" asp-route-cashSessionId="@Model.Attribute" title="@btnName">
+        <i class="bi bi-arrow-up-circle"></i>
+    </a>    
+}

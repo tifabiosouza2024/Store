@@ -24,6 +24,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="Areas\Admin\Views\Shared\Components\Buttons\_BtnAddExpense.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\FS.Store.Core\FS.Store.Core.csproj" />
     <ProjectReference Include="..\FS.Store.Model\FS.Store.Model.csproj" />
   </ItemGroup>

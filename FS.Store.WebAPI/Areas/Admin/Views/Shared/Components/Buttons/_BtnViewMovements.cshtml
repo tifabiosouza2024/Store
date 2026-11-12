@@ -1,0 +1,18 @@
+﻿@model ButtonsViewModels
+@{
+    string btnName = "Ver Movimentações";
+
+}
+@if (Model.IsDropdown)
+{
+    <a class="dropdown-item " asp-action="Index" asp-controller="CashMovement" asp-route-cashSessionId="@Model.Attribute">
+        <i class="bi bi-card-list me-2 text-primary"></i>
+        @btnName
+    </a>
+}
+else
+{
+    <a class="btn btn-sm btn-outline-primary" asp-action="Index" asp-controller="CashMovement" asp-route-cashSessionId="@Model.Attribute" title="@btnName">
+        <i class="bi bi-card-list"></i>
+    </a>
+}

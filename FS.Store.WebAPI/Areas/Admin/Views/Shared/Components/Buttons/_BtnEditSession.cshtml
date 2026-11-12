@@ -1,0 +1,18 @@
+﻿@model ButtonsViewModels
+@{
+    string btnName = "Editar";
+
+}
+@if (Model.IsDropdown)
+{
+    <a class="dropdown-item" asp-action="Edit" asp-controller="CashSession" asp-route-id="@Model.Attribute">
+        <i class="bi bi-pencil-square me-2 text-secondary"></i>
+        @btnName
+    </a>
+}
+else
+{
+    <a class="btn btn-sm btn-outline-secondary" asp-action="Edit" asp-controller="CashSession" asp-route-id="@Model.Attribute" title="@btnName">
+        <i class="bi bi-pencil-square"></i>
+    </a>
+}

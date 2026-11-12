@@ -3,18 +3,160 @@
 @{
     ViewData["Title"] = "Caixas Abertos";
 
-    var sessions = Model.CashRegisterSessionsOpened;
-    var hasSessions = sessions != null && sessions.Any();
-    var totalOpeningAmount = sessions?.Sum(s => s.OpeningAmount) ?? 0m;
+    var pagination = Model.CashRegisterSessionsOpened;
+    var sessions = pagination?.Data?.ToList() ?? [];
+    var hasSessions = sessions.Count > 0;
+    var totalOpeningAmount = sessions.Sum(s => s.OpeningAmount);
+
+    var sortableFields = new[]
+    {
+        new { Field = "CashSessionNumber", Label = "Caixa" },
+        new { Field = "OpenedAt", Label = "Aberto em" },
+        new { Field = "OpeningAmount", Label = "Valor Inicial" },
+        new { Field = "OpenedByUser.Name", Label = "Aberto por" }
+    };
+
+    var mobileSorts = new List<(string Field, string Label, string Direction)>();
+
+    foreach (var query in Context.Request.Query)
+    {
+        if (!query.Key.StartsWith("orderBy", StringComparison.OrdinalIgnoreCase))
+            continue;
+
+        var field = sortableFields.FirstOrDefault(x =>
+            string.Equals($"orderBy{x.Field}", query.Key, StringComparison.OrdinalIgnoreCase));
+
+        var direction = query.Value.ToString().ToLowerInvariant();
+
+        if (field != null && (direction == "asc" || direction == "desc"))
+            mobileSorts.Add((field.Field, field.Label, direction));
+    }
+
+    if (mobileSorts.Count == 0)
+        mobileSorts.Add(("OpenedAt", "Aberto em", "desc"));
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/admin/table.css" asp-append-version="true" />
+
+    <style>
+        /* Indicadores */
+        .cash-summary-icon {
+            width: 52px;
+            height: 52px;
+            flex-shrink: 0;
+            display: grid;
+            place-items: center;
+            border-radius: 12px;
+        }
+
+        /* Cards mobile */
+        .cash-session-card {
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            background: white;
+            transition: box-shadow .2s ease;
+        }
+
+            .cash-session-card:hover {
+                box-shadow: 0 3px 12px rgb(0 0 0 / 5%);
+            }
+
+        .cash-session-number {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .cash-session-amount {
+            padding: 13px 15px;
+            background: var(--app-bg);
+            border-radius: 9px;
+        }
+
+        .cash-session-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+        }
+
+        .cash-session-info-icon {
+            width: 36px;
+            height: 36px;
+            flex-shrink: 0;
+            display: grid;
+            place-items: center;
+            border-radius: 9px;
+            background: var(--app-bg);
+            color: var(--text-muted);
+        }
+
+        .cash-session-info-content {
+            min-width: 0;
+        }
+
+            .cash-session-info-content .value {
+                font-weight: 500;
+                overflow-wrap: anywhere;
+            }
+
+        .cash-session-actions .dropdown-menu {
+            min-width: 220px;
+        }
+
+        .cash-session-actions .dropdown-item {
+            padding: 9px 14px;
+            font-size: .9rem;
+        }
+
+            .cash-session-actions .dropdown-item i {
+                width: 20px;
+                display: inline-block;
+            }
+
+            .cash-session-actions .dropdown-item svg {
+                width: 20px;
+                height: 20px;
+                vertical-align: middle;
+                margin-right: 8px;
+            }
+
+        .cash-session-table-actions svg {
+            width: 20px;
+            height: 20px;
+            vertical-align: middle;
+        }
+
+        /* Ajustes para telas pequenas */
+        @@media (max-width: 575.98px) {
+            .cash-summary-icon {
+                width: 42px;
+                height: 42px;
+            }
+
+                .cash-summary-icon i {
+                    font-size: 1.2rem !important;
+                }
+
+            .cash-summary-value {
+                font-size: 1.2rem !important;
+            }
+
+            .cash-session-card-body {
+                padding: 14px !important;
+            }
+        }
+    </style>
 }
 
 <div class="container py-4">
+    @* Cabeçalho *@
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
         <div class="d-flex align-items-center gap-3">
             <div class="bg-primary bg-opacity-10 text-primary rounded-3 p-3">
                 <i class="bi bi-cash-stack fs-3"></i>
             </div>
-
             <div>
                 <h2 class="mb-1">Caixas Abertos</h2>
                 <p class="text-muted mb-0">
@@ -26,50 +168,53 @@
 
     @if (hasSessions)
     {
+        @* Indicadores *@
         <div class="row g-3 mb-4">
-
-            <div class="col-12 col-md-6">
+            <div class="col-6 col-md-6">
                 <div class="card border-0 shadow-sm h-100">
-                    <div class="card-body d-flex align-items-center gap-3">
-                        <div class="bg-primary bg-opacity-10 text-primary rounded-3 p-3">
+                    <div class="card-body d-flex align-items-center gap-2 gap-md-3">
+                        <div class="cash-summary-icon bg-primary bg-opacity-10 text-primary">
                             <i class="bi bi-shop fs-4"></i>
                         </div>
-                        <div>
+                        <div class="min-w-0">
                             <div class="text-muted small">
                                 Sessões ativas
                             </div>
-                            <div class="fs-3 fw-semibold">
-                                @sessions!.Count()
+                            <div class="fs-3 fw-semibold cash-summary-value">
+                                @pagination!.TotalItems
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="col-12 col-md-6">
+            <div class="col-6 col-md-6">
                 <div class="card border-0 shadow-sm h-100">
-                    <div class="card-body d-flex align-items-center gap-3">
-                        <div class="bg-success bg-opacity-10 text-success rounded-3 p-3">
+                    <div class="card-body d-flex align-items-center gap-2 gap-md-3">
+                        <div class="cash-summary-icon bg-success bg-opacity-10 text-success">
                             <i class="bi bi-wallet2 fs-4"></i>
                         </div>
-                        <div>
+                        <div class="min-w-0">
                             <div class="text-muted small">
                                 Total de abertura
                             </div>
-                            <div class="fs-3 fw-semibold">
+                            <div class="fs-5 fs-md-4 fw-semibold text-truncate cash-summary-value">
                                 @totalOpeningAmount.ToString("C")
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
         </div>
 
+        @* Listagem *@
         <div class="card border-0 shadow-sm">
 
-            <div class="card-header bg-body border-0 px-4 pt-4 pb-3">
+            @* Cabeçalho da listagem *@
+            <div class="card-header bg-body border-0 px-3 px-md-4 pt-4 pb-3">
+
                 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+
                     <div>
                         <h5 class="mb-1">Sessões de caixa</h5>
                         <p class="text-muted small mb-0">
@@ -78,132 +223,334 @@
                     </div>
 
                     <span class="badge text-bg-success rounded-pill px-3 py-2">
-                        <i class="bi bi-circle-fill me-1 small"></i>Em andamento
+                        <i class="bi bi-circle-fill me-1 small"></i>
+                        Em andamento
                     </span>
+
+                </div>
+
+            </div>
+
+            @* =========================================
+               DESKTOP - TABELA
+            ========================================= *@
+
+            <div class="d-none d-lg-block">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="pe-4"></th>
+                                    <th table-header-ordered field="CashSessionNumber" header-text="Caixa" is-number></th>
+                                    <th table-header-ordered field="OpenedAt" header-text="Aberto em" is-number></th>
+                                    <th table-header-ordered field="OpeningAmount" header-text="Valor Inicial" is-number></th>
+                                    <th>Status</th>
+                                    <th>Operação</th>
+                                    <th table-header-ordered field="OpenedByUser.Name" header-text="Aberto por"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var session in sessions)
+                                {
+                                    <tr>
+                                        @* Ações *@
+                                        <td class="text-start pe-4">
+                                            <div class="btn-group cash-session-table-actions" role="group">
+                                                <partial name="Components/Buttons/_BtnAddSupply" model="new ButtonsViewModels(session?.Id)" />
+                                                <partial name="Components/Buttons/_BtnAddWithdrawal" model="new ButtonsViewModels(session?.Id)" />
+                                                <partial name="Components/Buttons/_BtnAddExpense" model="new ButtonsViewModels(session?.Id)" />
+                                                @if (User.IsManagerOrGreater())
+                                                {
+                                                    <partial name="Components/Buttons/_BtnEditSession" model="new ButtonsViewModels(session?.Id)" />
+                                                }
+                                                <partial name="Components/Buttons/_BtnViewMovements" model="new ButtonsViewModels(session?.Id)" />
+                                                <partial name="Components/Buttons/_BtnCloseSession" model="new ButtonsViewModels(session?.Id)" />
+                                            </div>
+                                        </td>
+                                        <td class="fw-semibold">
+                                            #@session.CashSessionNumber
+                                        </td>
+                                        <td class="text-nowrap">
+                                            <div class="fw-medium">
+                                                @session.OpenedAt.ToString("dd/MM/yyyy")
+                                            </div>
+                                            <div class="text-muted small">
+                                                @session.OpenedAt.ToString("HH:mm")
+                                            </div>
+                                        </td>
+                                        <td class="text-end text-nowrap fw-semibold">
+                                            @session.OpeningAmount.ToString("C")
+                                        </td>
+                                        <td>
+                                            <span class="badge text-bg-success bg-opacity-10 text-success border border-success border-opacity-25">
+                                                @session.CashRegisterStatus
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <i class="bi bi-shop text-muted"></i>
+                                                <span>
+                                                    @(session.Operation?.Name ?? "Não informada")
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <i class="bi bi-person-circle fs-5 text-muted"></i>
+                                                <span>
+                                                    @(session.OpenedByUser?.Name ?? "Não informado")
+                                                </span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot class="table-light">
+                                <tr>
+                                    <th colspan="2">Total da página</th>
+                                    <th class="text-end">
+                                        @totalOpeningAmount.ToString("C")
+                                    </th>
+                                    <th colspan="4"></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            @* =========================================
+               MOBILE - CARDS
+            ========================================= *@
+            <div class="d-lg-none">
+                <div class="card-body p-3">
+
+                    @* Ordenação mobile *@
+                    <div class="mb-3" id="mobileSort">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label class="form-label fw-semibold mb-0">Ordenar por</label>
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="addMobileSort">
+                                <i class="bi bi-plus-circle me-1"></i> Adicionar campo
+                            </button>
+                        </div>
+
+                        <div id="mobileSortCriteria" class="d-flex flex-column gap-2">
+                            @foreach (var sort in mobileSorts)
+                            {
+                                <div class="row g-2 align-items-center" data-sort-row>
+                                    <div class="col-6">
+                                        <select class="form-select form-select-sm" data-sort-field>
+                                            @foreach (var field in sortableFields)
+                                            {
+                                                <option value="@field.Field" selected="@(sort.Field == field.Field)">@field.Label</option>
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="col-4">
+                                        <select class="form-select form-select-sm" data-sort-direction>
+                                            <option value="asc" selected="@(sort.Direction == "asc")">Crescente</option>
+                                            <option value="desc" selected="@(sort.Direction == "desc")">Decrescente</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-2">
+                                        <button type="button" class="btn btn-outline-danger btn-sm w-100" data-remove-sort title="Remover critério">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="d-flex justify-content-end mt-2">
+                            <button type="button" class="btn btn-primary btn-sm" id="applyMobileSort">
+                                <i class="bi bi-sort-down me-1"></i> Aplicar ordenação
+                            </button>
+                        </div>
+                    </div>
+
+                    <template id="mobileSortTemplate">
+                        <div class="row g-2 align-items-center" data-sort-row>
+                            <div class="col-6">
+                                <select class="form-select form-select-sm" data-sort-field>
+                                    @foreach (var field in sortableFields)
+                                    {
+                                        <option value="@field.Field">@field.Label</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-4">
+                                <select class="form-select form-select-sm" data-sort-direction>
+                                    <option value="asc">Crescente</option>
+                                    <option value="desc" selected>Decrescente</option>
+                                </select>
+                            </div>
+                            <div class="col-2">
+                                <button type="button" class="btn btn-outline-danger btn-sm w-100" data-remove-sort title="Remover critério">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+
+                    <div class="d-flex flex-column gap-3">
+                        @foreach (var session in sessions)
+                        {
+                            <div class="cash-session-card">
+                                <div class="cash-session-card-body p-3">
+                                    @* Identificação e ações *@
+                                    <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
+                                        <div>
+                                            <div class="text-muted small mb-1">
+                                                Número do caixa
+                                            </div>
+                                            <div class="cash-session-number">
+                                                #@session.CashSessionNumber
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="badge text-bg-success bg-opacity-10 text-success border border-success border-opacity-25">
+                                                @session.CashRegisterStatus
+                                            </span>
+                                            <div class="dropdown cash-session-actions">
+                                                <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Ações do caixa">
+                                                    <i class="bi bi-three-dots-vertical"></i>
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                                    <li>
+                                                        <partial name="Components/Buttons/_BtnAddSupply" model="new ButtonsViewModels(session?.Id, true)" />
+                                                        
+                                                    </li>
+                                                    <li>
+                                                        <partial name="Components/Buttons/_BtnAddWithdrawal" model="new ButtonsViewModels(session?.Id, true)" />
+                                                    </li>
+                                                    <li>
+                                                        <partial name="Components/Buttons/_BtnAddExpense" model="new ButtonsViewModels(session?.Id, true)" />
+                                                    </li>
+                                                    <li>
+                                                        <hr class="dropdown-divider" />
+                                                    </li>
+                                                    
+                                                    @if (User.IsManagerOrGreater())
+                                                    {
+                                                        <li>
+                                                            <partial name="Components/Buttons/_BtnEditSession" model="new ButtonsViewModels(session?.Id, true)" />
+                                                        </li>
+                                                    }
+                                                    <li>
+                                                        <partial name="Components/Buttons/_BtnViewMovements" model="new ButtonsViewModels(session?.Id, true)" />
+
+                                                    </li>
+                                                    <li>
+                                                        <hr class="dropdown-divider" />
+                                                    </li>
+
+                                                    <li>
+                                                        <partial name="Components/Buttons/_BtnCloseSession" model="new ButtonsViewModels(session?.Id, true)" />
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    @* Valor inicial *@
+                                    <div class="cash-session-amount mb-3">
+                                        <div class="text-muted small mb-1">
+                                            Valor inicial
+                                        </div>
+                                        <div class="fs-4 fw-semibold">
+                                            @session.OpeningAmount.ToString("C")
+                                        </div>
+                                    </div>
+
+                                    @* Data de abertura *@
+                                    <div class="d-flex flex-column gap-3">
+                                        <div class="cash-session-info">
+                                            <div class="cash-session-info-icon">
+                                                <i class="bi bi-calendar3"></i>
+                                            </div>
+                                            <div class="cash-session-info-content">
+                                                <div class="text-muted small">
+                                                    Aberto em
+                                                </div>
+                                                <div class="value">
+                                                    @session.OpenedAt.ToString("dd/MM/yyyy")
+                                                    às @session.OpenedAt.ToString("HH:mm")
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        @* Operação *@
+                                        <div class="cash-session-info">
+                                            <div class="cash-session-info-icon">
+                                                <i class="bi bi-shop"></i>
+                                            </div>
+                                            <div class="cash-session-info-content">
+
+                                                <div class="text-muted small">
+                                                    Operação
+                                                </div>
+                                                <div class="value">
+                                                    @(session.Operation?.Name ?? "Não informada")
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        @* Responsável *@
+                                        <div class="cash-session-info">
+                                            <div class="cash-session-info-icon">
+                                                <i class="bi bi-person-circle"></i>
+                                            </div>
+                                            <div class="cash-session-info-content">
+                                                <div class="text-muted small">
+                                                    Aberto por
+                                                </div>
+                                                <div class="value">
+                                                    @(session.OpenedByUser?.Name ?? "Não informado")
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
                 </div>
             </div>
 
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
+            @* Paginação única para desktop e mobile *@
+            <div class="card-footer bg-body border-0 py-3 px-3 px-md-4">
+                <partial name="_Pagination"
+                         model="@(new PaginationViewModel
+                         {
+                             TotalItems = pagination!.TotalItems,
+                             QttPerPage = pagination.QttPerPage,
+                             CurrentPage = pagination.CurrentPage
+                         })" />
 
-                    <thead class="table-light">
-                        <tr>
-                            <th class="pe-4"></th>
-                            <th class="ps-4 text-nowrap">Caixa</th>
-                            <th class="ps-4 text-nowrap">Aberto em</th>
-                            <th class="text-end text-nowrap">Valor inicial</th>
-                            <th class="text-nowrap">Status</th>
-                            <th>Operação</th>
-                            <th class="pe-4">Aberto por</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        @foreach (var session in sessions!)
-                        {
-                            <tr>
-                                <td>
-                                    <a class="btn btn-success" asp-action="Supply" asp-controller="CashMovement" asp-route-cashSessionId="@session.Id" title="Adicionar Suprimento">
-                                        <i class="bi bi-arrow-up-circle me-1"></i>
-                                    </a>
-                                    <a class="btn btn-success" asp-action="Withdrawal" asp-controller="CashMovement" asp-route-cashSessionId="@session.Id" title="Realizar Sangria">
-                                        <i class="bi bi-arrow-down-circle me-1"></i>
-                                    </a>
-                                    <a class="btn btn-success" asp-action="Expense" asp-controller="CashMovement" asp-route-cashSessionId="@session.Id" title="Registrar Despesas">
-                                        <svg width="24px" height="24px" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" fill="#ffffff" stroke="#ffffff"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path fill="#ffffff" d="M298.9 24.31c-14.9.3-25.6 3.2-32.7 8.4l-97.3 52.1-54.1 73.59c-11.4 17.6-3.3 51.6 32.3 29.8l39-51.4c49.5-42.69 150.5-23.1 102.6 62.6-23.5 49.6-12.5 73.8 17.8 84l13.8-46.4c23.9-53.8 68.5-63.5 66.7-106.9l107.2 7.7-1-112.09-194.3-1.4zM244.8 127.7c-17.4-.3-34.5 6.9-46.9 17.3l-39.1 51.4c10.7 8.5 21.5 3.9 32.2-6.4 12.6 6.4 22.4-3.5 30.4-23.3 3.3-13.5 8.2-23 23.4-39zm-79.6 96c-.4 0-.9 0-1.3.1-3.3.7-7.2 4.2-9.8 12.2-2.7 8-3.3 19.4-.9 31.6 2.4 12.1 7.4 22.4 13 28.8 5.4 6.3 10.4 8.1 13.7 7.4 3.4-.6 7.2-4.2 9.8-12.1 2.7-8 3.4-19.5 1-31.6-2.5-12.2-7.5-22.5-13-28.8-4.8-5.6-9.2-7.6-12.5-7.6zm82.6 106.8c-7.9.1-17.8 2.6-27.5 7.3-11.1 5.5-19.8 13.1-24.5 20.1-4.7 6.9-5.1 12.1-3.6 15.2 1.5 3 5.9 5.9 14.3 6.3 8.4.5 19.7-1.8 30.8-7.3 11.1-5.5 19.8-13 24.5-20 4.7-6.9 5.1-12.2 3.6-15.2-1.5-3.1-5.9-5.9-14.3-6.3-1.1-.1-2.1-.1-3.3-.1zm-97.6 95.6c-4.7.1-9 .8-12.8 1.9-8.5 2.5-13.4 7-15 12.3-1.7 5.4 0 11.8 5.7 18.7 5.8 6.8 15.5 13.3 27.5 16.9 11.9 3.6 23.5 3.5 32.1.9 8.6-2.5 13.5-7 15.1-12.3 1.6-5.4 0-11.8-5.8-18.7-5.7-6.8-15.4-13.3-27.4-16.9-6.8-2-13.4-2.9-19.4-2.8z"></path></g></svg>
-                                    </a>
-                                    @if (User.IsManagerOrGreater())
-                                    {
-                                        <a class="btn btn-success" asp-action="Edit" asp-controller="CashSession" asp-route-id="@session.Id" title="Editar Abertura de Caixa">
-                                            <i class="bi bi-pencil-square"></i>
-                                        </a>
-                                    }
-                                    <a class="btn btn-success" asp-action="Index" asp-controller="CashMovement" asp-route-cashSessionId="@session.Id" title="Ver Movimentações de Caixa">
-                                        <i class="bi bi-card-list"></i>
-                                    </a>
-                                    <a class="btn btn-success" asp-action="Close" asp-route-id="@session.Id" title="Fechar Caixa">
-                                        <svg class="fs-2 text-success" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="24px" width="24px" fill="#ffffff"><path d="M7,8Q6.18,8 5.59,7.41T5,6V4Q5,3.17 5.59,2.59T7,2H17q0.82,0 1.41,0.59T19,4V6q0,0.82-0.59,1.41T17,8H7ZM7,6H17V4H7V6ZM4,22q-0.82,0-1.41-0.59T2,20V19H22v1q0,0.82-0.59,1.41T20,22H4ZM2,18l3.48-7.83Q5.73,9.63 6.23,9.31T7.3,9h9.4q0.58,0 1.08,0.31t0.75,0.86L22,18H2Zm6.5-2h1q0.2,0 0.35-0.15T10,15.5T9.85,15.15T9.5,15h-1q-0.2,0-0.35,0.15T8,15.5t0.15,0.35T8.5,16Zm0-2h1q0.2,0 0.35-0.15T10,13.5T9.85,13.15T9.5,13h-1q-0.2,0-0.35,0.15T8,13.5t0.15,0.35T8.5,14Zm0-2h1q0.2,0 0.35-0.15T10,11.5T9.85,11.15T9.5,11h-1q-0.2,0-0.35,0.15T8,11.5t0.15,0.35T8.5,12Zm3,4h1q0.2,0 0.35-0.15T13,15.5t-0.15-0.35T12.5,15h-1q-0.2,0-0.35,0.15T11,15.5t0.15,0.35T11.5,16Zm0-2h1q0.2,0 0.35-0.15T13,13.5t-0.15-0.35T12.5,13h-1q-0.2,0-0.35,0.15T11,13.5t0.15,0.35T11.5,14Zm0-2h1q0.2,0 0.35-0.15T13,11.5t-0.15-0.35T12.5,11h-1q-0.2,0-0.35,0.15T11,11.5t0.15,0.35T11.5,12Zm3,4h1q0.2,0 0.35-0.15T16,15.5t-0.15-0.35T15.5,15h-1q-0.2,0-0.35,0.15T14,15.5t0.15,0.35T14.5,16Zm0-2h1q0.2,0 0.35-0.15T16,13.5t-0.15-0.35T15.5,13h-1q-0.2,0-0.35,0.15T14,13.5t0.15,0.35T14.5,14Zm0-2h1q0.2,0 0.35-0.15T16,11.5t-0.15-0.35T15.5,11h-1q-0.2,0-0.35,0.15T14,11.5t0.15,0.35T14.5,12Z" /></svg>
-                                    </a>
-                                </td>
-                                <td class="ps-4 text-nowrap">
-                                    <div class="fw-medium">
-                                        @session.CashSessionNumber
-                                    </div>
-                                </td>
-                                <td class="ps-4 text-nowrap">
-                                    <div class="fw-medium">
-                                        @session.OpenedAt.ToString("dd/MM/yyyy")
-                                    </div>
-                                    <div class="text-muted small">
-                                        @session.OpenedAt.ToString("HH:mm")
-                                    </div>
-                                </td>
-                                <td class="text-end text-nowrap fw-semibold">
-                                    @session.OpeningAmount.ToString("C")
-                                </td>
-                                <td>
-                                    <span class="badge text-bg-success bg-opacity-10 text-success border border-success border-opacity-25">
-                                        @session.CashRegisterStatus
-                                    </span>
-                                </td>
-                                <td>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <i class="bi bi-shop text-muted"></i>
-                                        <span>
-                                            @(session.Operation?.Name ?? "Não informada")
-                                        </span>
-                                    </div>
-                                </td>
-                                <td class="pe-4">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <i class="bi bi-person-circle fs-5 text-muted"></i>
-                                        <span>
-                                            @(session.OpenedByUser?.Name ?? "Não informado")
-                                        </span>
-                                    </div>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                    <tfoot class="table-light">
-                        <tr>
-                            <th class="ps-4" colspan="1">Total</th>
-                            <th class="text-end">@totalOpeningAmount.ToString("C")</th>
-                            <th colspan="5"></th>
-                        </tr>
-                    </tfoot>
-
-                </table>
             </div>
-
-            <div class="card-footer bg-body border-0 px-4 py-3">
-                <small class="text-muted">
-                    Exibindo @sessions!.Count() @(sessions.Count() == 1 ? "sessão ativa" : "sessões ativas").
-                </small>
-            </div>
-
         </div>
     }
     else
     {
+        @* Estado vazio *@
         <div class="card border-0 shadow-sm">
             <div class="card-body text-center py-5 px-4">
-
                 <div class="bg-body-secondary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 88px; height: 88px;">
                     <i class="bi bi-cash-stack display-5 text-secondary"></i>
                 </div>
-
-                <h4 class="mb-2">Nenhum caixa aberto</h4>
-
+                <h4 class="mb-2">
+                    Nenhum caixa aberto
+                </h4>
                 <p class="text-muted mx-auto mb-4" style="max-width: 420px;">
-                    Não existem sessões de caixa em andamento. Você pode iniciar uma nova abertura para registrar o valor inicial da operação.
+                    Não existem sessões de caixa em andamento.
+                    Você pode iniciar uma nova abertura para registrar
+                    o valor inicial da operação.
                 </p>
-
                 <a asp-area="Admin" asp-controller="CashSession" asp-action="Open" class="btn btn-primary">
+
                     <i class="bi bi-plus-circle me-2"></i>
                     Abrir caixa
                 </a>
-
             </div>
         </div>
     }
@@ -218,3 +565,94 @@
 }
 
 <partial name="_FloatingButtons" model="fab" />
+
+@section Scripts {
+    <script src="~/js/admin/table.js" asp-append-version="true"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const criteria = document.getElementById('mobileSortCriteria');
+            const template = document.getElementById('mobileSortTemplate');
+            const addButton = document.getElementById('addMobileSort');
+            const applyButton = document.getElementById('applyMobileSort');
+
+            if (!criteria || !template || !addButton || !applyButton)
+                return;
+
+            function updateSortOptions() {
+                const selects = [...criteria.querySelectorAll('[data-sort-field]')];
+
+                selects.forEach(select => {
+                    [...select.options].forEach(option => {
+                        option.disabled = selects.some(other =>
+                            other !== select && other.value === option.value);
+                    });
+                });
+
+                addButton.disabled = selects.length >= template.content.querySelectorAll('[data-sort-field] option').length;
+                criteria.querySelectorAll('[data-remove-sort]').forEach(button => {
+                    button.disabled = selects.length === 1;
+                });
+            }
+
+            addButton.addEventListener('click', function () {
+                const usedFields = [...criteria.querySelectorAll('[data-sort-field]')]
+                    .map(select => select.value);
+
+                const availableField = [...template.content.querySelectorAll('[data-sort-field] option')]
+                    .find(option => !usedFields.includes(option.value));
+
+                if (!availableField)
+                    return;
+
+                const newRow = template.content.firstElementChild.cloneNode(true);
+                newRow.querySelector('[data-sort-field]').value = availableField.value;
+                criteria.appendChild(newRow);
+
+                updateSortOptions();
+            });
+
+            criteria.addEventListener('click', function (event) {
+                const removeButton = event.target.closest('[data-remove-sort]');
+
+                if (!removeButton || criteria.querySelectorAll('[data-sort-row]').length <= 1)
+                    return;
+
+                removeButton.closest('[data-sort-row]').remove();
+                updateSortOptions();
+            });
+
+            criteria.addEventListener('change', updateSortOptions);
+
+            applyButton.addEventListener('click', function () {
+                const url = new URL(window.location.href);
+                const rows = [...criteria.querySelectorAll('[data-sort-row]')];
+
+                [...url.searchParams.keys()]
+                    .filter(key => key.toLowerCase().startsWith('orderby'))
+                    .forEach(key => url.searchParams.delete(key));
+
+                rows.forEach(row => {
+                    const field = row.querySelector('[data-sort-field]').value;
+                    const direction = row.querySelector('[data-sort-direction]').value;
+
+                    url.searchParams.set(`orderBy${field}`, direction);
+                });
+
+                url.searchParams.set('page', '1');
+
+                window.history.replaceState({}, '', url);
+
+                const applyTableChanges = document.getElementById('applyTableChanges');
+
+                if (applyTableChanges) {
+                    applyTableChanges.click();
+                } else {
+                    window.location.reload();
+                }
+            });
+
+            updateSortOptions();
+        });
+    </script>
+}

@@ -1,9 +1,10 @@
-﻿using FS.Store.Model.Entity;
+﻿using FS.Store.Model.Elements;
+using FS.Store.Model.Entity;
 
 namespace FS.Store.WebAPI.Areas.Admin.ViewModels
 {
     public class CashSessionIndexViewModel
     {
-        public IEnumerable<CashRegisterSession>? CashRegisterSessionsOpened { get; set; }
+        public Pagination<CashRegisterSession>? CashRegisterSessionsOpened { get; set; }
     }
 }

@@ -1,0 +1,25 @@
+﻿@model ButtonsViewModels
+@{
+    string btnName = "Realizar Sangria";
+
+}
+@if (Model.IsDropdown)
+{
+    <a class="dropdown-item" asp-action="Withdrawal" asp-controller="CashMovement" asp-route-cashSessionId="@Model.Attribute">
+        <i class="bi bi-arrow-down-circle text-danger me-2"></i>
+        @btnName
+    </a>
+}
+else if (Model.HasText)
+{
+    <a asp-action="Withdrawal" asp-controller="CashMovement" asp-route-cashSessionId="@Model.Attribute" class="btn btn-danger">
+        <i class="bi bi-arrow-down-circle me-1"></i>
+        Sangria
+    </a>
+}
+else
+{
+    <a class="btn btn-sm btn-outline-danger" asp-action="Withdrawal" asp-controller="CashMovement" asp-route-cashSessionId="@Model.Attribute" title="@btnName">
+        <i class="bi bi-arrow-down-circle"></i>
+    </a>
+}

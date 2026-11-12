@@ -24,9 +24,10 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
         , ICurrentCashSessionService currentCashSessionService
         , CashSessionHelper cashSessionHelper) : Controller
     {
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page, int qttPerPage)
         {
-            IEnumerable<CashRegisterSession> cashSessions = await cashRegisterSessionService.GetCashRegisterSessionOpenedAsync();
+            var sorting = this.GetSorting();
+            Pagination<CashRegisterSession> cashSessions = await cashRegisterSessionService.GetCashRegisterSessionOpenedPagedAsync(page: page, qttPerPage: qttPerPage, sorting);
             CashSessionIndexViewModel vm = new()
             {
                 CashRegisterSessionsOpened = cashSessions
@@ -180,7 +181,7 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
             sessionVM.OpenedAt = session.OpenedAt;
             if (operation?.PaymentTerminals != null)
             {
-                foreach (var terminal in operation.PaymentTerminals)
+                foreach (var terminal in operation.PaymentTerminals.OrderBy(c => c.Name))
                 {
                     sessionVM.Terminals.Add(new CashClosingTerminalViewModel()
                     {

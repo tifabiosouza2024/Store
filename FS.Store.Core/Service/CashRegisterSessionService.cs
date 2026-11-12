@@ -11,11 +11,21 @@ namespace FS.Store.Core.Service
     public class CashRegisterSessionService(ICashRegisterSessionRepository repository
         , CurrentUserHelper currentUserHelper) : BaseService<CashRegisterSession, long>(repository), ICashRegisterSessionService
     {
-        public async Task<IEnumerable<CashRegisterSession>> GetCashRegisterSessionOpenedAsync()
+        public async Task<IEnumerable<CashRegisterSession>> GetCashRegisterSessionOpenedAsync(Dictionary<string, string>? dynamicSorts = null)
         {
-            var result = await GetAllAsync(c
+            var result = await base.GetAllAsync(filter: c
                 => c.OperationId == currentUserHelper.CurrentOperationId
-                && c.CashRegisterStatus == CashRegisterStatusEnum.Open);
+                && c.CashRegisterStatus == CashRegisterStatusEnum.Open
+                , dynamicSorts: dynamicSorts);
+
+            return result!;
+        }
+        public async Task<Pagination<CashRegisterSession>> GetCashRegisterSessionOpenedPagedAsync(int page, int qttPerPage, Dictionary<string, string>? dynamicSorts = null)
+        {
+            var result = await base.GetAllPagedAsync(currentPage: page, qttPerPage: qttPerPage, filter: c
+                => c.OperationId == currentUserHelper.CurrentOperationId
+                && c.CashRegisterStatus == CashRegisterStatusEnum.Open
+                , dynamicSorts: dynamicSorts);
 
             return result!;
         }
