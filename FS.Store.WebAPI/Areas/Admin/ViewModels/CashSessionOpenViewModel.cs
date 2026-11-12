@@ -12,5 +12,6 @@ namespace FS.Store.WebAPI.Areas.Admin.ViewModels
         [Range(1, 100, ErrorMessage = "O Número do caixa precisa estar entre 1 e 100")]
         public int CashSessionNumber { get; set; }
         public bool CashSessionAlreadyExists { get; set; }
+        public DateTime OpenedAt { get; set; }
     }
 }

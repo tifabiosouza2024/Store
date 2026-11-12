@@ -65,6 +65,18 @@
         <div class="card-body p-4">
             <form method="post" id="frm" class="@(Model.CashSessionAlreadyExists ? "d-none" : "")">
                 <div class="mb-4">
+                    <label asp-for="OpenedAt" class="form-label fw-semibold">
+                        Data e hora de abertura
+                    </label>
+                    <div class="input-group input-group-lg w-100 w-md-25">
+                       <input asp-for="OpenedAt" asp-format="{0:yyyy-MM-ddTHH:mm}" type="datetime-local" class="form-control" type="datetime-local" max="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
+                    </div>
+                    <span asp-validation-for="OpenedAt" class="text-danger small"></span>
+                    <div class="form-text">
+                        Informe o número do caixa que está sendo aberto.
+                    </div>
+                </div>
+                <div class="mb-4">
                     <label asp-for="Amount" class="form-label fw-semibold">
                         Número do Caixa
                     </label>
@@ -72,7 +84,7 @@
                         <input type="text" asp-for="CashSessionNumber" class="form-control" inputmode="numeric" autocomplete="off" />
                     </div>
                     <span asp-validation-for="CashSessionNumber" class="text-danger small"></span>
-                    <div id="amountHelp" class="form-text">
+                    <div class="form-text">
                         Informe o número do caixa que está sendo aberto.
                     </div>
                 </div>
@@ -85,7 +97,7 @@
                         <input type="text" asp-for="Amount" class="form-control price" inputmode="numeric" autocomplete="off" value="0,00" />
                     </div>
                     <span asp-validation-for="Amount" class="text-danger small"></span>
-                    <div id="amountHelp" class="form-text">
+                    <div class="form-text">
                         Informe o valor total em dinheiro disponível no início da operação.
                     </div>
                 </div>

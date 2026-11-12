@@ -32,6 +32,9 @@ namespace FS.Store.Core.Helper
 
             foreach (var terminal in sessionVM.Terminals)
             {
+                if (terminal.CreditAmount == 0 && terminal.DebitAmount == 0 && terminal.PixAmount == 0)
+                    continue;
+
                 closing.Terminals!.Add(new()
                 {
                     CashRegisterSessionId = sessionVM.CashRegisterSessionId,

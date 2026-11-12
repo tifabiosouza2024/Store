@@ -49,7 +49,8 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
             {
                 OperationName = operation?.Name,
                 CashSessionAlreadyExists = await cashRegisterSessionService.AlreadyOpened(),
-                CashSessionNumber = qtt + 1
+                CashSessionNumber = qtt + 1,
+                OpenedAt = DateTime.Now
             };
             return View(session);
         }
@@ -68,7 +69,7 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
             var registerSession = new CashRegisterSession()
             {
                 CashRegisterStatus = Model.Enums.CashRegisterStatusEnum.Open,
-                OpenedAt = DateTime.Now,
+                OpenedAt = session.OpenedAt,
                 OpenedByUserId = User.GetUserId(),
                 OpeningAmount = session.Amount,
                 CashSessionNumber = session.CashSessionNumber,
