@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using FS.Store.Model.Extensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FS.Store.WebAPI.Areas.Catalog.Controllers
@@ -14,7 +15,7 @@ namespace FS.Store.WebAPI.Areas.Catalog.Controllers
             var images = Directory
                 .EnumerateFiles(presentationPath)
                 .Select(Path.GetFileName)
-                .Where(x => !string.IsNullOrEmpty(x))
+                .Where(x => x.IsNotNullOrEmpty())
                 .ToList();
 
             return View(images);

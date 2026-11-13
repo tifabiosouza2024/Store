@@ -284,6 +284,14 @@
                         </div>
                         <div class="mb-3">
                             <small class="text-muted d-block">
+                                Total de Suprimentos:
+                            </small>
+                            <strong id="cash-inflows">
+                                @Model.CashMovements.Where(c => c.CashMovementType == CashMovementTypeEnum.CashInflows).Sum(c => c.Amount).ToString("c")
+                            </strong>
+                        </div>
+                        <div class="mb-3">
+                            <small class="text-muted d-block">
                                 Total de Sangrias:
                             </small>
                             <strong id="withdrawals">
@@ -296,14 +304,6 @@
                             </small>
                             <strong id="expenses">
                                 @Model.CashMovements.Where(c => c.CashMovementType == CashMovementTypeEnum.Expense).Sum(c => c.Amount).ToString("c")
-                            </strong>
-                        </div>
-                        <div class="mb-3">
-                            <small class="text-muted d-block">
-                                Total de Suprimentos:
-                            </small>
-                            <strong id="cash-inflows">
-                                @Model.CashMovements.Where(c => c.CashMovementType == CashMovementTypeEnum.CashInflows).Sum(c => c.Amount).ToString("c")
                             </strong>
                         </div>
                         <div class="mb-3">
@@ -340,7 +340,7 @@
                         </div>
                         <hr />
                         <small class="text-muted d-block">
-                            Total informado
+                            Valor total da venda
                         </small>
                         <h3 class="text-primary mb-0" id="summaryTotal">
                             R$ 0,00

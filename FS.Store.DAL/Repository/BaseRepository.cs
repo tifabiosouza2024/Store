@@ -4,6 +4,7 @@ using FS.Store.DAL.Extensions;
 using FS.Store.DAL.Interfaces;
 using FS.Store.Model.Elements;
 using FS.Store.Model.Entity;
+using FS.Store.Model.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using System.Linq.Expressions;
@@ -18,7 +19,7 @@ namespace FS.Store.DAL.Repository
         #region Queryable
         private IQueryable<Entity> Queryable(Expression<Func<Entity, bool>>? filter = null
             , Func<IQueryable<Entity>, IIncludableQueryable<Entity, object?>>? includeProperties = null
-            , Pagination<Entity> pagination = null
+            , Pagination<Entity>? pagination = null
             , Func<IQueryable<Entity>, IQueryable<Entity>>? orderBy = null
             , Dictionary<string, string>? dynamicSorts = null
             , bool asNoTracking = false)
@@ -109,9 +110,9 @@ namespace FS.Store.DAL.Repository
             if (currentPage is null)
                 currentPage = 0;
 
+            var pagination = new Pagination<Entity>() { QttPerPage = qttPerPage.GetValueOrDefault() };
             var qtt = await CountAsync(filter);
 
-            var pagination = new Pagination<Entity>() { QttPerPage = qttPerPage.GetValueOrDefault() };
             pagination.CurrentPage = currentPage.GetValueOrDefault();
             pagination.TotalItems = qtt;
             pagination.Data = await Queryable(filter: filter
@@ -147,7 +148,7 @@ namespace FS.Store.DAL.Repository
                 return Convert.ToInt32(id) == 0;
 
             if (id is string)
-                return string.IsNullOrEmpty(id.ToString());
+                return id.ToString().IsNullOrEmpty();
 
             throw new RepositoryException("Tipo de Id não identificado");
         }

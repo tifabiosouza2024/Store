@@ -1,5 +1,5 @@
-﻿using FS.Store.Core.Extension;
-using FS.Store.Model.Entity;
+﻿using FS.Store.Model.Entity;
+using FS.Store.Model.Extensions;
 using Microsoft.AspNetCore.Identity;
 
 namespace FS.Store.Core.Helper

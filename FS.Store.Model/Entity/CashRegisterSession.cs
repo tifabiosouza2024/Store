@@ -33,6 +33,10 @@ namespace FS.Store.Model.Entity
         [Comment("Valor em espécie do total da abertura de caixa")]
         public decimal OpeningAmount { get; set; }
 
+        [Column("total_sales", TypeName = "decimal(10,2)")]
+        [Comment("Valor total vendido")]
+        public decimal TotalSales { get; set; }
+
         [Column("cash_register_status")]
         [Comment("Status da abertura de caixa (1 - aberto, 2 - fechado, 3 - cancelado)")]
         public CashRegisterStatusEnum CashRegisterStatus { get; set; }
@@ -65,5 +69,13 @@ namespace FS.Store.Model.Entity
         public virtual User? ChangedByUser { get; set; }
 
         public virtual ICollection<CashMovement> CashMovements { get; set; }
+
+        public virtual CashClosing? CashClosing { get; set; }
+
+        /// <summary>
+        /// retorna o balanço, obtendo os valores do fechamento subtraindo o valor de entrada, resultando no total vendido.
+        /// </summary>
+        public decimal ClosingBalance
+            => CashClosing?.ClosingTotalSales ?? 0 - OpeningAmount;
     }
 }

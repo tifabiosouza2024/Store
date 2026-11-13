@@ -1,4 +1,5 @@
-﻿using System.Linq.Dynamic.Core;
+﻿using FS.Store.Model.Extensions;
+using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 
 namespace FS.Store.DAL.Extensions
@@ -15,7 +16,7 @@ namespace FS.Store.DAL.Extensions
                 var property = param.Key;
                 var direction = param.Value?.ToLowerInvariant();
 
-                if (string.IsNullOrWhiteSpace(direction))
+                if (direction.IsNullOrEmpty())
                     continue;
 
                 if (complexExpressions != null && complexExpressions.TryGetValue(property, out var expr))

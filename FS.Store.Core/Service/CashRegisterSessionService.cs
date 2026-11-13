@@ -51,10 +51,11 @@ namespace FS.Store.Core.Service
                 && c.CashRegisterStatus == CashRegisterStatusEnum.Open
             , includeProperties: includeProperties);
 
-        public async Task<Pagination<CashRegisterSession>> GetAllPagedAsync(int page, int qttPerPage, Dictionary<string, string>? dynamicSorts = null)
+        public async Task<Pagination<CashRegisterSession>> GetAllPagedAsync(int page, int qttPerPage, Dictionary<string, string>? dynamicSorts = null
+            , Func<IQueryable<CashRegisterSession>, IQueryable<CashRegisterSession>>? orderBy = null)
             => await base.GetAllPagedAsync(currentPage: page, qttPerPage: qttPerPage, filter: c
                 => c.OperationId == currentUserHelper.CurrentOperationId,
-                dynamicSorts: dynamicSorts);
+                dynamicSorts: dynamicSorts, orderBy: orderBy);
 
         public async Task<int> Count()
             => await base.CountAsync(c => c.OperationId == currentUserHelper.CurrentOperationId

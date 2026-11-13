@@ -1,7 +1,9 @@
-﻿@model Pagination<CashRegisterSession>
+﻿@model CashSessionHistoryViewModel
 
 @{
     ViewData["Title"] = "Histórico de caixas";
+    var pagination = Model.Pagination;
+    var data = pagination?.Data;
 }
 
 @section Styles {
@@ -35,7 +37,7 @@
                 </h6>
 
                 <span class="text-muted small">
-                    @Model.TotalItems registros
+                    @pagination?.TotalItems registros
                 </span>
             </div>
         </div>
@@ -45,21 +47,24 @@
                 <table class="table table-hover align-middle mb-0">
                     <thead class="table-light">
                         <tr>
-                            <th table-header-ordered field="CashSessionNumber" header-text="Número do Caixa" is-number></th>
-                            <th table-header-ordered field="OpenedAt" header-text="Data de abertura"></th>
-                            <th table-header-ordered field="ClosedAt" header-text="Data de fechamento"></th>
-                            <th table-header-ordered field="OpenedByUser.Name" header-text="Responsável"></th>
-                            <th table-header-ordered field="OpeningAmount" header-text="Valor inicial" is-number class="text-end"></th>
-                            <th table-header-ordered field="CashRegisterStatus" header-text="Status" class="text-center"></th>
+                            <th table-header-ordered field="@nameof(CashRegisterSession.CashSessionNumber)" header-text="Número do Caixa" is-number></th>
+                            <th table-header-ordered field="@nameof(CashRegisterSession.OpenedAt)" header-text="Data de abertura"></th>
+                            <th table-header-ordered field="@nameof(CashRegisterSession.OpeningAmount)" header-text="Valor inicial" is-number class="text-end"></th>
+                            <th table-header-ordered field="@nameof(CashRegisterSession.OpenedByUser).@nameof(FS.Store.Model.Entity.User.Name)" header-text="Aberto por"></th>
+                            <th table-header-ordered field="@nameof(CashRegisterSession.ClosedAt)" header-text="Data de fechamento"></th>
+                            <th>Balanço</th>
+                            <th table-header-ordered field="@nameof(CashRegisterSession.TotalSales)" header-text="Total Vendido" is-number></th>
+                            <th table-header-ordered field="@nameof(CashRegisterSession.ClosedByUser).@nameof(FS.Store.Model.Entity.User.Name)" header-text="Fechado por por"></th>
+                            <th table-header-ordered field="@nameof(CashRegisterSession.CashRegisterStatus)" header-text="Status" class="text-center"></th>
                             <th class="text-end pe-3">Ações</th>
                         </tr>
                     </thead>
 
                     <tbody>
 
-                        @if (Model.Data.Any())
+                        @if (data != null&& data.Any())
                         {
-                            foreach (var item in Model.Data)
+                            foreach (var item in data)
                             {
                                 if (item == null)
                                     continue;
@@ -75,6 +80,12 @@
                                             @item.OpenedAt.ToString("HH:mm")
                                         </div>
                                     </td>
+                                    <td class="text-end">
+                                        @item.OpeningAmount.ToString("C2")
+                                    </td>
+                                    <td>
+                                        @item.OpenedByUser?.Name
+                                    </td>
 
                                     <td>
                                         @if (item.ClosedAt.HasValue)
@@ -89,14 +100,16 @@
                                             <span class="text-muted">—</span>
                                         }
                                     </td>
-
+                                    <td class="@(item.ClosingBalance != item.TotalSales ? "text-danger" : 0)">
+                                        @item.ClosingBalance.ToString("C2")
+                                    </td>
                                     <td>
-                                        @item.OpenedByUser?.Name
+                                        @item.TotalSales.ToString("C2")
+                                    </td>
+                                    <td>
+                                        @item.ClosedByUser?.Name
                                     </td>
 
-                                    <td class="text-end">
-                                        @item.OpeningAmount.ToString("C2")
-                                    </td>
 
                                     <td class="text-center">
                                         @switch (item.CashRegisterStatus)
@@ -151,15 +164,18 @@
             </div>
         </div>
 
-        <div class="card-footer bg-white border-0 py-3">
-            <partial name="_Pagination"
-                     model="@(new PaginationViewModel
-                     {
-                         TotalItems = Model.TotalItems,
-                         QttPerPage = Model.QttPerPage,
-                         CurrentPage = Model.CurrentPage
-                     })" />
-        </div>
+        @if (pagination != null)
+        {
+            <div class="card-footer bg-white border-0 py-3">
+                <partial name="_Pagination"
+                         model="@(new PaginationViewModel
+                         {
+                             TotalItems = pagination.TotalItems,
+                             QttPerPage = pagination.QttPerPage,
+                             CurrentPage = pagination.CurrentPage
+                         })" />
+            </div>            
+        }
 
     </div>
 

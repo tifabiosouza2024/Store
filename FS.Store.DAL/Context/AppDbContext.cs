@@ -60,12 +60,25 @@ namespace FS.Store.DAL.Context
                 }
             }
 
+            modelBuilder.Entity<CashClosingTerminal>(entity =>
+            {
+                entity.Property(e => e.ClosedAt)
+                    .HasColumnType("datetime(0)")
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                    .ValueGeneratedOnAdd();
+            });
+
             modelBuilder.Entity<CashRegisterSession>(entity =>
             {
                 entity.Property(e => e.OpenedAt)
                     .HasColumnType("datetime(0)")
                     .HasDefaultValueSql("CURRENT_TIMESTAMP")
                     .ValueGeneratedOnAdd();
+
+                entity
+                    .HasOne(s => s.CashClosing)
+                    .WithOne(c => c.CashRegisterSession)
+                    .HasForeignKey<CashClosing>(c => c.CashRegisterSessionId);
             });
 
             modelBuilder.Entity<Operation>(entity =>

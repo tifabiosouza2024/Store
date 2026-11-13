@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FS.Store.Model.Entity
@@ -14,6 +15,11 @@ namespace FS.Store.Model.Entity
     [Comment("Armazena o valor de cada terminal (maquininha)")]
     public class CashClosingTerminal : BaseEntity<long>
     {
+        [Column("closed_at", TypeName = "datetime(0)")]
+        [Comment("Data/Hora de fechamento")]
+        [DataType(DataType.DateTime)]
+        public DateTime? ClosedAt { get; set; }
+
         [Column("credit_amount", TypeName = "decimal(10,2)")]
         [Comment("Valor em crédito do terminal")]
         public decimal CreditAmount { get; set; }
@@ -36,6 +42,11 @@ namespace FS.Store.Model.Entity
         [ForeignKey("cash_register_session_id")]
         public long CashRegisterSessionId { get; set; }
         public virtual CashRegisterSession? CashRegisterSession { get; set; }
+
+        [Column("cash_closing_id")]
+        [ForeignKey("cash_closing_id")]
+        public long CashClosingId { get; set; }
+        public virtual CashClosing? CashClosing { get; set; }
 
         [Column("created_by_user_id")]
         [ForeignKey("created_by_user_id")]

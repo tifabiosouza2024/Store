@@ -23,21 +23,33 @@ namespace FS.Store.Model.Entity
         [DataType(DataType.DateTime)]
         public DateTime ClosedAt { get; set; }
 
-        [Column("cash_amount")]
-        [Comment("Valor total em dinheiro")]
+        [Column("cash_closing_amount", TypeName = "decimal(10,2)")]
+        [Comment("Valor total em dinheiro encontrado no fechamento do caixa")]
         public decimal CashAmount { get; set; }
 
-        [Column("total_credit")]
-        [Comment("Valor total de crédito")]
+        [Column("total_credit", TypeName = "decimal(10,2)")]
+        [Comment("Valor total de crédito passado em todas as maquininhas")]
         public decimal TotalCredit { get; set; }
 
-        [Column("total_debit")]
-        [Comment("Valor total de débito")]
+        [Column("total_debit", TypeName = "decimal(10,2)")]
+        [Comment("Valor total de débito passado em todas as maquininhas")]
         public decimal TotalDebit { get; set; }
 
-        [Column("total_pix")]
-        [Comment("Valor total de PIX")]
+        [Column("total_pix", TypeName = "decimal(10,2)")]
+        [Comment("Valor total de PIX recebido em todas as maquininhas")]
         public decimal TotalPix { get; set; }
+
+        [Column("total_expenses", TypeName = "decimal(10,2)")]
+        [Comment("Valor total de despesas pago em dinheiro")]
+        public decimal TotalExpenses { get; set; }
+
+        [Column("total_withdrawal", TypeName = "decimal(10,2)")]
+        [Comment("Valor total de saques realizado em dinheiro")]
+        public decimal TotalWithdrawal { get; set; }
+
+        [Column("total_cash_inflows", TypeName = "decimal(10,2)")]
+        [Comment("Valor total de aportes em dinheiro")]
+        public decimal TotalCashInflows { get; set; }
 
         [Column("notes")]
         [Comment("Observações sobre o fechamento")]
@@ -57,5 +69,11 @@ namespace FS.Store.Model.Entity
         public virtual User? ClosedByUser { get; set; }
 
         public virtual ICollection<CashClosingTerminal>? Terminals { get; set; }
+
+        /// <summary>
+        /// Retorna a soma do valores. Dinheiro + Pix + Crédito + Débito + Despesas + Sangrias
+        /// </summary>
+        public decimal ClosingTotalSales
+            => CashAmount + TotalPix + TotalCredit + TotalDebit + TotalExpenses + TotalWithdrawal;
     }
 }

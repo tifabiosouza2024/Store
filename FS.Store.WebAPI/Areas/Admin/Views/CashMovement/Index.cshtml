@@ -24,9 +24,9 @@
         <div class="d-flex flex-wrap gap-2">
 
             <partial name="Components/Buttons/_BtnAddSupply" model="new ButtonsViewModels(Model.CashSessionId, false, true)" />
-            
+
             <partial name="Components/Buttons/_BtnAddWithdrawal" model="new ButtonsViewModels(Model.CashSessionId, false, true)" />
-            
+
             <partial name="Components/Buttons/_BtnAddExpense" model="new ButtonsViewModels(Model.CashSessionId, false, true)" />
 
             <partial name="Components/Buttons/_BtnCloseSession" model="new ButtonsViewModels(Model.CashSessionId, false, true)" />
@@ -134,7 +134,7 @@
                         <option value="">Todas as movimentações</option>
                         @foreach (CashMovementTypeEnum type in Enum.GetValues(typeof(CashMovementTypeEnum)))
                         {
-                            <option value="@type" selected="@(movementType == type.ToString())">
+                            <option value="@type" selected="@(type.EqualsName(movementType.ToString()))">
                                 @type.GetDisplayName()
                             </option>
                         }
@@ -146,7 +146,7 @@
 
         <div class="card-body p-0">
 
-            @if (Model.Items.Where(i => string.IsNullOrEmpty(movementType) || i.CashMovementType.ToString() == movementType).Any())
+            @if (Model.Items.Where(i => movementType.IsNullOrEmpty() || i.CashMovementType.EqualsName(movementType.ToString())).Any())
             {
                 <div class="table-responsive">
 
@@ -164,7 +164,7 @@
 
                         <tbody>
 
-                            @foreach (var item in Model.Items.Where(i => string.IsNullOrEmpty(movementType) || i.CashMovementType.ToString() == movementType))
+                            @foreach (var item in Model.Items.Where(i => movementType.IsNullOrEmpty() || i.CashMovementType.EqualsName(movementType.ToString())))
                             {
                                 var isSupply = item.CashMovementType == CashMovementTypeEnum.CashInflows;
                                 <tr>
@@ -198,9 +198,7 @@
                                     </td>
 
                                     <td>
-                                        @(string.IsNullOrWhiteSpace(item.Description)
-                                            ? "Não informado"
-                                            : item.Description)
+                                        @(item.Description ?? "Não informado")
                                     </td>
 
                                     <td>

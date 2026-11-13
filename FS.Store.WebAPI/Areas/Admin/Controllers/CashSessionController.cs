@@ -138,6 +138,9 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
 
             await cashRegisterSessionService.SaveChangesAsync();
 
+            if (sessionVM.CashRegisterStatus == CashRegisterStatusEnum.Canceled || sessionVM.Deleted)
+                currentCashSessionService.Clear();
+
             return RedirectToAction("Index");
         }
 
@@ -199,8 +202,12 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
         public async Task<IActionResult> History(int page, int qttPerPage)
         {
             var sorting = this.GetSorting();
-            Pagination<CashRegisterSession> result = await cashRegisterSessionService.GetAllPagedAsync(page, qttPerPage, sorting);
-            return View(result);
+            Pagination<CashRegisterSession> result = await cashRegisterSessionService.GetAllPagedAsync(page, qttPerPage, sorting, q => q.OrderByDescending(o => o.Id));
+            var vm = new CashSessionHistoryViewModel()
+            {
+                Pagination = result
+            };
+            return View(vm);
         }
 
     }

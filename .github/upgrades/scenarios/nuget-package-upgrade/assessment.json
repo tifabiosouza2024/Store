@@ -1,0 +1,799 @@
+{
+  "settings": {
+    "components": {
+      "code": true,
+      "binaries": false
+    },
+    "targetId": ""
+  },
+  "analysisStartTime": "2026-11-13T22:31:56.1465382Z",
+  "analysisEndTime": "2026-11-13T22:32:01.4865039Z",
+  "privacyModeHelpUrl": "https://go.microsoft.com/fwlink/?linkid=2270980",
+  "stats": {
+    "summary": {
+      "projects": 4,
+      "issues": 2,
+      "incidents": 26,
+      "effort": 1
+    },
+    "charts": {
+      "severity": {
+        "Mandatory": 0,
+        "Optional": 0,
+        "Potential": 1,
+        "Information": 25
+      },
+      "category": {
+        "Pkg": 26
+      }
+    }
+  },
+  "projects": [
+    {
+      "path": "FS.Store.Core\\FS.Store.Core.csproj",
+      "startingProject": true,
+      "issues": 1,
+      "storyPoints": 0,
+      "properties": {
+        "appName": "FS.Store.Core",
+        "projectKind": "ClassLibrary",
+        "frameworks": [
+          "net10.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "isTestProject": false,
+        "numberOfFiles": 24,
+        "numberOfCodeFiles": 24,
+        "linesTotal": 581,
+        "linesOfCode": 581,
+        "totalApiScanned": 0,
+        "minLinesOfCodeToChange": 0,
+        "maxLinesOfCodeToChange": 0
+      },
+      "ruleInstances": [
+        {
+          "incidentId": "bd457575-855d-46cc-835d-2bdb03082e18",
+          "ruleId": "Pkg.0001",
+          "description": "Project references \u0027Microsoft.AspNetCore.Http.Abstractions\u0027 2.3.13; proposed upgrade to 2.3.14.",
+          "projectPath": "FS.Store.Core\\FS.Store.Core.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Microsoft.AspNetCore.Http.Abstractions, 2.3.13",
+              "protected": "Microsoft.AspNetCore.Http.Abstractions, 2.3.13"
+            },
+            "kind": "File",
+            "path": "FS.Store.Core\\FS.Store.Core.csproj",
+            "snippet": "Microsoft.AspNetCore.Http.Abstractions, 2.3.13",
+            "protectedSnippet": "Microsoft.AspNetCore.Http.Abstractions, 2.3.13",
+            "label": "Microsoft.AspNetCore.Http.Abstractions 2.3.13",
+            "properties": {
+              "PackageId": "Microsoft.AspNetCore.Http.Abstractions",
+              "PackageVersion": "2.3.13",
+              "PackageNewVersion": "2.3.14",
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "0f924047-c8e6-446e-a565-35b507c259f4",
+          "ruleId": "Pkg.0001",
+          "description": "Project references \u0027Microsoft.Extensions.Identity.Core\u0027 10.0.14; proposed upgrade to 11.0.0.",
+          "projectPath": "FS.Store.Core\\FS.Store.Core.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Microsoft.Extensions.Identity.Core, 10.0.14",
+              "protected": "Microsoft.Extensions.Identity.Core, 10.0.14"
+            },
+            "kind": "File",
+            "path": "FS.Store.Core\\FS.Store.Core.csproj",
+            "snippet": "Microsoft.Extensions.Identity.Core, 10.0.14",
+            "protectedSnippet": "Microsoft.Extensions.Identity.Core, 10.0.14",
+            "label": "Microsoft.Extensions.Identity.Core 10.0.14",
+            "properties": {
+              "PackageId": "Microsoft.Extensions.Identity.Core",
+              "PackageVersion": "10.0.14",
+              "PackageNewVersion": "11.0.0",
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "01c1ee10-9ef6-4631-af4d-b13f7b38b9a3",
+          "ruleId": "Pkg.0001",
+          "description": "Project references \u0027System.Security.Cryptography.Pkcs\u0027 10.0.14; proposed upgrade to 11.0.0.",
+          "projectPath": "FS.Store.Core\\FS.Store.Core.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "System.Security.Cryptography.Pkcs, 10.0.14",
+              "protected": "System.Security.Cryptography.Pkcs, 10.0.14"
+            },
+            "kind": "File",
+            "path": "FS.Store.Core\\FS.Store.Core.csproj",
+            "snippet": "System.Security.Cryptography.Pkcs, 10.0.14",
+            "protectedSnippet": "System.Security.Cryptography.Pkcs, 10.0.14",
+            "label": "System.Security.Cryptography.Pkcs 10.0.14",
+            "properties": {
+              "PackageId": "System.Security.Cryptography.Pkcs",
+              "PackageVersion": "10.0.14",
+              "PackageNewVersion": "11.0.0",
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "21efd080-2eed-470e-82cd-69d84f372b2a",
+          "ruleId": "Pkg.0001",
+          "description": "Project references \u0027System.Security.Cryptography.Xml\u0027 10.0.14; proposed upgrade to 11.0.0.",
+          "projectPath": "FS.Store.Core\\FS.Store.Core.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "System.Security.Cryptography.Xml, 10.0.14",
+              "protected": "System.Security.Cryptography.Xml, 10.0.14"
+            },
+            "kind": "File",
+            "path": "FS.Store.Core\\FS.Store.Core.csproj",
+            "snippet": "System.Security.Cryptography.Xml, 10.0.14",
+            "protectedSnippet": "System.Security.Cryptography.Xml, 10.0.14",
+            "label": "System.Security.Cryptography.Xml 10.0.14",
+            "properties": {
+              "PackageId": "System.Security.Cryptography.Xml",
+              "PackageVersion": "10.0.14",
+              "PackageNewVersion": "11.0.0",
+              "PackageReplacements": null
+            }
+          }
+        }
+      ],
+      "features": []
+    },
+    {
+      "path": "FS.Store.DAL\\FS.Store.DAL.csproj",
+      "startingProject": true,
+      "issues": 1,
+      "storyPoints": 0,
+      "properties": {
+        "appName": "FS.Store.DAL",
+        "projectKind": "ClassLibrary",
+        "frameworks": [
+          "net10.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "isTestProject": false,
+        "numberOfFiles": 35,
+        "numberOfCodeFiles": 35,
+        "linesTotal": 7227,
+        "linesOfCode": 7227,
+        "totalApiScanned": 0,
+        "minLinesOfCodeToChange": 0,
+        "maxLinesOfCodeToChange": 0
+      },
+      "ruleInstances": [
+        {
+          "incidentId": "d674445e-fab9-463a-bfb8-34bce0f23a0d",
+          "ruleId": "Pkg.0001",
+          "description": "Project references \u0027Microsoft.Extensions.Identity.Core\u0027 10.0.14; proposed upgrade to 11.0.0.",
+          "projectPath": "FS.Store.DAL\\FS.Store.DAL.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Microsoft.Extensions.Identity.Core, 10.0.14",
+              "protected": "Microsoft.Extensions.Identity.Core, 10.0.14"
+            },
+            "kind": "File",
+            "path": "FS.Store.DAL\\FS.Store.DAL.csproj",
+            "snippet": "Microsoft.Extensions.Identity.Core, 10.0.14",
+            "protectedSnippet": "Microsoft.Extensions.Identity.Core, 10.0.14",
+            "label": "Microsoft.Extensions.Identity.Core 10.0.14",
+            "properties": {
+              "PackageId": "Microsoft.Extensions.Identity.Core",
+              "PackageVersion": "10.0.14",
+              "PackageNewVersion": "11.0.0",
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "7e21f3a3-0d6b-484e-b708-93037e544c7b",
+          "ruleId": "Pkg.0001",
+          "description": "Project references \u0027System.Security.Cryptography.Pkcs\u0027 10.0.14; proposed upgrade to 11.0.0.",
+          "projectPath": "FS.Store.DAL\\FS.Store.DAL.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "System.Security.Cryptography.Pkcs, 10.0.14",
+              "protected": "System.Security.Cryptography.Pkcs, 10.0.14"
+            },
+            "kind": "File",
+            "path": "FS.Store.DAL\\FS.Store.DAL.csproj",
+            "snippet": "System.Security.Cryptography.Pkcs, 10.0.14",
+            "protectedSnippet": "System.Security.Cryptography.Pkcs, 10.0.14",
+            "label": "System.Security.Cryptography.Pkcs 10.0.14",
+            "properties": {
+              "PackageId": "System.Security.Cryptography.Pkcs",
+              "PackageVersion": "10.0.14",
+              "PackageNewVersion": "11.0.0",
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "c638edf0-d7fc-4052-8f23-87eee1b13e38",
+          "ruleId": "Pkg.0001",
+          "description": "Project references \u0027System.Security.Cryptography.Xml\u0027 10.0.14; proposed upgrade to 11.0.0.",
+          "projectPath": "FS.Store.DAL\\FS.Store.DAL.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "System.Security.Cryptography.Xml, 10.0.14",
+              "protected": "System.Security.Cryptography.Xml, 10.0.14"
+            },
+            "kind": "File",
+            "path": "FS.Store.DAL\\FS.Store.DAL.csproj",
+            "snippet": "System.Security.Cryptography.Xml, 10.0.14",
+            "protectedSnippet": "System.Security.Cryptography.Xml, 10.0.14",
+            "label": "System.Security.Cryptography.Xml 10.0.14",
+            "properties": {
+              "PackageId": "System.Security.Cryptography.Xml",
+              "PackageVersion": "10.0.14",
+              "PackageNewVersion": "11.0.0",
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "04b2e1c1-0ef2-4c06-bff7-75e7fedf0df7",
+          "ruleId": "Pkg.0001",
+          "description": "Project references \u0027Microsoft.Extensions.Configuration\u0027 10.0.14; proposed upgrade to 11.0.0.",
+          "projectPath": "FS.Store.DAL\\FS.Store.DAL.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Microsoft.Extensions.Configuration, 10.0.14",
+              "protected": "Microsoft.Extensions.Configuration, 10.0.14"
+            },
+            "kind": "File",
+            "path": "FS.Store.DAL\\FS.Store.DAL.csproj",
+            "snippet": "Microsoft.Extensions.Configuration, 10.0.14",
+            "protectedSnippet": "Microsoft.Extensions.Configuration, 10.0.14",
+            "label": "Microsoft.Extensions.Configuration 10.0.14",
+            "properties": {
+              "PackageId": "Microsoft.Extensions.Configuration",
+              "PackageVersion": "10.0.14",
+              "PackageNewVersion": "11.0.0",
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "c4c62250-0d3b-4d44-b03b-b9084c5947c4",
+          "ruleId": "Pkg.0001",
+          "description": "Project references \u0027Microsoft.EntityFrameworkCore\u0027 10.0.14; proposed upgrade to 10.0.15.",
+          "projectPath": "FS.Store.DAL\\FS.Store.DAL.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Microsoft.EntityFrameworkCore, 10.0.14",
+              "protected": "Microsoft.EntityFrameworkCore, 10.0.14"
+            },
+            "kind": "File",
+            "path": "FS.Store.DAL\\FS.Store.DAL.csproj",
+            "snippet": "Microsoft.EntityFrameworkCore, 10.0.14",
+            "protectedSnippet": "Microsoft.EntityFrameworkCore, 10.0.14",
+            "label": "Microsoft.EntityFrameworkCore 10.0.14",
+            "properties": {
+              "PackageId": "Microsoft.EntityFrameworkCore",
+              "PackageVersion": "10.0.14",
+              "PackageNewVersion": "10.0.15",
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "6937699f-d6f4-4594-99a1-2af6645e1d4e",
+          "ruleId": "Pkg.0001",
+          "description": "Project references \u0027Microsoft.EntityFrameworkCore.Design\u0027 10.0.14; proposed upgrade to 10.0.15.",
+          "projectPath": "FS.Store.DAL\\FS.Store.DAL.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Microsoft.EntityFrameworkCore.Design, 10.0.14",
+              "protected": "Microsoft.EntityFrameworkCore.Design, 10.0.14"
+            },
+            "kind": "File",
+            "path": "FS.Store.DAL\\FS.Store.DAL.csproj",
+            "snippet": "Microsoft.EntityFrameworkCore.Design, 10.0.14",
+            "protectedSnippet": "Microsoft.EntityFrameworkCore.Design, 10.0.14",
+            "label": "Microsoft.EntityFrameworkCore.Design 10.0.14",
+            "properties": {
+              "PackageId": "Microsoft.EntityFrameworkCore.Design",
+              "PackageVersion": "10.0.14",
+              "PackageNewVersion": "10.0.15",
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "cb200f8f-862c-42ad-8aff-01df9fc8f1fe",
+          "ruleId": "Pkg.0001",
+          "description": "Project references \u0027Microsoft.EntityFrameworkCore.Proxies\u0027 10.0.14; proposed upgrade to 10.0.15.",
+          "projectPath": "FS.Store.DAL\\FS.Store.DAL.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Microsoft.EntityFrameworkCore.Proxies, 10.0.14",
+              "protected": "Microsoft.EntityFrameworkCore.Proxies, 10.0.14"
+            },
+            "kind": "File",
+            "path": "FS.Store.DAL\\FS.Store.DAL.csproj",
+            "snippet": "Microsoft.EntityFrameworkCore.Proxies, 10.0.14",
+            "protectedSnippet": "Microsoft.EntityFrameworkCore.Proxies, 10.0.14",
+            "label": "Microsoft.EntityFrameworkCore.Proxies 10.0.14",
+            "properties": {
+              "PackageId": "Microsoft.EntityFrameworkCore.Proxies",
+              "PackageVersion": "10.0.14",
+              "PackageNewVersion": "10.0.15",
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "bd51386a-20b5-4a2d-82b3-cc80f0088efb",
+          "ruleId": "Pkg.0001",
+          "description": "Project references \u0027Microsoft.EntityFrameworkCore.Relational\u0027 10.0.14; proposed upgrade to 10.0.15.",
+          "projectPath": "FS.Store.DAL\\FS.Store.DAL.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Microsoft.EntityFrameworkCore.Relational, 10.0.14",
+              "protected": "Microsoft.EntityFrameworkCore.Relational, 10.0.14"
+            },
+            "kind": "File",
+            "path": "FS.Store.DAL\\FS.Store.DAL.csproj",
+            "snippet": "Microsoft.EntityFrameworkCore.Relational, 10.0.14",
+            "protectedSnippet": "Microsoft.EntityFrameworkCore.Relational, 10.0.14",
+            "label": "Microsoft.EntityFrameworkCore.Relational 10.0.14",
+            "properties": {
+              "PackageId": "Microsoft.EntityFrameworkCore.Relational",
+              "PackageVersion": "10.0.14",
+              "PackageNewVersion": "10.0.15",
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "bf9a6c9f-b764-4e52-a6e3-9fa48e3b1741",
+          "ruleId": "Pkg.0001",
+          "description": "Project references \u0027Microsoft.EntityFrameworkCore.Tools\u0027 10.0.14; proposed upgrade to 11.0.0.",
+          "projectPath": "FS.Store.DAL\\FS.Store.DAL.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Microsoft.EntityFrameworkCore.Tools, 10.0.14",
+              "protected": "Microsoft.EntityFrameworkCore.Tools, 10.0.14"
+            },
+            "kind": "File",
+            "path": "FS.Store.DAL\\FS.Store.DAL.csproj",
+            "snippet": "Microsoft.EntityFrameworkCore.Tools, 10.0.14",
+            "protectedSnippet": "Microsoft.EntityFrameworkCore.Tools, 10.0.14",
+            "label": "Microsoft.EntityFrameworkCore.Tools 10.0.14",
+            "properties": {
+              "PackageId": "Microsoft.EntityFrameworkCore.Tools",
+              "PackageVersion": "10.0.14",
+              "PackageNewVersion": "11.0.0",
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "894759a4-f672-4407-b660-447864911568",
+          "ruleId": "Pkg.0001",
+          "description": "Project references \u0027MySql.EntityFrameworkCore\u0027 10.0.12 (included in this upgrade).",
+          "projectPath": "FS.Store.DAL\\FS.Store.DAL.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "MySql.EntityFrameworkCore, 10.0.12",
+              "protected": "MySql.EntityFrameworkCore, 10.0.12"
+            },
+            "kind": "File",
+            "path": "FS.Store.DAL\\FS.Store.DAL.csproj",
+            "snippet": "MySql.EntityFrameworkCore, 10.0.12",
+            "protectedSnippet": "MySql.EntityFrameworkCore, 10.0.12",
+            "label": "MySql.EntityFrameworkCore 10.0.12",
+            "properties": {
+              "PackageId": "MySql.EntityFrameworkCore",
+              "PackageVersion": "10.0.12",
+              "PackageNewVersion": "10.0.12",
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "12201c32-12ec-4eed-8514-2227378800fe",
+          "ruleId": "Pkg.0001",
+          "description": "Project references \u0027System.Linq.Dynamic.Core\u0027 1.7.4 (included in this upgrade).",
+          "projectPath": "FS.Store.DAL\\FS.Store.DAL.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "System.Linq.Dynamic.Core, 1.7.4",
+              "protected": "System.Linq.Dynamic.Core, 1.7.4"
+            },
+            "kind": "File",
+            "path": "FS.Store.DAL\\FS.Store.DAL.csproj",
+            "snippet": "System.Linq.Dynamic.Core, 1.7.4",
+            "protectedSnippet": "System.Linq.Dynamic.Core, 1.7.4",
+            "label": "System.Linq.Dynamic.Core 1.7.4",
+            "properties": {
+              "PackageId": "System.Linq.Dynamic.Core",
+              "PackageVersion": "1.7.4",
+              "PackageNewVersion": "1.7.4",
+              "PackageReplacements": null
+            }
+          }
+        }
+      ],
+      "features": []
+    },
+    {
+      "path": "FS.Store.Model\\FS.Store.Model.csproj",
+      "startingProject": true,
+      "issues": 1,
+      "storyPoints": 0,
+      "properties": {
+        "appName": "FS.Store.Model",
+        "projectKind": "ClassLibrary",
+        "frameworks": [
+          "net10.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "isTestProject": false,
+        "numberOfFiles": 29,
+        "numberOfCodeFiles": 29,
+        "linesTotal": 1041,
+        "linesOfCode": 1041,
+        "totalApiScanned": 0,
+        "minLinesOfCodeToChange": 0,
+        "maxLinesOfCodeToChange": 0
+      },
+      "ruleInstances": [
+        {
+          "incidentId": "99e667de-e8f2-43bd-a284-0b2028f9bd72",
+          "ruleId": "Pkg.0001",
+          "description": "Project references \u0027System.Security.Cryptography.Pkcs\u0027 10.0.14; proposed upgrade to 11.0.0.",
+          "projectPath": "FS.Store.Model\\FS.Store.Model.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "System.Security.Cryptography.Pkcs, 10.0.14",
+              "protected": "System.Security.Cryptography.Pkcs, 10.0.14"
+            },
+            "kind": "File",
+            "path": "FS.Store.Model\\FS.Store.Model.csproj",
+            "snippet": "System.Security.Cryptography.Pkcs, 10.0.14",
+            "protectedSnippet": "System.Security.Cryptography.Pkcs, 10.0.14",
+            "label": "System.Security.Cryptography.Pkcs 10.0.14",
+            "properties": {
+              "PackageId": "System.Security.Cryptography.Pkcs",
+              "PackageVersion": "10.0.14",
+              "PackageNewVersion": "11.0.0",
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "8d6e4646-1903-4808-b87c-b31c08a582b2",
+          "ruleId": "Pkg.0001",
+          "description": "Project references \u0027System.Security.Cryptography.Xml\u0027 10.0.14; proposed upgrade to 11.0.0.",
+          "projectPath": "FS.Store.Model\\FS.Store.Model.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "System.Security.Cryptography.Xml, 10.0.14",
+              "protected": "System.Security.Cryptography.Xml, 10.0.14"
+            },
+            "kind": "File",
+            "path": "FS.Store.Model\\FS.Store.Model.csproj",
+            "snippet": "System.Security.Cryptography.Xml, 10.0.14",
+            "protectedSnippet": "System.Security.Cryptography.Xml, 10.0.14",
+            "label": "System.Security.Cryptography.Xml 10.0.14",
+            "properties": {
+              "PackageId": "System.Security.Cryptography.Xml",
+              "PackageVersion": "10.0.14",
+              "PackageNewVersion": "11.0.0",
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "615a0a90-93d0-461d-a7d1-0875eabd9678",
+          "ruleId": "Pkg.0001",
+          "description": "Project references \u0027Microsoft.AspNetCore.Mvc.ViewFeatures\u0027 2.3.13; proposed upgrade to 2.3.14.",
+          "projectPath": "FS.Store.Model\\FS.Store.Model.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Microsoft.AspNetCore.Mvc.ViewFeatures, 2.3.13",
+              "protected": "Microsoft.AspNetCore.Mvc.ViewFeatures, 2.3.13"
+            },
+            "kind": "File",
+            "path": "FS.Store.Model\\FS.Store.Model.csproj",
+            "snippet": "Microsoft.AspNetCore.Mvc.ViewFeatures, 2.3.13",
+            "protectedSnippet": "Microsoft.AspNetCore.Mvc.ViewFeatures, 2.3.13",
+            "label": "Microsoft.AspNetCore.Mvc.ViewFeatures 2.3.13",
+            "properties": {
+              "PackageId": "Microsoft.AspNetCore.Mvc.ViewFeatures",
+              "PackageVersion": "2.3.13",
+              "PackageNewVersion": "2.3.14",
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "52a12c2f-676c-4955-8481-103fde76bff1",
+          "ruleId": "Pkg.0001",
+          "description": "Project references \u0027Microsoft.EntityFrameworkCore.Abstractions\u0027 10.0.14; proposed upgrade to 11.0.0.",
+          "projectPath": "FS.Store.Model\\FS.Store.Model.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Microsoft.EntityFrameworkCore.Abstractions, 10.0.14",
+              "protected": "Microsoft.EntityFrameworkCore.Abstractions, 10.0.14"
+            },
+            "kind": "File",
+            "path": "FS.Store.Model\\FS.Store.Model.csproj",
+            "snippet": "Microsoft.EntityFrameworkCore.Abstractions, 10.0.14",
+            "protectedSnippet": "Microsoft.EntityFrameworkCore.Abstractions, 10.0.14",
+            "label": "Microsoft.EntityFrameworkCore.Abstractions 10.0.14",
+            "properties": {
+              "PackageId": "Microsoft.EntityFrameworkCore.Abstractions",
+              "PackageVersion": "10.0.14",
+              "PackageNewVersion": "11.0.0",
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "ee680e68-9087-470d-88d8-4802acb84027",
+          "ruleId": "Pkg.0001",
+          "description": "Project references \u0027Microsoft.Extensions.Configuration\u0027 10.0.14; proposed upgrade to 11.0.0.",
+          "projectPath": "FS.Store.Model\\FS.Store.Model.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Microsoft.Extensions.Configuration, 10.0.14",
+              "protected": "Microsoft.Extensions.Configuration, 10.0.14"
+            },
+            "kind": "File",
+            "path": "FS.Store.Model\\FS.Store.Model.csproj",
+            "snippet": "Microsoft.Extensions.Configuration, 10.0.14",
+            "protectedSnippet": "Microsoft.Extensions.Configuration, 10.0.14",
+            "label": "Microsoft.Extensions.Configuration 10.0.14",
+            "properties": {
+              "PackageId": "Microsoft.Extensions.Configuration",
+              "PackageVersion": "10.0.14",
+              "PackageNewVersion": "11.0.0",
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "97e7149f-7eca-4b0e-b329-90f241971efe",
+          "ruleId": "Pkg.0001",
+          "description": "Project references \u0027Microsoft.Extensions.Configuration.Json\u0027 10.0.14; proposed upgrade to 11.0.0.",
+          "projectPath": "FS.Store.Model\\FS.Store.Model.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Microsoft.Extensions.Configuration.Json, 10.0.14",
+              "protected": "Microsoft.Extensions.Configuration.Json, 10.0.14"
+            },
+            "kind": "File",
+            "path": "FS.Store.Model\\FS.Store.Model.csproj",
+            "snippet": "Microsoft.Extensions.Configuration.Json, 10.0.14",
+            "protectedSnippet": "Microsoft.Extensions.Configuration.Json, 10.0.14",
+            "label": "Microsoft.Extensions.Configuration.Json 10.0.14",
+            "properties": {
+              "PackageId": "Microsoft.Extensions.Configuration.Json",
+              "PackageVersion": "10.0.14",
+              "PackageNewVersion": "11.0.0",
+              "PackageReplacements": null
+            }
+          }
+        }
+      ],
+      "features": []
+    },
+    {
+      "path": "FS.Store.WebAPI\\FS.Store.WebAPI.csproj",
+      "startingProject": true,
+      "issues": 2,
+      "storyPoints": 1,
+      "properties": {
+        "appName": "FS.Store.WebAPI",
+        "projectKind": "AspNetCore",
+        "frameworks": [
+          "net10.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "isTestProject": false,
+        "numberOfFiles": 88,
+        "numberOfCodeFiles": 74,
+        "linesTotal": 6406,
+        "linesOfCode": 5078,
+        "totalApiScanned": 0,
+        "minLinesOfCodeToChange": 0,
+        "maxLinesOfCodeToChange": 0
+      },
+      "ruleInstances": [
+        {
+          "incidentId": "6cf79f6c-5f5e-41ac-924f-a278448a9b9e",
+          "ruleId": "Pkg.0001",
+          "description": "Project references \u0027Microsoft.EntityFrameworkCore.Design\u0027 10.0.14; proposed upgrade to 10.0.15.",
+          "projectPath": "FS.Store.WebAPI\\FS.Store.WebAPI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Microsoft.EntityFrameworkCore.Design, 10.0.14",
+              "protected": "Microsoft.EntityFrameworkCore.Design, 10.0.14"
+            },
+            "kind": "File",
+            "path": "FS.Store.WebAPI\\FS.Store.WebAPI.csproj",
+            "snippet": "Microsoft.EntityFrameworkCore.Design, 10.0.14",
+            "protectedSnippet": "Microsoft.EntityFrameworkCore.Design, 10.0.14",
+            "label": "Microsoft.EntityFrameworkCore.Design 10.0.14",
+            "properties": {
+              "PackageId": "Microsoft.EntityFrameworkCore.Design",
+              "PackageVersion": "10.0.14",
+              "PackageNewVersion": "10.0.15",
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "b2033973-5ffc-40d1-b21c-49813a2cf91f",
+          "ruleId": "Pkg.0001",
+          "description": "Project references \u0027Microsoft.AspNetCore.Authentication.JwtBearer\u0027 10.0.14; proposed upgrade to 10.0.15.",
+          "projectPath": "FS.Store.WebAPI\\FS.Store.WebAPI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Microsoft.AspNetCore.Authentication.JwtBearer, 10.0.14",
+              "protected": "Microsoft.AspNetCore.Authentication.JwtBearer, 10.0.14"
+            },
+            "kind": "File",
+            "path": "FS.Store.WebAPI\\FS.Store.WebAPI.csproj",
+            "snippet": "Microsoft.AspNetCore.Authentication.JwtBearer, 10.0.14",
+            "protectedSnippet": "Microsoft.AspNetCore.Authentication.JwtBearer, 10.0.14",
+            "label": "Microsoft.AspNetCore.Authentication.JwtBearer 10.0.14",
+            "properties": {
+              "PackageId": "Microsoft.AspNetCore.Authentication.JwtBearer",
+              "PackageVersion": "10.0.14",
+              "PackageNewVersion": "10.0.15",
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "e9772fa9-e2e8-41fb-82ed-7fb582bec427",
+          "ruleId": "Pkg.0001",
+          "description": "Project references \u0027Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation\u0027 10.0.14; proposed upgrade to 10.0.15.",
+          "projectPath": "FS.Store.WebAPI\\FS.Store.WebAPI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation, 10.0.14",
+              "protected": "Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation, 10.0.14"
+            },
+            "kind": "File",
+            "path": "FS.Store.WebAPI\\FS.Store.WebAPI.csproj",
+            "snippet": "Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation, 10.0.14",
+            "protectedSnippet": "Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation, 10.0.14",
+            "label": "Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation 10.0.14",
+            "properties": {
+              "PackageId": "Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation",
+              "PackageVersion": "10.0.14",
+              "PackageNewVersion": "10.0.15",
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "2010a652-30ca-4e27-9b44-a5b46220088c",
+          "ruleId": "Pkg.0001",
+          "description": "Project references \u0027Microsoft.VisualStudio.Azure.Containers.Tools.Targets\u0027 1.24.2-preview.1, but no supported upgrade version could be resolved for it; this project must stay on 1.24.2-preview.1.",
+          "projectPath": "FS.Store.WebAPI\\FS.Store.WebAPI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Microsoft.VisualStudio.Azure.Containers.Tools.Targets, 1.24.2-preview.1",
+              "protected": "Microsoft.VisualStudio.Azure.Containers.Tools.Targets, 1.24.2-preview.1"
+            },
+            "kind": "File",
+            "path": "FS.Store.WebAPI\\FS.Store.WebAPI.csproj",
+            "snippet": "Microsoft.VisualStudio.Azure.Containers.Tools.Targets, 1.24.2-preview.1",
+            "protectedSnippet": "Microsoft.VisualStudio.Azure.Containers.Tools.Targets, 1.24.2-preview.1",
+            "label": "Microsoft.VisualStudio.Azure.Containers.Tools.Targets 1.24.2-preview.1",
+            "properties": {
+              "PackageId": "Microsoft.VisualStudio.Azure.Containers.Tools.Targets",
+              "PackageVersion": "1.24.2-preview.1",
+              "PackageNewVersion": null,
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "ecff1987-a7aa-4910-a73d-81bb22e7c4ea",
+          "ruleId": "Pkg.0003",
+          "description": "Package \u0027Microsoft.VisualStudio.Azure.Containers.Tools.Targets\u0027 could not be unified to a single version across the scoped projects; no available version supports this project\u0027s target framework(s), so this project cannot be upgraded and must stay on 1.24.2-preview.1.",
+          "projectPath": "FS.Store.WebAPI\\FS.Store.WebAPI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Microsoft.VisualStudio.Azure.Containers.Tools.Targets, 1.24.2-preview.1",
+              "protected": "Microsoft.VisualStudio.Azure.Containers.Tools.Targets, 1.24.2-preview.1"
+            },
+            "kind": "File",
+            "path": "FS.Store.WebAPI\\FS.Store.WebAPI.csproj",
+            "snippet": "Microsoft.VisualStudio.Azure.Containers.Tools.Targets, 1.24.2-preview.1",
+            "protectedSnippet": "Microsoft.VisualStudio.Azure.Containers.Tools.Targets, 1.24.2-preview.1",
+            "label": "Microsoft.VisualStudio.Azure.Containers.Tools.Targets 1.24.2-preview.1",
+            "properties": {
+              "PackageId": "Microsoft.VisualStudio.Azure.Containers.Tools.Targets",
+              "PackageVersion": "1.24.2-preview.1",
+              "PackageNewVersion": null,
+              "PackageReplacements": null
+            }
+          }
+        }
+      ],
+      "features": []
+    }
+  ],
+  "rules": {
+    "Pkg.0001": {
+      "id": "Pkg.0001",
+      "isFeature": false,
+      "description": "Project references a package included in this upgrade.\n\nThe project references one of the packages being upgraded. This finding records the reference (current and proposed version) so the assessment lists every affected project even when no breaking API changes were detected.",
+      "label": "Project references an upgraded package",
+      "severity": "Information",
+      "effort": 0
+    },
+    "Pkg.0003": {
+      "id": "Pkg.0003",
+      "isFeature": false,
+      "description": "NuGet package version diverges across the scoped projects.\n\nDifferent projects need or support different versions of the package, so a single unified upgrade version could not be selected. Review the per-project breakdown and decide whether to align the projects on a common version or upgrade them independently.",
+      "label": "NuGet package version diverges across projects",
+      "severity": "Potential",
+      "effort": 1
+    }
+  }
+}

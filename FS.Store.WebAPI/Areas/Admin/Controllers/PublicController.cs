@@ -1,4 +1,5 @@
 ﻿using FS.Store.Core.Interfaces;
+using FS.Store.Model.Extensions;
 using FS.Store.WebAPI.Areas.Admin.ViewModels;
 using FS.Store.WebAPI.Helpers;
 using Microsoft.AspNetCore.Authentication;
@@ -19,7 +20,7 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginViewModel model)
+        public async Task<IActionResult> Login(LoginViewModel model, string? returnUrl)
         {
             if (!ModelState.IsValid)
                 return View(model);
@@ -27,7 +28,11 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
             var user = await userService.FindByEmail(model.Email);
 
             if (await authHelper.LoginAsync(user, model))
+            {
+                if (returnUrl.IsNotNullOrEmpty())
+                    return Redirect(returnUrl);
                 return RedirectToAction("Index", "Home", new { Area = "Admin" });
+            }
 
             ModelState.AddModelError(nameof(LoginViewModel.Password), "Senha Incorreta");
 

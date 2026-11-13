@@ -19,5 +19,9 @@ namespace FS.Store.Model.Extensions
 
             return enumValue.ToString();
         }
+
+        public static bool EqualsName<TEnum>(this TEnum value, string? name) where TEnum : struct, Enum
+            => value.ToString().Equals(name, StringComparison.OrdinalIgnoreCase);
+
     }
 }

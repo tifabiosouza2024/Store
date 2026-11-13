@@ -7,7 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace FS.Store.Model.Entity
 {
     /// <summary>
-    /// Usuarios do sistema
+    /// Usuários do sistema
     /// <para>
     /// TypeId: Guid
     /// </para>

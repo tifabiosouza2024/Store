@@ -6,7 +6,8 @@ namespace FS.Store.Core.Interfaces
 {
     public interface ICashRegisterSessionService : IBaseService<CashRegisterSession, long>
     {
-        Task<Pagination<CashRegisterSession>> GetAllPagedAsync(int page, int qttPerPage, Dictionary<string, string>? dynamicSorts = null);
+        Task<Pagination<CashRegisterSession>> GetAllPagedAsync(int page, int qttPerPage, Dictionary<string, string>? dynamicSorts = null
+            , Func<IQueryable<CashRegisterSession>, IQueryable<CashRegisterSession>>? orderBy = null);
 
         Task<CashRegisterSession?> GetByIdAsync(long id
             , Func<IQueryable<CashRegisterSession>, IIncludableQueryable<CashRegisterSession, object?>>? includeProperties = null);

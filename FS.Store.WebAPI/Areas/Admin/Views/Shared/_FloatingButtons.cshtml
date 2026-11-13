@@ -6,7 +6,7 @@
         <div class="fab-menu">
             @foreach (var btn in Model.Buttons)
             {
-                if (!string.IsNullOrEmpty(btn.Url))
+                if (btn.Url.IsNotNullOrEmpty())
                 {
                     <a href="@btn.Url"
                        class="btn @btn.Color rounded-circle shadow fab-item d-flex align-items-center justify-content-center"
@@ -27,7 +27,7 @@
             }
         </div>
     }
-    @if (!string.IsNullOrEmpty(Model.MainUrl))
+    @if (Model.MainUrl.IsNotNullOrEmpty())
     {
         <a href="@Model.MainUrl"
            class="btn @Model.MainColor rounded-circle shadow fab-item d-flex align-items-center justify-content-center"

@@ -30,9 +30,9 @@ namespace FS.Store.DAL.Migrations
                         .HasColumnName("id");
 
                     b.Property<decimal>("CashAmount")
-                        .HasColumnType("decimal(18,2)")
-                        .HasColumnName("cash_amount")
-                        .HasComment("Valor total em dinheiro");
+                        .HasColumnType("decimal(10,2)")
+                        .HasColumnName("cash_closing_amount")
+                        .HasComment("Valor total em dinheiro encontrado no fechamento do caixa");
 
                     b.Property<long>("CashRegisterSessionId")
                         .HasColumnType("bigint")
@@ -69,20 +69,35 @@ namespace FS.Store.DAL.Migrations
                         .HasColumnName("notes")
                         .HasComment("Observações sobre o fechamento");
 
+                    b.Property<decimal>("TotalCashInflows")
+                        .HasColumnType("decimal(10,2)")
+                        .HasColumnName("total_cash_inflows")
+                        .HasComment("Valor total de aportes em dinheiro");
+
                     b.Property<decimal>("TotalCredit")
-                        .HasColumnType("decimal(18,2)")
+                        .HasColumnType("decimal(10,2)")
                         .HasColumnName("total_credit")
-                        .HasComment("Valor total de crédito");
+                        .HasComment("Valor total de crédito passado em todas as maquininhas");
 
                     b.Property<decimal>("TotalDebit")
-                        .HasColumnType("decimal(18,2)")
+                        .HasColumnType("decimal(10,2)")
                         .HasColumnName("total_debit")
-                        .HasComment("Valor total de débito");
+                        .HasComment("Valor total de débito passado em todas as maquininhas");
+
+                    b.Property<decimal>("TotalExpenses")
+                        .HasColumnType("decimal(10,2)")
+                        .HasColumnName("total_expenses")
+                        .HasComment("Valor total de despesas pago em dinheiro");
 
                     b.Property<decimal>("TotalPix")
-                        .HasColumnType("decimal(18,2)")
+                        .HasColumnType("decimal(10,2)")
                         .HasColumnName("total_pix")
-                        .HasComment("Valor total de PIX");
+                        .HasComment("Valor total de PIX recebido em todas as maquininhas");
+
+                    b.Property<decimal>("TotalWithdrawal")
+                        .HasColumnType("decimal(10,2)")
+                        .HasColumnName("total_withdrawal")
+                        .HasComment("Valor total de saques realizado em dinheiro");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .ValueGeneratedOnAddOrUpdate()
@@ -93,7 +108,8 @@ namespace FS.Store.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CashRegisterSessionId");
+                    b.HasIndex("CashRegisterSessionId")
+                        .IsUnique();
 
                     b.HasIndex("ClosedByUserId");
 
@@ -110,12 +126,20 @@ namespace FS.Store.DAL.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("id");
 
-                    b.Property<long?>("CashClosingId")
-                        .HasColumnType("bigint");
+                    b.Property<long>("CashClosingId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("cash_closing_id");
 
                     b.Property<long>("CashRegisterSessionId")
                         .HasColumnType("bigint")
                         .HasColumnName("cash_register_session_id");
+
+                    b.Property<DateTime?>("ClosedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(0)")
+                        .HasColumnName("closed_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                        .HasComment("Data/Hora de fechamento");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -334,6 +358,11 @@ namespace FS.Store.DAL.Migrations
                         .HasColumnType("char(36)")
                         .HasColumnName("operation_id")
                         .HasComment("ID da Operação");
+
+                    b.Property<decimal>("TotalSales")
+                        .HasColumnType("decimal(10,2)")
+                        .HasColumnName("total_sales")
+                        .HasComment("Valor total vendido");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .ValueGeneratedOnAddOrUpdate()
@@ -736,8 +765,8 @@ namespace FS.Store.DAL.Migrations
             modelBuilder.Entity("FS.Store.Model.Entity.CashClosing", b =>
                 {
                     b.HasOne("FS.Store.Model.Entity.CashRegisterSession", "CashRegisterSession")
-                        .WithMany()
-                        .HasForeignKey("CashRegisterSessionId")
+                        .WithOne("CashClosing")
+                        .HasForeignKey("FS.Store.Model.Entity.CashClosing", "CashRegisterSessionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -754,9 +783,11 @@ namespace FS.Store.DAL.Migrations
 
             modelBuilder.Entity("FS.Store.Model.Entity.CashClosingTerminal", b =>
                 {
-                    b.HasOne("FS.Store.Model.Entity.CashClosing", null)
+                    b.HasOne("FS.Store.Model.Entity.CashClosing", "CashClosing")
                         .WithMany("Terminals")
-                        .HasForeignKey("CashClosingId");
+                        .HasForeignKey("CashClosingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("FS.Store.Model.Entity.CashRegisterSession", "CashRegisterSession")
                         .WithMany()
@@ -775,6 +806,8 @@ namespace FS.Store.DAL.Migrations
                         .HasForeignKey("PaymentTerminalId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("CashClosing");
 
                     b.Navigation("CashRegisterSession");
 
@@ -901,6 +934,8 @@ namespace FS.Store.DAL.Migrations
 
             modelBuilder.Entity("FS.Store.Model.Entity.CashRegisterSession", b =>
                 {
+                    b.Navigation("CashClosing");
+
                     b.Navigation("CashMovements");
                 });
 

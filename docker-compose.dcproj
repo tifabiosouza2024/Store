@@ -9,6 +9,8 @@
     <DockerServiceName>fs.store.webapi</DockerServiceName>
   </PropertyGroup>
   <ItemGroup>
+    <None Include=".github\upgrades\scenarios\nuget-package-upgrade\plan.md" />
+    <None Include=".github\upgrades\scenarios\nuget-package-upgrade\scenario-instructions.md" />
     <None Include="docker-compose.override.yml">
       <DependentUpon>docker-compose.yml</DependentUpon>
     </None>

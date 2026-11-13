@@ -1,4 +1,5 @@
-﻿using FS.Store.Model.Utils;
+﻿using FS.Store.Model.Extensions;
+using FS.Store.Model.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
@@ -14,12 +15,12 @@ namespace FS.Store.DAL.Context
         {
             var connectionString = ConnectionString;
 
-            if (string.IsNullOrWhiteSpace(connectionString))
+            if (connectionString.IsNullOrEmpty())
                 throw new InvalidOperationException("A connection string DefaultConnection não foi encontrada.");
 
             var builder = new MySqlConnectionStringBuilder(connectionString);
 
-            if (string.IsNullOrWhiteSpace(builder.Server))
+            if (builder.Server.IsNullOrEmpty())
                 throw new InvalidOperationException("O host da conexão MySQL está vazio.");
 
             var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();

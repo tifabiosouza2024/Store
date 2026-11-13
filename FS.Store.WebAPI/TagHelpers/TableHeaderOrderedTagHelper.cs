@@ -1,4 +1,5 @@
-﻿using FS.Store.WebAPI.Models;
+﻿using FS.Store.Model.Extensions;
+using FS.Store.WebAPI.Models;
 using FS.Store.WebAPI.Utils;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -38,7 +39,7 @@ namespace FS.Store.WebAPI.TagHelpers
                 Classes,
                 IsNumber ? "numericOrder" : "alphaOrder"
             };
-            output.Attributes.SetAttribute("class", string.Join(" ", classes.Where(c => !string.IsNullOrWhiteSpace(c))));
+            output.Attributes.SetAttribute("class", string.Join(" ", classes.Where(c => c.IsNotNullOrEmpty())));
 
             output.Attributes.SetAttribute("data-field", Field);
 
@@ -62,7 +63,7 @@ namespace FS.Store.WebAPI.TagHelpers
             icon.AddCssClass("notranslate");
             icon.AddCssClass("order-by");
 
-            if (!string.IsNullOrWhiteSpace(IconClasses))
+            if (IconClasses.IsNotNullOrEmpty())
                 icon.AddCssClass(IconClasses);
 
             icon.AddCssClass(orderBy.Icon ?? "bi-arrow-down-up");
