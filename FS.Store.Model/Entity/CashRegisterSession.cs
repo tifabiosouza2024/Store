@@ -69,6 +69,7 @@ namespace FS.Store.Model.Entity
         public virtual User? ChangedByUser { get; set; }
 
         public virtual ICollection<CashMovement> CashMovements { get; set; }
+        public virtual ICollection<CashClosingTerminal> CashClosingTerminals { get; set; }
 
         public virtual CashClosing? CashClosing { get; set; }
 

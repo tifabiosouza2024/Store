@@ -210,5 +210,13 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
             return View(vm);
         }
 
+        public async Task<IActionResult> Details(long id)
+        {
+            var session = await cashRegisterSessionService.GetByIdAsync(id);
+
+            if (session == null)
+                return this.RedirectAdminToBadRequest("Sessão inexistente para esta operação");
+            return View(session);
+        }
     }
 }

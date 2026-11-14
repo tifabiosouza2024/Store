@@ -1,0 +1,444 @@
+﻿@model CashRegisterSession
+
+@{
+    ViewData["Title"] = $"Detalhes do Caixa #{Model.CashSessionNumber}";
+
+    var status = (int)Model.CashRegisterStatus;
+
+    var statusText = status switch
+    {
+        1 => "Aberto",
+        2 => "Fechado",
+        3 => "Cancelado",
+        _ => "Desconhecido"
+    };
+
+    var statusClass = status switch
+    {
+        1 => "bg-success",
+        2 => "bg-secondary",
+        3 => "bg-danger",
+        _ => "bg-light text-dark"
+    };
+
+    var closingBalance = Model.CashClosing == null
+        ? (decimal?)null
+        : Model.CashClosing.ClosingTotalSales - Model.OpeningAmount;
+
+    string MovementLabel(CashMovementTypeEnum type) => type.ToString() switch
+    {
+        "CashInflows" or "Supply" => "Suprimento",
+        "Withdrawal" => "Sangria",
+        "Expense" => "Despesa",
+        _ => type.ToString()
+    };
+
+    string MovementClass(CashMovementTypeEnum type) => type.ToString() switch
+    {
+        "CashInflows" or "Supply" => "text-success",
+        "Withdrawal" or "Expense" => "text-danger",
+        _ => "text-secondary"
+    };
+}
+
+<div class="container-fluid">
+
+    <!-- Cabeçalho -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2">
+                <h4 class="mb-0">Caixa #@Model.CashSessionNumber</h4>
+                <span class="badge @statusClass">@statusText</span>
+            </div>
+            <div class="text-muted small mt-1">
+                @Model.Operation.Name
+            </div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i> Voltar
+            </a>
+
+            @if (status == 1)
+            {
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">
+                    <i class="bi bi-pencil me-1"></i> Editar
+                </a>
+            }
+        </div>
+    </div>
+
+    <!-- Resumo financeiro -->
+    <div class="row g-3 mb-4">
+
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small mb-2">
+                        <i class="bi bi-wallet2 me-1"></i> Valor de abertura
+                    </div>
+                    <h4 class="mb-0">
+                        @Model.OpeningAmount.ToString("C2")
+                    </h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small mb-2">
+                        <i class="bi bi-cart-check me-1"></i> Total vendido
+                    </div>
+                    <h4 class="mb-0 text-success">
+                        @Model.TotalSales.ToString("C2")
+                    </h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small mb-2">
+                        <i class="bi bi-arrow-down-circle me-1"></i> Suprimentos
+                    </div>
+                    <h4 class="mb-0 text-success">
+                        @Model.CashMovements.Where(c => c.CashMovementType == CashMovementTypeEnum.CashInflows).Sum(c => c.Amount).ToString("C2")
+                    </h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small mb-2">
+                        <i class="bi bi-arrow-up-circle me-1"></i> Sangrias e despesas
+                    </div>
+                    <h4 class="mb-0 text-danger">
+                        @Model.CashMovements.Where(c => c.CashMovementType != CashMovementTypeEnum.CashInflows).Sum(c => c.Amount).ToString("C2")
+                    </h4>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Informações da sessão -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white py-3">
+            <h6 class="mb-0">
+                <i class="bi bi-info-circle me-2"></i> Informações da sessão
+            </h6>
+        </div>
+
+        <div class="card-body">
+            <div class="row g-4">
+
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="text-muted small">Aberto por</div>
+                    <div class="fw-semibold">
+                        @Model.OpenedByUser?.Name
+                    </div>
+                </div>
+
+
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="text-muted small">Data de abertura</div>
+                    <div class="fw-semibold">
+                        @Model.OpenedAt.ToString("dd/MM/yyyy HH:mm")
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="text-muted small">Fechado por</div>
+                    <div class="fw-semibold">
+                        @(Model.ClosedByUser?.Name ?? "—")
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="text-muted small">Data de fechamento</div>
+                    <div class="fw-semibold">
+                        @(Model.ClosedAt?.ToString("dd/MM/yyyy HH:mm") ?? "Não fechado")
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="text-muted small">Última alteração por</div>
+                    <div class="fw-semibold">
+                        @(Model.ChangedByUser?.Name ?? "—")
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Fechamento -->
+    @if (Model.CashClosing != null)
+    {
+        <div class="card border-0 shadow-sm mb-4">
+
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0">
+                    <i class="bi bi-calculator me-2"></i> Fechamento do caixa
+                </h6>
+            </div>
+
+            <div class="card-body">
+
+                <div class="row g-3 mb-4">
+
+                    <div class="col-12 col-sm-6 col-lg-3">
+                        <div class="p-3 bg-light rounded">
+                            <div class="text-muted small">Dinheiro</div>
+                            <h5 class="mb-0">@Model.CashClosing.CashAmount.ToString("C2")</h5>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-lg-3">
+                        <div class="p-3 bg-light rounded">
+                            <div class="text-muted small">Crédito</div>
+                            <h5 class="mb-0">@Model.CashClosing.TotalCredit.ToString("C2")</h5>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-lg-3">
+                        <div class="p-3 bg-light rounded">
+                            <div class="text-muted small">Débito</div>
+                            <h5 class="mb-0">@Model.CashClosing.TotalDebit.ToString("C2")</h5>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-lg-3">
+                        <div class="p-3 bg-light rounded">
+                            <div class="text-muted small">Pix</div>
+                            <h5 class="mb-0">@Model.CashClosing.TotalPix.ToString("C2")</h5>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row g-3 align-items-stretch">
+
+                    <div class="col-12 col-md-6">
+                        <div class="border rounded p-3 h-100">
+                            <div class="text-muted small">Total informado no fechamento</div>
+                            <h4 class="mb-0">
+                                @Model.CashClosing.ClosingTotalSales.ToString("C2")
+                            </h4>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <div class="border rounded p-3 h-100">
+                            <div class="text-muted small">Diferença em relação à abertura</div>
+                            <h4 class="mb-0 @(closingBalance >= 0 ? "text-success" : "text-danger")">
+                                @closingBalance?.ToString("C2")
+                            </h4>
+                        </div>
+                    </div>
+
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(Model.CashClosing.Notes))
+                {
+                    <div class="mt-3">
+                        <div class="text-muted small mb-1">Observações</div>
+                        <div class="border rounded p-3">
+                            @Model.CashClosing.Notes
+                        </div>
+                    </div>
+                }
+
+            </div>
+        </div>
+    }
+
+    
+    <!-- Fechamentos das maquininhas -->
+    <div class="border-top pt-4 mb-4">
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="mb-0">
+                <i class="bi bi-credit-card me-2"></i> Fechamento das maquininhas
+            </h6>
+
+            <span class="badge bg-light text-dark">
+                @Model.CashClosingTerminals.Count terminais
+            </span>
+        </div>
+
+        @if (Model.CashClosingTerminals.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-3">Terminal</th>
+                            <th>Fechado em</th>
+                            <th>Responsável</th>
+                            <th class="text-end">Crédito</th>
+                            <th class="text-end">Débito</th>
+                            <th class="text-end">Pix</th>
+                            <th class="text-end pe-3">Total</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var terminal in Model.CashClosingTerminals)
+                        {
+                            var terminalTotal = terminal.CreditAmount
+                                + terminal.DebitAmount
+                                + terminal.PixAmount;
+
+                            <tr>
+                                <td class="ps-3">
+                                    <div class="fw-semibold">
+                                        @terminal.PaymentTerminal?.Name
+                                    </div>
+                                </td>
+
+                                <td class="text-nowrap">
+                                    @(terminal.ClosedAt?.ToString("dd/MM/yyyy HH:mm") ?? "—")
+                                </td>
+
+                                <td>
+                                    @(terminal.CreatedByUser?.Name ?? "—")
+                                </td>
+
+                                <td class="text-end text-nowrap">
+                                    @terminal.CreditAmount.ToString("C2")
+                                </td>
+
+                                <td class="text-end text-nowrap">
+                                    @terminal.DebitAmount.ToString("C2")
+                                </td>
+
+                                <td class="text-end text-nowrap">
+                                    @terminal.PixAmount.ToString("C2")
+                                </td>
+
+                                <td class="text-end pe-3 fw-semibold text-nowrap">
+                                    @terminalTotal.ToString("C2")
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                    <tfoot class="table-light">
+                        <tr class="fw-semibold">
+                            <td colspan="3" class="ps-3">Total dos terminais</td>
+
+                            <td class="text-end">
+                                @Model.CashClosingTerminals.Sum(x => x.CreditAmount).ToString("C2")
+                            </td>
+
+                            <td class="text-end">
+                                @Model.CashClosingTerminals.Sum(x => x.DebitAmount).ToString("C2")
+                            </td>
+
+                            <td class="text-end">
+                                @Model.CashClosingTerminals.Sum(x => x.PixAmount).ToString("C2")
+                            </td>
+
+                            <td class="text-end pe-3">
+                                @Model.CashClosingTerminals.Sum(x => x.CreditAmount + x.DebitAmount + x.PixAmount).ToString("C2")
+                            </td>
+                        </tr>
+                    </tfoot>
+
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-4 bg-light rounded">
+                <i class="bi bi-credit-card fs-3 text-muted"></i>
+                <p class="text-muted mt-2 mb-0">
+                    Nenhum fechamento de terminal registrado.
+                </p>
+            </div>
+        }
+
+    </div>
+
+
+    <!-- Histórico de movimentações -->
+    <div class="card border-0 shadow-sm mb-4">
+
+        <div class="card-header bg-white py-3">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                <h6 class="mb-0">
+                    <i class="bi bi-arrow-left-right me-2"></i> Histórico de movimentações
+                </h6>
+                <span class="badge bg-light text-dark">
+                    @Model.CashMovements.Count movimentações
+                </span>
+            </div>
+        </div>
+
+        <div class="card-body p-0">
+
+            @if (Model.CashMovements.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-3">Data/Hora</th>
+                                <th>Tipo</th>
+                                <th>Descrição</th>
+                                <th>Responsável</th>
+                                <th class="text-end pe-3">Valor</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var movement in Model.CashMovements.OrderByDescending(x => x.OccurredAt))
+                            {
+                                <tr>
+                                    <td class="ps-3 text-nowrap">
+                                        @movement.OccurredAt.ToString("dd/MM/yyyy HH:mm")
+                                    </td>
+
+                                    <td>
+                                        <span class="fw-semibold @MovementClass(movement.CashMovementType)">
+                                            @MovementLabel(movement.CashMovementType)
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        @(string.IsNullOrWhiteSpace(movement.Description) ? "—" : movement.Description)
+                                    </td>
+
+                                    <td>@movement.CreatedByUser?.Name</td>
+
+                                    <td class="text-end pe-3 fw-semibold text-nowrap">
+                                        @movement.Amount.ToString("C2")
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <i class="bi bi-inbox fs-1 text-muted"></i>
+                    <p class="text-muted mt-2 mb-0">
+                        Nenhuma movimentação registrada nesta sessão.
+                    </p>
+                </div>
+            }
+
+        </div>
+    </div>
+
+</div>

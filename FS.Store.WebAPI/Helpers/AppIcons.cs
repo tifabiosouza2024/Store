@@ -9,12 +9,6 @@
         };
 
         public static bool TryGetViewBox(string name, out string viewBox)
-        {
-            if (SvgIcons.TryGetValue(name, out viewBox!))
-                return true;
-
-            viewBox = string.Empty;
-            return false;
-        }
+            => SvgIcons.TryGetValue(name, out viewBox);
     }
 }

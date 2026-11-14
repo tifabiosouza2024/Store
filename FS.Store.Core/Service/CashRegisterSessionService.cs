@@ -48,7 +48,6 @@ namespace FS.Store.Core.Service
              => await FirstOrDefaultAsync(c
                 => c.Id == id
                 && c.OperationId == currentUserHelper.CurrentOperationId
-                && c.CashRegisterStatus == CashRegisterStatusEnum.Open
             , includeProperties: includeProperties);
 
         public async Task<Pagination<CashRegisterSession>> GetAllPagedAsync(int page, int qttPerPage, Dictionary<string, string>? dynamicSorts = null

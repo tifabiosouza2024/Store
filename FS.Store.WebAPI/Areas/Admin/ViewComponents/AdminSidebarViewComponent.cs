@@ -22,7 +22,7 @@ namespace FS.Store.WebAPI.Areas.Admin.ViewComponents
                     cashSessionId = sessions.FirstOrDefault(c => c.OpenedByUserId.Equals(currentUserHelper.UserId.GetValueOrDefault()))?.Id;
             }
             if (cashSessionId != null)
-                HttpContext.Session.SetString("CurrentCashSessionId", cashSessionId.Value.ToString());
+                HttpContext.Session.SetString("CurrentCashSessionId", cashSessionId?.ToString());
 
             var model = new AdminSidebarViewModel
             {

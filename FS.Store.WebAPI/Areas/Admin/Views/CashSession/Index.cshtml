@@ -4,7 +4,7 @@
     ViewData["Title"] = "Caixas Abertos";
 
     var pagination = Model.CashRegisterSessionsOpened;
-    var sessions = pagination?.Data?.Where(s => s is not null).Select(s => s!).ToList() ?? [];
+    var sessions = pagination?.Data?.ToList() ?? [];
     var hasSessions = sessions.Count > 0;
     var totalOpeningAmount = sessions.Sum(s => s.OpeningAmount);
 
@@ -269,7 +269,7 @@
                                             </div>
                                         </td>
                                         <td class="fw-semibold">
-                                            #@session!.CashSessionNumber
+                                            #@session.CashSessionNumber
                                         </td>
                                         <td class="text-nowrap">
                                             <div class="fw-medium">
@@ -280,7 +280,7 @@
                                             </div>
                                         </td>
                                         <td class="text-end text-nowrap fw-semibold">
-                                            @session!.OpeningAmount.ToString("C")
+                                            @session.OpeningAmount.ToString("C")
                                         </td>
                                         <td>
                                             <span class="badge text-bg-success bg-opacity-10 text-success border border-success border-opacity-25">
