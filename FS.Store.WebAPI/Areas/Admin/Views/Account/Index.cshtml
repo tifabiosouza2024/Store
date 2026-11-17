@@ -1,0 +1,62 @@
+﻿@model AccountIndexViewmodel
+@{
+    ViewData["Title"] = "Minha conta";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/admin/change-password.css" asp-append-version="true" />
+}
+
+<div class="container-fluid account-page">
+
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h4 class="mb-1">Minha conta</h4>
+            <p class="text-muted mb-0">Gerencie suas informações pessoais e segurança.</p>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <div class="account-header d-flex align-items-center gap-3 mb-4">
+                <div class="account-avatar">
+                    <i class="bi bi-person"></i>
+                </div>
+                <div>
+                    <h5 class="mb-1">Minha conta</h5>
+                    <span class="text-muted small">Gerencie seus dados de acesso ao sistema.</span>
+                </div>
+            </div>
+
+            <ul class="nav nav-tabs account-tabs mb-4" id="accountTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="personal-data-tab" data-bs-toggle="tab" data-bs-target="#personal-data" type="button" role="tab" aria-controls="personal-data" aria-selected="true">
+                        <i class="bi bi-person me-1"></i>
+                        Dados pessoais
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="change-password-tab" data-bs-toggle="tab" data-bs-target="#change-password" type="button" role="tab" aria-controls="change-password" aria-selected="false">
+                        <i class="bi bi-shield-lock me-1"></i>
+                        Segurança
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="accountTabsContent">
+                <div class="tab-pane fade show active" id="personal-data" role="tabpanel" aria-labelledby="personal-data-tab" tabindex="0">
+                    <partial name="_PersonalData" model="@Model.PersonalData" />
+                </div>
+
+                <div class="tab-pane fade" id="change-password" role="tabpanel" aria-labelledby="change-password-tab" tabindex="0">
+                    <partial name="_ChangePassword" model="@new ChangePasswordViewModel()" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript" src="~/js/admin/change-password.js" asp-append-version="true"></script>
+    <script type="text/javascript" src="~/js/admin/account-index.js" asp-append-version="true"></script>
+}

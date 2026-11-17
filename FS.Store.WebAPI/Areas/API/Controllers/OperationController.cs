@@ -3,15 +3,15 @@ using FS.Store.Core.Interfaces;
 using FS.Store.Model.Dtos.API;
 using FS.Store.Model.Dtos.Operations;
 using FS.Store.Model.Extensions;
-using FS.Store.WebAPI.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FS.Store.WebAPI.Areas.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[area]/[controller]")]
     [ApiController]
     [Authorize]
+    [Area("api")]
     public class OperationController(IUserService userService) : ControllerBase
     {
         [HttpGet]
@@ -28,9 +28,9 @@ namespace FS.Store.WebAPI.Areas.API.Controllers
             var operations = user?.Operations?.ToDto<OperationDto>();
 
             if (operations == null)
-                return NotFound(ApiResponseDto<OperationDto>.Fail("Usuario sem operacoes vinculadas"));
+                return NotFound(ApiResponseDto<OperationDto>.Fail("Usuário sem operações vinculadas"));
 
-            return Ok(ApiResponseDto<OperationDto>.Ok(operations, "Operacoes Localizadas"));
+            return Ok(ApiResponseDto<OperationDto>.Ok(operations, "operações Localizadas"));
         }
     }
 }

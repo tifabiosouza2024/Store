@@ -98,13 +98,27 @@ namespace FS.Store.DAL.Context
                     e.OperationId,
                     e.RoleId
                 }).IsUnique();
+                entity.Property(e => e.IsActive).HasDefaultValue(true);
+
+                entity.HasOne(x => x.InvitedByUser)
+                    .WithMany()
+                    .HasForeignKey(x => x.InvitedByUserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.Property(e => e.InvitedAt)
+                    .HasColumnType("datetime(0)")
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                    .ValueGeneratedOnAdd();
             });
 
             modelBuilder.Entity<User>(entity =>
             {
+
+                entity.HasIndex(u => u.Email).IsUnique();
                 entity.Property(e => e.RememberMe).HasDefaultValue(false);
                 entity.Property(e => e.IsBeta).HasDefaultValue(false);
-                entity.Property(e => e.IsActive).HasDefaultValue(false);
+                entity.Property(e => e.IsActive).HasDefaultValue(true);
+                entity.Property(e => e.MustChangePassword).HasDefaultValue(true);
 
                 entity.HasIndex(e => e.Email).IsUnique();
             });

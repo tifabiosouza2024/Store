@@ -14,7 +14,7 @@ namespace FS.Store.Core.Helper
 
         public Guid? CurrentOperationId
             => User?.GetOperationId();
-        private ClaimsPrincipal? User
+        public ClaimsPrincipal? User
             => httpContextAccessor.HttpContext.User;
     }
 }

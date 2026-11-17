@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace FS.Store.WebAPI.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize]
+    [Authorize(Roles = "SUPER,ADMIN,MANAGER,SELLER")]
     public class CashMovementController(CashSessionHelper cashSessionHelper
         , ICashRegisterSessionService cashRegisterSessionService) : Controller
     {

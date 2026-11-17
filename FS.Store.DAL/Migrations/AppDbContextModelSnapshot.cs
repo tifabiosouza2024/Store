@@ -113,7 +113,7 @@ namespace FS.Store.DAL.Migrations
 
                     b.HasIndex("ClosedByUserId");
 
-                    b.ToTable("cash_closing", t =>
+                    b.ToTable("cash_closing", null, t =>
                         {
                             t.HasComment("Registra o fechamento do caixa");
                         });
@@ -197,7 +197,7 @@ namespace FS.Store.DAL.Migrations
 
                     b.HasIndex("PaymentTerminalId");
 
-                    b.ToTable("cash_closing_terminal", t =>
+                    b.ToTable("cash_closing_terminal", null, t =>
                         {
                             t.HasComment("Armazena o valor de cada terminal (maquininha)");
                         });
@@ -286,7 +286,7 @@ namespace FS.Store.DAL.Migrations
 
                     b.HasIndex("CreatedByUserId");
 
-                    b.ToTable("cash_movement", t =>
+                    b.ToTable("cash_movement", null, t =>
                         {
                             t.HasComment("Registra as movimentações financeiras");
                         });
@@ -381,7 +381,7 @@ namespace FS.Store.DAL.Migrations
 
                     b.HasIndex("OperationId");
 
-                    b.ToTable("cash_register_session", t =>
+                    b.ToTable("cash_register_session", null, t =>
                         {
                             t.HasComment("controle de abertura e fechamento de caixa");
                         });
@@ -454,7 +454,7 @@ namespace FS.Store.DAL.Migrations
                     b.HasIndex("Document", "Email")
                         .IsUnique();
 
-                    b.ToTable("operations", t =>
+                    b.ToTable("operations", null, t =>
                         {
                             t.HasComment("Empresa/Loja Operante");
                         });
@@ -466,6 +466,11 @@ namespace FS.Store.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
                         .HasColumnName("id");
+
+                    b.Property<DateTime?>("AcceptedAt")
+                        .HasColumnType("datetime(0)")
+                        .HasColumnName("accepted_at")
+                        .HasComment("Data de aceitação do convite");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -481,6 +486,25 @@ namespace FS.Store.DAL.Migrations
                         .HasColumnName("deleted")
                         .HasComment("registro deletado virtualmente");
 
+                    b.Property<DateTime>("InvitedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(0)")
+                        .HasColumnName("invited_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                        .HasComment("Data do convite");
+
+                    b.Property<Guid?>("InvitedByUserId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("invited_by_user_id")
+                        .HasComment("Usuário responsável pelo convite");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(true)
+                        .HasColumnName("is_active")
+                        .HasComment("Determina se o usuário estará ativo para aquela operação.");
+
                     b.Property<Guid>("OperationId")
                         .HasColumnType("char(36)")
                         .HasColumnName("operation_id")
@@ -490,6 +514,11 @@ namespace FS.Store.DAL.Migrations
                         .HasColumnType("int")
                         .HasColumnName("role_id")
                         .HasComment("Id do papel do Usuário na Operação");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int")
+                        .HasColumnName("status")
+                        .HasComment("Status do vínculo do usuário com a operação");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .ValueGeneratedOnAddOrUpdate()
@@ -505,6 +534,8 @@ namespace FS.Store.DAL.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("InvitedByUserId");
+
                     b.HasIndex("OperationId");
 
                     b.HasIndex("RoleId");
@@ -512,7 +543,7 @@ namespace FS.Store.DAL.Migrations
                     b.HasIndex("UserId", "OperationId", "RoleId")
                         .IsUnique();
 
-                    b.ToTable("operation_user_role", t =>
+                    b.ToTable("operation_user_role", null, t =>
                         {
                             t.HasComment("Relacionamento entre Operação, Usuário e seus papeis");
                         });
@@ -561,7 +592,7 @@ namespace FS.Store.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("payment_provider", t =>
+                    b.ToTable("payment_provider", null, t =>
                         {
                             t.HasComment("Armazena os fornecedores dos terminais");
                         });
@@ -618,7 +649,7 @@ namespace FS.Store.DAL.Migrations
 
                     b.HasIndex("PaymentProviderId");
 
-                    b.ToTable("payment_terminal", t =>
+                    b.ToTable("payment_terminal", null, t =>
                         {
                             t.HasComment("Armazena os terminais (maquininhas) de pagamento");
                         });
@@ -668,7 +699,7 @@ namespace FS.Store.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("roles", t =>
+                    b.ToTable("roles", null, t =>
                         {
                             t.HasComment("Papéis de usuários do sistema");
                         });
@@ -705,7 +736,7 @@ namespace FS.Store.DAL.Migrations
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("tinyint(1)")
-                        .HasDefaultValue(false)
+                        .HasDefaultValue(true)
                         .HasColumnName("is_active")
                         .HasComment("Usuário ativo");
 
@@ -720,6 +751,13 @@ namespace FS.Store.DAL.Migrations
                         .HasColumnType("char(36)")
                         .HasColumnName("last_operation_id")
                         .HasComment("Id da última operação logada");
+
+                    b.Property<bool>("MustChangePassword")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(true)
+                        .HasColumnName("must_change_password")
+                        .HasComment("Indica se o usuário deve alterar a senha no próximo acesso");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -756,7 +794,7 @@ namespace FS.Store.DAL.Migrations
 
                     b.HasIndex("LastOperationId");
 
-                    b.ToTable("users", t =>
+                    b.ToTable("users", null, t =>
                         {
                             t.HasComment("Usuários do sistema");
                         });
@@ -790,7 +828,7 @@ namespace FS.Store.DAL.Migrations
                         .IsRequired();
 
                     b.HasOne("FS.Store.Model.Entity.CashRegisterSession", "CashRegisterSession")
-                        .WithMany()
+                        .WithMany("CashClosingTerminals")
                         .HasForeignKey("CashRegisterSessionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -874,6 +912,11 @@ namespace FS.Store.DAL.Migrations
 
             modelBuilder.Entity("FS.Store.Model.Entity.OperationUserRole", b =>
                 {
+                    b.HasOne("FS.Store.Model.Entity.User", "InvitedByUser")
+                        .WithMany()
+                        .HasForeignKey("InvitedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("FS.Store.Model.Entity.Operation", "Operation")
                         .WithMany("UsersRoles")
                         .HasForeignKey("OperationId")
@@ -891,6 +934,8 @@ namespace FS.Store.DAL.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("InvitedByUser");
 
                     b.Navigation("Operation");
 
@@ -935,6 +980,8 @@ namespace FS.Store.DAL.Migrations
             modelBuilder.Entity("FS.Store.Model.Entity.CashRegisterSession", b =>
                 {
                     b.Navigation("CashClosing");
+
+                    b.Navigation("CashClosingTerminals");
 
                     b.Navigation("CashMovements");
                 });

@@ -1,0 +1,204 @@
+﻿@model Pagination<User>
+
+@{
+    ViewData["Title"] = "Usuários";
+
+    var operationId = User.GetOperationId();
+    var data = Model.Data;
+}
+
+<div class="container-fluid py-4">
+
+    <!-- Cabeçalho -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="fw-bold mb-1">Usuários</h4>
+            <p class="text-muted mb-0">
+                Gerencie os usuários e suas permissões de acesso.
+            </p>
+        </div>
+    </div>
+
+    <!-- Tabela -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white py-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <h6 class="mb-0 fw-semibold">
+                    <i class="bi bi-people me-2"></i>
+                    Usuários cadastrados
+                </h6>
+
+                <span class="badge text-bg-light">
+                    @Model.TotalItems registro(s)
+                </span>
+            </div>
+        </div>
+
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th table-header-ordered field="@nameof(FS.Store.Model.Entity.User.Name)" header-text="Nome"></th>
+                            <th table-header-ordered field="@nameof(FS.Store.Model.Entity.User.Email)" header-text="E-mail"></th>
+                            <th>Função</th>
+                            <th table-header-ordered field="@nameof(FS.Store.Model.Entity.User.CreatedAt)" header-text="Data de cadastro"></th>
+                            <th table-header-ordered field="@nameof(FS.Store.Model.Entity.User.IsActive)" header-text="Status" class="text-center"></th>
+                            <th class="text-center">Beta</th>
+                            <th class="text-end pe-3">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (data != null && data.Any())
+                        {
+                            foreach (var item in data)
+                            {
+                                if (item == null)
+                                    continue;
+
+                                var role = item.Operations?.FirstOrDefault(x => x.OperationId == operationId)?.Role?.Name;
+
+                                <tr>
+                                    <!-- Nome -->
+                                    <td class="ps-3">
+                                        <div class="fw-semibold">
+                                            @item.Name
+                                        </div>
+                                    </td>
+
+                                    <!-- E-mail -->
+                                    <td>
+                                        <span class="text-muted">
+                                            @item.Email
+                                        </span>
+                                    </td>
+
+                                    <!-- Função -->
+                                    <td>
+                                        @if (role.IsNotNullOrEmpty())
+                                        {
+                                            <span class="badge rounded-pill text-bg-light border">
+                                                @role
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">—</span>
+                                        }
+                                    </td>
+
+                                    <!-- Cadastro -->
+                                    <td>
+                                        @item.CreatedAt.ToString("dd/MM/yyyy")
+                                        <div class="text-muted small">
+                                            @item.CreatedAt.ToString("HH:mm")
+                                        </div>
+                                    </td>
+
+                                    <!-- Status -->
+                                    <td class="text-center">
+                                        @if (item.IsActive)
+                                        {
+                                            <span class="badge rounded-pill text-bg-success">
+                                                Ativo
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge rounded-pill text-bg-secondary">
+                                                Inativo
+                                            </span>
+                                        }
+                                    </td>
+
+                                    <!-- Beta -->
+                                    <td class="text-center">
+                                        @if (item.IsBeta)
+                                        {
+                                            <span class="badge rounded-pill text-bg-info">
+                                                <i class="bi bi-flask me-1"></i>Sim
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">—</span>
+                                        }
+                                    </td>
+
+                                    <!-- Ações -->
+                                    <td class="text-end pe-3">
+                                        @if (item.Id != User.GetUserId())
+                                        {
+                                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-light" title="Visualizar">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+
+                                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-light" title="Editar">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <button class="btn btn-sm btn-light disabled" title="Visualizar">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+
+                                            <button class="btn btn-sm btn-light disabled" title="Editar">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="7" class="text-center py-5">
+                                    <i class="bi bi-people fs-2 text-muted"></i>
+                                    <p class="fw-semibold mt-2 mb-1">
+                                        Nenhum usuário encontrado
+                                    </p>
+                                    <span class="text-muted small">
+                                        Não existem usuários cadastrados nesta operação.
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Paginação -->
+        <div class="card-footer bg-white border-0 py-3">
+            <partial name="_Pagination"
+                     model="@(new PaginationViewModel
+                     {
+                         TotalItems = Model.TotalItems,
+                         QttPerPage = Model.QttPerPage,
+                         CurrentPage = Model.CurrentPage
+                     })" />
+        </div>
+    </div>
+</div>
+
+<!-- Botão flutuante -->
+@{
+    var fab = new FloatingButtonDto
+    {
+        MainUrl = Url.Action("Create")!,
+        MainIcon = "bi bi-plus-lg",
+        MainTitle = "Novo usuário"
+    };
+}
+
+<partial name="_FloatingButtons" model="fab" />
+
+@section Scripts {
+    <script src="~/js/admin/table.js" asp-append-version="true"></script>
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/admin/table.css" asp-append-version="true" />
+}

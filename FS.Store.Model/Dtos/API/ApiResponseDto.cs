@@ -29,10 +29,11 @@ namespace FS.Store.Model.Dtos.API
             };
         }
 
-        public static ApiResponseDto<T> Fail(string message, IEnumerable<string>? errors = null)
+        public static ApiResponseDto<T> Fail(string message, T? data = default, IEnumerable<string>? errors = null)
         {
             return new()
             {
+                Data = data,
                 Success = false,
                 Message = message,
                 Errors = errors

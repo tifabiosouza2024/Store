@@ -24,15 +24,14 @@ namespace FS.Store.Model.Entity
 
         [Column("name")]
         [MaxLength(255)]
-        [NotNull]
         [Comment("Nome do usuário")]
-        public string Name { get; set; } = default!;
+        public string? Name { get; set; } = default!;
 
         [Column("password_hash")]
         [MaxLength(255)]
         [NotNull]
         [Comment("Hash de senha")]
-        public string PasswordHash { get; set; } = default!;
+        public string? PasswordHash { get; set; } = default!;
 
         [Column("is_active")]
         [DefaultValue(true)]
@@ -46,6 +45,11 @@ namespace FS.Store.Model.Entity
         [Column("remember_me")]
         [Comment("Informa se o usuário permanece logado após fechar o navegador")]
         public bool RememberMe { get; set; }
+
+        [Column("must_change_password")]
+        [DefaultValue(true)]
+        [Comment("Indica se o usuário deve alterar a senha no próximo acesso")]
+        public bool MustChangePassword { get; set; }
 
         [Column("last_operation_id")]
         [Comment("Id da última operação logada")]

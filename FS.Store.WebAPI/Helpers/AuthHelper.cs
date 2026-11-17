@@ -4,6 +4,7 @@
     using FS.Store.Core.Helper;
     using FS.Store.Core.Interfaces;
     using FS.Store.Model.Entity;
+    using FS.Store.Model.Enums;
     using FS.Store.WebAPI.Areas.Admin.ViewModels;
     using Microsoft.AspNetCore.Authentication;
     using Microsoft.AspNetCore.Authentication.Cookies;
@@ -20,22 +21,31 @@
             if (user == null || !user.IsActive || !passwordHelper.IsCorrectPassword(user, model.Password))
                 return false;
 
-            if (user.LastOperationId is null && 1 == user.Operations?.Count)
-                user.LastOperationId = user.Operations?.First().OperationId;
+            if (user.Operations?.Count(o => o.IsActive && o.Status == OperationUserRoleStatusEnum.Active) > 1)
+            {
+                user.LastOperationId = null;
+            }
+            else
+            {
+                user.LastOperationId = user.Operations?.FirstOrDefault(o => o.IsActive && o.Status == OperationUserRoleStatusEnum.Active)?.OperationId;
+            }
 
-            await AssignPermissionsAsync(user, user.LastOperationId);
+            await AssignPermissionsAsync(user, user?.LastOperationId);
 
-            user.RememberMe = model.RememberMe;
+            user!.RememberMe = model.RememberMe;
             await userService.AddOrUpdateAsync(user);
 
             return true;
         }
 
-        public async Task AssignPermissionsAsync(User user, Guid? operationId)
+        public async Task AssignPermissionsAsync(User? user, Guid? operationId)
         {
+            if (user == null)
+                return;
+
             List<Claim> claims = [
                 new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new(ClaimTypes.Name, user.Name),
+                new(ClaimTypes.Name, user.Name ?? "Usuário"),
                 new(ClaimTypes.Email, user.Email)
             ];
 
@@ -46,8 +56,8 @@
                 claims.Add(new(ClaimTypesExtensions.OperationName, operation.Name.ToString()));
             }
 
-            var operationRoles = user.Operations?.Where(o => o.OperationId == operationId);
-            if (operationRoles is not null)
+            var operationRoles = user.Operations?.Where(o => o.OperationId == operationId && o.IsActive && o.Status == OperationUserRoleStatusEnum.Active).ToList();
+            if (operationRoles is not null && operationRoles.Any())
             {
                 foreach (var operationRole in operationRoles)
                 {

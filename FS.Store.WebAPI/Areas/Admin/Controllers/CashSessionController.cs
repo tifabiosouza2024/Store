@@ -16,7 +16,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 namespace FS.Store.WebAPI.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize]
+    [Authorize(Roles = "SUPER,ADMIN,MANAGER,SELLER")]
     public class CashSessionController(ILogger<CashSessionController> logger
         , ICashRegisterSessionService cashRegisterSessionService
         , IOperationService operationService
@@ -108,7 +108,7 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
             vm.OperationId = session.OperationId;
             vm.StatusOptions = session.CashRegisterStatus.ToSelectListItemsInEditView();
             vm.WasClosed = session.CashRegisterStatus == CashRegisterStatusEnum.Closed;
-            vm.Operations = [.. operations.Select(o => new SelectListItem { Text = o.Name, Value = o.Id.ToString(), Selected = o.Id == session.OperationId })];
+            vm.Operations = [.. operations.Select(o => new SelectListItem { Text = o.Operation?.Name, Value = o.Operation?.Id.ToString(), Selected = session.OperationId == o.Operation?.Id })];
             return View(vm);
         }
 

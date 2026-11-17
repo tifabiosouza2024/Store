@@ -3,33 +3,33 @@
         return path.replace(/\/+$/, "").toLowerCase() || "/";
     }
 
-    const currentPath = normalizePath(window.location.pathname);
+    function updateSidebar() {
+        const currentPath = normalizePath(window.location.pathname);
+        const currentHash = window.location.hash.toLowerCase();
 
-    // Primeiro, identifica os links correspondentes à página atual.
-    $(".sidebar-nav a.nav-link[href]").each(function () {
-        const linkUrl = new URL(this.href, window.location.origin);
+        $(".sidebar-nav a.nav-link[href]").each(function () {
+            const linkUrl = new URL(this.href, window.location.origin);
+            const samePath = normalizePath(linkUrl.pathname) === currentPath;
+            const linkHash = linkUrl.hash.toLowerCase();
 
-        const isActive =
-            normalizePath(linkUrl.pathname) === currentPath;
+            const isActive = samePath && (currentHash ? linkHash === currentHash : !linkHash);
 
-        $(this).toggleClass("active", isActive);
-    });
+            $(this).toggleClass("active", isActive);
+        });
 
-    // Depois, verifica todos os submenus.
-    $(".sidebar-nav .collapse[id]").each(function () {
-        const $submenu = $(this);
-        const submenuId = this.id;
+        $(".sidebar-nav .collapse[id]").each(function () {
+            const $submenu = $(this);
+            const submenuId = this.id;
+            const $toggle = $('.sidebar-nav [data-bs-target="#' + submenuId + '"]');
+            const hasActiveItem = $submenu.find("a.nav-link.active").length > 0;
 
-        const $toggle = $(
-            '.sidebar-nav [data-bs-target="#' + submenuId + '"]'
-        );
+            $toggle.toggleClass("active", hasActiveItem);
+            $toggle.attr("aria-expanded", hasActiveItem ? "true" : "false");
+            $submenu.toggleClass("show", hasActiveItem);
+        });
+    }
 
-        const hasActiveItem = $submenu.find("a.nav-link.active").length > 0;
+    updateSidebar();
 
-        // Destaca o botão principal e expande o submenu.
-        $toggle.toggleClass("active", hasActiveItem);
-        $toggle.attr("aria-expanded", hasActiveItem ? "true" : "false");
-
-        $submenu.toggleClass("show", hasActiveItem);
-    });
+    window.addEventListener('hashchange', updateSidebar);
 });

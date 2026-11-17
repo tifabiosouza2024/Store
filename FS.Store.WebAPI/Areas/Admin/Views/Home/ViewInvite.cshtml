@@ -1,0 +1,147 @@
+﻿@model IEnumerable<OperationUserRole>
+
+@{
+    ViewData["Title"] = "Meus Convites";
+}
+
+<div class="container-fluid">
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <h4 class="mb-1">Convites para operações</h4>
+            <p class="text-muted mb-0">
+                Confira os convites recebidos e escolha se deseja participar das operações.
+            </p>
+        </div>
+    </div>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <i class="bi bi-envelope-check display-4 text-muted"></i>
+                <h5 class="mt-3">Nenhum convite encontrado</h5>
+                <p class="text-muted mb-0">
+                    Você não possui convites disponíveis no momento.
+                </p>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row g-3">
+
+            @foreach (var invite in Model)
+            {
+                var isPending = invite.Status == OperationUserRoleStatusEnum.Pending;
+
+                <div class="col-12 col-xl-6">
+                    <div class="card h-100 shadow-sm">
+
+                        <div class="card-body">
+
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <span class="text-muted small">
+                                        CONVITE PARA PARTICIPAR DE
+                                    </span>
+                                    <h5 class="mb-0 mt-1">
+                                        @invite.Operation?.Name
+                                    </h5>
+                                </div>
+
+                                @if (isPending)
+                                {
+                                    <span class="badge bg-warning text-dark">
+                                        Pendente
+                                    </span>
+                                }
+                                else if (invite.Status == OperationUserRoleStatusEnum.Active)
+                                {
+                                    <span class="badge bg-success">
+                                        Aceito
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">
+                                        Revogado
+                                    </span>
+                                }
+                            </div>
+
+                            <hr />
+                            @if (invite.InvitedByUser != null)
+                            {
+                                <div class="mb-3">
+                                    <div class="text-muted small mb-1">
+                                        <i class="bi bi-person-fill me-1"></i>
+                                        Convite enviado por
+                                    </div>
+                                    <strong>
+                                        @invite.InvitedByUser?.Name
+                                    </strong>
+                                </div>                                
+                            }
+
+                            <div class="mb-3">
+                                <div class="text-muted small mb-1">
+                                    <i class="bi bi-shield-lock me-1"></i>
+                                    Perfil atribuído
+                                </div>
+                                <strong>
+                                    @invite.Role?.Name
+                                </strong>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="text-muted small mb-1">
+                                    <i class="bi bi-calendar-event me-1"></i>
+                                    Data do convite
+                                </div>
+                                <strong>
+                                    @invite.InvitedAt.ToString("dd/MM/yyyy HH:mm")
+                                </strong>
+                            </div>
+
+                        </div>
+
+                        @if (isPending)
+                        {
+                            <div class="card-footer bg-light">
+                                <div class="d-flex justify-content-end gap-2">
+
+                                    <form asp-action="RejectInvite"
+                                          method="post">
+                                        <input type="hidden" name="id" value="@invite.Id" />
+
+                                        <button type="submit"
+                                                class="btn btn-outline-danger">
+                                            <i class="bi bi-x-circle me-1"></i>
+                                            Recusar
+                                        </button>
+                                    </form>
+
+                                    <form asp-action="AcceptInvite"
+                                          method="post">
+                                        <input type="hidden" name="id" value="@invite.Id" />
+
+                                        <button type="submit"
+                                                class="btn btn-success">
+                                            <i class="bi bi-check-circle me-1"></i>
+                                            Aceitar convite
+                                        </button>
+                                    </form>
+
+                                </div>
+                            </div>
+                        }
+
+                    </div>
+                </div>
+            }
+
+        </div>
+    }
+
+</div>

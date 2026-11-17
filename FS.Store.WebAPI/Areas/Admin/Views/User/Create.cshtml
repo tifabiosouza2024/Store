@@ -1,0 +1,351 @@
+﻿@model CreateUserViewModel
+
+@{
+    ViewData["Title"] = "Convidar usuário";
+}
+
+@section Styles {
+    <style>
+        .operation-highlight {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px;
+            background: #f0f4ff;
+            border: 1px solid #dce5ff;
+            border-radius: 10px;
+            max-width: 600px;
+        }
+
+        .operation-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 46px;
+            height: 46px;
+            flex-shrink: 0;
+            border-radius: 10px;
+            background: #dce5ff;
+            color: #4f6bed;
+            font-size: 1.35rem;
+        }
+    </style>
+}
+
+<div class="container py-4">
+    <div class="mb-4">
+        <h4 class="fw-bold mb-1">Convidar usuário</h4>
+        <p class="text-muted mb-0">Conceda acesso de um usuário à operação atual.</p>
+    </div>
+
+    <form asp-action="Create" method="post" id="createUserForm">
+        @Html.AntiForgeryToken()
+
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0 fw-semibold">
+                    <i class="bi bi-person-check me-2"></i>Identificação do usuário
+                </h6>
+            </div>
+
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-8 col-xl-7">
+                        <label asp-for="Email" class="form-label">E-mail</label>
+
+                        <div class="input-group">
+                            <input asp-for="Email" class="form-control"
+                                   type="email" placeholder="usuario@empresa.com"
+                                   autocomplete="off" />
+
+                            <button type="button" class="btn btn-primary"
+                                    id="checkEmailButton">
+                                <i class="bi bi-arrow-right-circle me-1"></i>
+                                Continuar
+                            </button>
+                        </div>
+
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+
+                        <div class="form-text">
+                            Informe o e-mail da pessoa que deseja convidar.
+                        </div>
+
+                        <div id="emailFeedback" class="mt-3" role="status"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dados para novo usuário -->
+        <div id="newUserSection" class="d-none">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3">
+                    <h6 class="mb-0 fw-semibold">
+                        <i class="bi bi-person-plus me-2"></i>Dados do novo usuário
+                    </h6>
+                </div>
+
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-8 col-xl-7">
+                            <div>
+                                <label asp-for="Password" class="form-label">Senha provisória</label>
+
+                                <div class="input-group">
+                                    <input asp-for="Password" class="form-control"
+                                           type="password"
+                                           placeholder="Informe uma senha provisória"
+                                           autocomplete="new-password" />
+
+                                    <button class="btn btn-outline-secondary" type="button"
+                                            id="togglePassword" title="Exibir senha">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
+
+                                <span asp-validation-for="Password" class="text-danger small"></span>
+
+                                <div class="form-text">
+                                    O usuário deverá alterar essa senha no primeiro acesso.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Configuração do acesso -->
+        <div id="accessSection" class="d-none">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3">
+                    <h6 class="mb-0 fw-semibold">
+                        <i class="bi bi-building me-2"></i>Configuração do acesso
+                    </h6>
+                </div>
+
+                <div class="card-body">
+                    <div class="mb-4">
+                        <label class="form-label text-muted small fw-semibold mb-2">
+                            OPERAÇÃO
+                        </label>
+
+                        <div class="operation-highlight">
+                            <div class="operation-icon">
+                                <i class="bi bi-shop"></i>
+                            </div>
+                            <div>
+                                <div class="fw-bold">@Model.OperationName</div>
+                                <div class="text-muted small">
+                                    O convite será realizado para esta operação.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-8 col-xl-6">
+                        <label asp-for="RoleId" class="form-label">Função do usuário</label>
+
+                        <select asp-for="RoleId" class="form-select">
+                            <option value="">Selecione uma função</option>
+                            @foreach (var role in Model.Roles ?? [])
+                            {
+                                <option value="@role.Id">@role.Name</option>
+                            }
+                        </select>
+
+                        <span asp-validation-for="RoleId" class="text-danger small"></span>
+
+                        <div class="form-text">
+                            Escolha a função que melhor representa o acesso deste novo usuário.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de confirmação -->
+        <div class="modal fade" id="confirmCreateModal" tabindex="-1"
+             aria-labelledby="confirmCreateModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow">
+                    <div class="modal-header">
+                        <h5 class="modal-title fw-semibold" id="confirmCreateModalLabel">
+                            Confirmar convite
+                        </h5>
+                        <button type="button" class="btn-close"
+                                data-bs-dismiss="modal" aria-label="Fechar"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <p class="mb-2">Confirma o convite deste usuário para a operação @User.GetOperationName()?</p>
+
+                        <div class="alert alert-light border mb-0">
+                            <i class="bi bi-shop me-2"></i>
+                            <strong>@Model.OperationName</strong>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+                            Cancelar
+                        </button>
+                        <button type="button" class="btn btn-primary" id="confirmCreateButton">
+                            <i class="bi bi-check-lg me-1"></i> Confirmar convite
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@{
+    var fab = new FloatingButtonDto
+    {
+        MainIcon = "bi bi-check-lg",
+        MainColor = "btn-primary",
+        MainTitle = "Confirmar convite",
+        MainBtnId = "btnSaveUser",
+        MainOnClick = "showCreateUserConfirmation()"
+    };
+}
+
+<partial name="_FloatingButtons" model="fab" />
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('createUserForm');
+            const emailInput = document.getElementById('Email');
+            const checkButton = document.getElementById('checkEmailButton');
+            const feedback = document.getElementById('emailFeedback');
+
+            const newUserSection = document.getElementById('newUserSection');
+            const accessSection = document.getElementById('accessSection');
+
+            const modal = new bootstrap.Modal(
+                document.getElementById('confirmCreateModal')
+            );
+
+            let verifiedEmail = null;
+            let isExistingUser = false;
+
+            function resetVerification() {
+                verifiedEmail = null;
+
+                newUserSection.classList.add('d-none');
+                accessSection.classList.add('d-none');
+
+                document.getElementById('Password').value = '';
+                document.getElementById('RoleId').value = '';
+
+                feedback.innerHTML = '';
+            }
+
+            emailInput.addEventListener('input', resetVerification);
+
+            checkButton.addEventListener('click', async function () {
+                if (!$(emailInput).valid()) {
+                    emailInput.focus();
+                    return;
+                }
+
+                const email = emailInput.value.trim();
+
+                console.log(email);
+                checkButton.disabled = true;
+                checkButton.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Consultando...';
+
+                try {
+                    const token = document.querySelector(
+                        'input[name="__RequestVerificationToken"]'
+                    ).value;
+
+                    const response = await fetch('/api/user/checkEmail', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': token
+                        },
+                        body: JSON.stringify({ email })
+                    });
+
+                    const data = await response.json();
+
+                    console.log(data);
+                    console.log(data.message);
+                    console.log(data.message.length);
+
+                    if (!response.ok) {
+                        
+                            throw new Error(data?.message || 'Não foi possível consultar o e-mail.');
+                    }
+
+                    console.log(data.data.exists);
+
+                    isExistingUser = data.data.exists;
+                    verifiedEmail = email;
+
+                    if (!isExistingUser) {
+                        newUserSection.classList.remove('d-none');
+                    }
+
+                    accessSection.classList.remove('d-none');
+
+                    feedback.innerHTML = isExistingUser
+                        ? ''
+                        : '<div class="text-primary small"><i class="bi bi-info-circle me-1"></i> Novo usuário. Informe os dados para criação da conta.</div>';
+
+                } catch (error) {
+                    verifiedEmail = null;
+                    feedback.innerHTML = '<div class="text-danger small"><i class="bi bi-exclamation-circle me-1"></i>' + error.message + '</div>';
+                } finally {
+                    checkButton.disabled = false;
+                    checkButton.innerHTML = '<i class="bi bi-arrow-right-circle me-1"></i> Continuar';
+                }
+            });
+
+            document.getElementById('togglePassword').addEventListener('click', function () {
+                const input = document.getElementById('Password');
+                const icon = this.querySelector('i');
+
+                input.type = input.type === 'password' ? 'text' : 'password';
+                icon.classList.toggle('bi-eye');
+                icon.classList.toggle('bi-eye-slash');
+            });
+
+            document.getElementById('confirmCreateButton').addEventListener('click', function () {
+                if (!$(form).valid()) return;
+
+                if (verifiedEmail !== emailInput.value.trim()) {
+                    resetVerification();
+                    modal.hide();
+                    return;
+                }
+
+                form.submit();
+            });
+
+            window.showCreateUserConfirmation = function () {
+                if (!verifiedEmail || verifiedEmail !== emailInput.value.trim()) {
+                    alert('Informe e verifique o e-mail antes de continuar.');
+                    emailInput.focus();
+                    return;
+                }
+
+                if (!$(form).valid()) {
+                    form.querySelector(':invalid')?.focus();
+                    return;
+                }
+
+                modal.show();
+            };
+        });
+    </script>
+}

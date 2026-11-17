@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using FS.Store.Model.Entity;
 
 namespace FS.Store.WebAPI.Areas.Admin.ViewModels
 {
@@ -6,7 +6,9 @@ namespace FS.Store.WebAPI.Areas.Admin.ViewModels
     {
         public Guid? OperationId { get; set; }
         public string? OperationName { get; set; }
-        public IEnumerable<SelectListItem> Operations { get; set; } = [];
+        public IEnumerable<OperationUserRole> OperationRoles { get; set; }
         public long? CashSessionId { get; set; }
+
+        public bool AnyInvite { get; set; }
     }
 }

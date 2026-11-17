@@ -25,10 +25,13 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            var user = await userService.FindByEmail(model.Email);
+            var user = await userService.FindByEmailAsync(model.Email);
 
             if (await authHelper.LoginAsync(user, model))
             {
+                if (user.MustChangePassword)
+                    return RedirectToAction("ChangePassword", "Account", new { Area = "Admin" });
+
                 if (returnUrl.IsNotNullOrEmpty())
                     return Redirect(returnUrl);
                 return RedirectToAction("Index", "Home", new { Area = "Admin" });

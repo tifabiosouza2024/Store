@@ -78,6 +78,7 @@ namespace FS.Store.WebAPI.Configs
             services.AddTransient<IOperationUserRoleService, OperationUserRoleService>();
             services.AddTransient<IPaymentProviderService, PaymentProviderService>();
             services.AddTransient<IPaymentTerminalService, PaymentTerminalService>();
+            services.AddTransient<IRoleService, RoleService>();
             services.AddTransient<IUserService, UserService>();
         }
         private static void Repositories(IServiceCollection services)
@@ -89,6 +90,7 @@ namespace FS.Store.WebAPI.Configs
             services.AddTransient<IOperationUserRoleRepository, OperationUserRoleRepository>();
             services.AddTransient<IPaymentProviderRepository, PaymentProviderRepository>();
             services.AddTransient<IPaymentTerminalRepository, PaymentTerminalRepository>();
+            services.AddTransient<IRoleRepository, RoleRepository>();
             services.AddTransient<IUserRepository, UserRepository>();
         }
 

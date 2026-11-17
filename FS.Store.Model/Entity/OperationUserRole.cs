@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using FS.Store.Model.Enums;
+using Microsoft.EntityFrameworkCore;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FS.Store.Model.Entity
@@ -13,6 +15,23 @@ namespace FS.Store.Model.Entity
     [Comment("Relacionamento entre Operação, Usuário e seus papeis")]
     public class OperationUserRole : BaseEntity<long>
     {
+        [Column("is_active")]
+        [DefaultValue(true)]
+        [Comment("Determina se o usuário estará ativo para aquela operação.")]
+        public bool IsActive { get; set; }
+
+        [Column("status")]
+        [Comment("Status do vínculo do usuário com a operação")]
+        public OperationUserRoleStatusEnum Status { get; set; } = OperationUserRoleStatusEnum.Pending;
+
+        [Column("invited_at", TypeName = "datetime(0)")]
+        [Comment("Data do convite")]
+        public DateTime InvitedAt { get; set; }
+
+        [Column("accepted_at", TypeName = "datetime(0)")]
+        [Comment("Data de aceitação do convite")]
+        public DateTime? AcceptedAt { get; set; }
+
         [ForeignKey("operation_id")]
         [Column("operation_id")]
         [Comment("Id da Operação")]
@@ -30,5 +49,11 @@ namespace FS.Store.Model.Entity
         [Comment("Id do papel do Usuário na Operação")]
         public int RoleId { get; set; }
         public virtual Role? Role { get; set; }
+
+        [Column("invited_by_user_id")]
+        [ForeignKey("invited_by_user_id")]
+        [Comment("Usuário responsável pelo convite")]
+        public Guid? InvitedByUserId { get; set; }
+        public virtual User? InvitedByUser { get; set; }
     }
 }
