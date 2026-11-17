@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FS.Store.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20261115033754_ChangeUserEntity_2")]
-    partial class ChangeUserEntity_2
+    [Migration("20261117121310_CreateCashEntities")]
+    partial class CreateCashEntities
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -763,7 +763,6 @@ namespace FS.Store.DAL.Migrations
                         .HasComment("Indica se o usuário deve alterar a senha no próximo acesso");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)")
                         .HasColumnName("name")

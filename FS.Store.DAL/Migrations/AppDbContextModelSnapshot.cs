@@ -113,7 +113,7 @@ namespace FS.Store.DAL.Migrations
 
                     b.HasIndex("ClosedByUserId");
 
-                    b.ToTable("cash_closing", null, t =>
+                    b.ToTable("cash_closing", t =>
                         {
                             t.HasComment("Registra o fechamento do caixa");
                         });
@@ -197,7 +197,7 @@ namespace FS.Store.DAL.Migrations
 
                     b.HasIndex("PaymentTerminalId");
 
-                    b.ToTable("cash_closing_terminal", null, t =>
+                    b.ToTable("cash_closing_terminal", t =>
                         {
                             t.HasComment("Armazena o valor de cada terminal (maquininha)");
                         });
@@ -286,7 +286,7 @@ namespace FS.Store.DAL.Migrations
 
                     b.HasIndex("CreatedByUserId");
 
-                    b.ToTable("cash_movement", null, t =>
+                    b.ToTable("cash_movement", t =>
                         {
                             t.HasComment("Registra as movimentações financeiras");
                         });
@@ -381,7 +381,7 @@ namespace FS.Store.DAL.Migrations
 
                     b.HasIndex("OperationId");
 
-                    b.ToTable("cash_register_session", null, t =>
+                    b.ToTable("cash_register_session", t =>
                         {
                             t.HasComment("controle de abertura e fechamento de caixa");
                         });
@@ -454,7 +454,7 @@ namespace FS.Store.DAL.Migrations
                     b.HasIndex("Document", "Email")
                         .IsUnique();
 
-                    b.ToTable("operations", null, t =>
+                    b.ToTable("operations", t =>
                         {
                             t.HasComment("Empresa/Loja Operante");
                         });
@@ -543,7 +543,7 @@ namespace FS.Store.DAL.Migrations
                     b.HasIndex("UserId", "OperationId", "RoleId")
                         .IsUnique();
 
-                    b.ToTable("operation_user_role", null, t =>
+                    b.ToTable("operation_user_role", t =>
                         {
                             t.HasComment("Relacionamento entre Operação, Usuário e seus papeis");
                         });
@@ -592,7 +592,7 @@ namespace FS.Store.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("payment_provider", null, t =>
+                    b.ToTable("payment_provider", t =>
                         {
                             t.HasComment("Armazena os fornecedores dos terminais");
                         });
@@ -649,7 +649,7 @@ namespace FS.Store.DAL.Migrations
 
                     b.HasIndex("PaymentProviderId");
 
-                    b.ToTable("payment_terminal", null, t =>
+                    b.ToTable("payment_terminal", t =>
                         {
                             t.HasComment("Armazena os terminais (maquininhas) de pagamento");
                         });
@@ -699,7 +699,7 @@ namespace FS.Store.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("roles", null, t =>
+                    b.ToTable("roles", t =>
                         {
                             t.HasComment("Papéis de usuários do sistema");
                         });
@@ -760,7 +760,6 @@ namespace FS.Store.DAL.Migrations
                         .HasComment("Indica se o usuário deve alterar a senha no próximo acesso");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)")
                         .HasColumnName("name")
@@ -794,7 +793,7 @@ namespace FS.Store.DAL.Migrations
 
                     b.HasIndex("LastOperationId");
 
-                    b.ToTable("users", null, t =>
+                    b.ToTable("users", t =>
                         {
                             t.HasComment("Usuários do sistema");
                         });

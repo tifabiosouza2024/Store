@@ -18,6 +18,7 @@ namespace FS.Store.Model.Entity
         public CashRegisterSession()
         {
             CashMovements = [];
+            CashClosingTerminals = [];
         }
         [Column("opened_at", TypeName = "datetime(0)")]
         [Comment("Data/Hora de abertura")]
