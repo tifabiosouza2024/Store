@@ -1,130 +1,47 @@
-﻿document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('input.price').forEach(input => {
-        const originalName = input.name;
+﻿let phoneValue;
+$(document).ready(function () {
+    $.validator.methods.number = function (value, element) {
+        return this.optional(element) || /^-?(?:\d+|\d{1,3}(?:\.\d{3})+)(?:,\d+)?$/.test(value);
+    };
 
-        if (!originalName) {
-            alert('O input.price precisa ter um atributo name.');
-            return;
-        }
+    $.validator.methods.range = function (value, element, param) {
+        if (this.optional(element)) return true;
 
-        // Preserva o valor original antes de modificar o input.
-        const initialValue = input.value;
+        value = value.replace(/\./g, '').replace(',', '.');
 
-        // Cria automaticamente o campo oculto.
-        const hidden = document.createElement('input');
-        hidden.type = 'hidden';
-        hidden.name = originalName;
+        return !isNaN(value) && parseFloat(value) >= param[0] && parseFloat(value) <= param[1];
+    };
 
-        input.insertAdjacentElement('afterend', hidden);
-
-        // Evita enviar o campo visível junto com o hidden.
-        input.removeAttribute('name');
-
-        // Remove os data-attributes dos criados hiddens.
-        input.removeAttribute('data-val');
-        input.removeAttribute('data-val-number');
-        input.removeAttribute('data-val-required');
-        input.removeAttribute('data-val-range');
-        input.removeAttribute('data-val-min');
-        input.removeAttribute('data-val-max');
-        input.removeAttribute('data-val-length');
-        input.removeAttribute('data-val-regex');
-
-        // Inicializa os dígitos com o valor existente.
-        let digits = initialValue
-            .replace(/\D/g, '')
-            .replace(/^0+(?=\d)/, '') || '0';
-
-        function formatPrice() {
-            const padded = digits.padStart(3, '0');
-            const integer = padded.slice(0, -2);
-            const cents = padded.slice(-2);
-
-            return integer.replace(/\B(?=(\d{3})+(?!\d))/g, '.') +
-                ',' + cents;
-        }
-
-        function update() {
-            input.value = formatPrice();
-
-            const padded = digits.padStart(3, '0');
-            const integer = padded.slice(0, -2).replace(/^0+(?=\d)/, '');
-            const cents = padded.slice(-2);
-
-            hidden.value = integer + ',' + cents;
-
-            input.dispatchEvent(new Event('price:updated', {
-                bubbles: true
-            }));
-        }
-
-
-        input.addEventListener('focus', () => {
-            input.select();
-        });
-
-        input.addEventListener('keydown', event => {
-            if (/^\d$/.test(event.key)) {
-                event.preventDefault();
-
-                const selectedAll =
-                    input.selectionStart === 0 &&
-                    input.selectionEnd === input.value.length;
-
-                digits = selectedAll
-                    ? event.key
-                    : (digits + event.key).replace(/^0+(?=\d)/, '');
-
-                update();
-                return;
-            }
-
-            if (event.key === 'Backspace' || event.key === 'Delete') {
-                event.preventDefault();
-
-                const selectedAll =
-                    input.selectionStart === 0 &&
-                    input.selectionEnd === input.value.length;
-
-                digits = selectedAll
-                    ? '0'
-                    : digits.slice(0, -1) || '0';
-
-                update();
-                return;
-            }
-
-            if (
-                event.ctrlKey ||
-                event.metaKey ||
-                [
-                    'Tab', 'ArrowLeft', 'ArrowRight',
-                    'Home', 'End'
-                ].includes(event.key)
-            ) {
-                return;
-            }
-
-            if (event.key.length === 1) {
-                event.preventDefault();
-            }
-        });
-
-        input.addEventListener('paste', event => {
-            event.preventDefault();
-
-            const pasted = event.clipboardData.getData('text');
-            const numbers = pasted.replace(/\D/g, '');
-
-            if (numbers) {
-                digits = numbers.replace(/^0+(?=\d)/, '') || '0';
-                update();
-            }
-        });
-
-        update();
+    $('.email').inputmask("email");
+    $('.price').focus(function () {
+        $(this).select();
     });
-
-    // Opcional: foca automaticamente no primeiro campo monetário.
-    document.querySelector('input.price')?.focus();
+    $('.price').inputmask('currency', {
+        radixPoint: ',',
+        removeMaskOnSubmit: true,
+        digits: 2,
+        onBeforePaste: function onBeforePaste(pastedValue) {
+            return pastedValue.replace('.', ',');
+        }
+    });
+    $('.phone').on('focus', function () {
+        if (phoneValue == null) {
+            phoneValue = $(this).val();
+        }
+    })
+    $('.phone').on('blur', function () {
+        verifyPhoneNumber($(this));
+    });
+    $('.percent').focus(function () {
+        $(this).select();
+    });
+    $('.percent').inputmask('percentage', {
+        min: 0,
+        max: 100,
+        suffix: " %",
+        removeMaskOnSubmit: true,
+        digits: 2,
+        radixPoint: (typeof radixPoint !== 'undefined') ? radixPoint : ','
+    });
+    $('.cnpj').inputmask('99.999.999/9999-99');
 });

@@ -227,12 +227,14 @@ INSERT INTO roles (name, normalized_name, deleted) VALUES
 
 
 INSERT INTO users (id, name, email, password_hash, is_active, is_beta) VALUES
-(uuid(),'Super User', 'superuser@gmail.com', 'AQAAAAIAAYagAAAAEDsFHuQNP3348XCKBFCxRMfp+P76ny50r+ndBtrSLBEIlukgHAFq9PvFWzBbjL3nkA==', true, true);
+(uuid(),'Super User', 'superuser@gmail.com', 'AQAAAAIAAYagAAAAEEMxJwmG0mt2lLMideICfyRWErAc/YTabcWxisnqK+LgWepq5UCX836/B+OZN0jNgg==', true, true);
+
+INSERT INTO operations (id, document, name, email) VALUES (uuid(),'40.953.557/0001-61', 'First Gift', 'firstgift@mail.com');
 
 
-INSERT INTO operation_user_role (user_id, role_id, operation_id)
+INSERT INTO operation_user_role (user_id, role_id, operation_id, is_active, status)
 SELECT
-    (SELECT id FROM users WHERE email LIKE 'superuser%'), r.id, o.id
+    (SELECT id FROM users WHERE email LIKE 'superuser%'), r.id, o.id, true, 1
 FROM roles r
 CROSS JOIN operations o
 WHERE r.normalized_name = 'SUPER';

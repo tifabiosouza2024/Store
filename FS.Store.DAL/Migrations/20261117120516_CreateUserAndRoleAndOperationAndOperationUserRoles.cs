@@ -1,4 +1,5 @@
 ﻿using FS.Store.Model.Entity;
+using FS.Store.Model.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore.Migrations;
 using MySql.EntityFrameworkCore.Metadata;
@@ -504,10 +505,12 @@ INSERT INTO roles (name, normalized_name, deleted) VALUES
 INSERT INTO users (id, name, email, password_hash, is_active, is_beta) VALUES
 (uuid(),'Super User', 'superuser@gmail.com', '{passwordHashed}', true, true);");
 
-            migrationBuilder.Sql(@"
-INSERT INTO operation_user_role (user_id, role_id, operation_id)
+            migrationBuilder.Sql($"INSERT INTO operations (id, document, name, email) VALUES (uuid(),'40.953.557/0001-61', 'First Gift', 'firstgift@mail.com');");
+
+            migrationBuilder.Sql(@$"
+INSERT INTO operation_user_role (user_id, role_id, operation_id, is_active, status)
 SELECT
-    (SELECT id FROM users WHERE email LIKE 'superuser%'), r.id, o.id
+    (SELECT id FROM users WHERE email LIKE 'superuser%'), r.id, o.id, true, {(int)OperationUserRoleStatusEnum.Pending}
 FROM roles r
 CROSS JOIN operations o
 WHERE r.normalized_name = 'SUPER';");

@@ -77,7 +77,7 @@
                     </div>
                 </div>
                 <div class="mb-4">
-                    <label asp-for="Amount" class="form-label fw-semibold">
+                    <label asp-for="CashSessionNumber" class="form-label fw-semibold">
                         Número do Caixa
                     </label>
                     <div class="input-group input-group-lg w-100 w-md-25">
@@ -94,7 +94,7 @@
                     </label>
                     <div class="input-group input-group-lg w-100 w-md-25">
                         <span class="input-group-text">R$</span>
-                        <input type="text" asp-for="Amount" class="form-control price" inputmode="numeric" autocomplete="off" value="0,00" />
+                        <input type="text" asp-for="Amount" class="form-control price" autocomplete="off" value="0,00" />
                     </div>
                     <span asp-validation-for="Amount" class="text-danger small"></span>
                     <div class="form-text">
@@ -118,6 +118,7 @@
 </div>
 
 @section Scripts {
+    <partial name="_ValidationScriptsPartial" />
     <script>
         function ShowForm() {
             const form = document.getElementById('frm');
@@ -125,5 +126,11 @@
             document.getElementById('cashSessionCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
             form.querySelector('#AmountDisplay').focus();
         }
+
+        document.getElementById('frm').addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+            }
+        });
     </script>
 }
