@@ -1,0 +1,637 @@
+﻿@model Pagination<Operation>
+
+@{
+    ViewData["Title"] = "Operações";
+
+    var operations = Model.Data?.ToList() ?? [];
+    var hasOperations = operations.Count > 0;
+    var search = Context.Request.Query["search"].ToString();
+
+    var sortableFields = new[]
+    {
+        new { Field = nameof(Operation.Name), Label = "Nome da Operação" },
+        new { Field = nameof(Operation.Document), Label = "CNPJ" },
+        new { Field = nameof(Operation.Email), Label = "E-mail" },
+        new { Field = nameof(Operation.IsActive), Label = "Situação" }
+    };
+
+    var mobileSorts = new List<(string Field, string Label, string Direction)>();
+
+    foreach (var query in Context.Request.Query)
+    {
+        if (!query.Key.StartsWith("orderBy", StringComparison.OrdinalIgnoreCase))
+            continue;
+
+        var field = sortableFields.FirstOrDefault(x =>
+            string.Equals($"orderBy{x.Field}", query.Key, StringComparison.OrdinalIgnoreCase));
+
+        var direction = query.Value.ToString().ToLowerInvariant();
+
+        if (field != null && (direction == "asc" || direction == "desc"))
+            mobileSorts.Add((field.Field, field.Label, direction));
+    }
+
+    if (mobileSorts.Count == 0)
+        mobileSorts.Add((nameof(Operation.Name), "Nome da Operação", "asc"));
+
+    var floatingButton = new FloatingButtonDto
+    {
+        MainUrl = Url.Action("Create")!,
+        MainIcon = "bi bi-plus-lg",
+        MainTitle = "Nova operação"
+    };
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/admin/table.css" asp-append-version="true" />
+
+    <style>
+        .operation-card {
+            background: #eaf0fa;
+            border: 1px solid #c5d2e8;
+            border-radius: 14px;
+            transition: background-color .2s ease, border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+            overflow: hidden;
+        }
+
+            .operation-card:hover {
+                background: #a0b9eb;
+                border-color: #a0b9eb;
+                box-shadow: 0 4px 14px rgb(30 50 90 / 9%);
+                transform: translateY(-2px);
+            }
+
+        .operation-card-body {
+            padding: 16px;
+        }
+
+        .operation-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            background: #fff;
+            border: 1px solid #e3e8f0;
+            border-radius: 10px;
+        }
+
+        .operation-info-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            flex-shrink: 0;
+            border-radius: 9px;
+            background: #eaf0ff;
+            color: #4263cf;
+            font-size: 1.1rem;
+        }
+
+        .operation-info-content {
+            min-width: 0;
+            overflow: hidden;
+        }
+
+            .operation-info-content small {
+                display: block;
+                color: #7b8495;
+                font-size: .75rem;
+                margin-bottom: 2px;
+            }
+
+            .operation-info-content span {
+                display: block;
+                color: #344054;
+                font-size: .875rem;
+                overflow-wrap: anywhere;
+            }
+
+        .operation-name {
+            color: #25324a;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .operation-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 42px;
+            height: 42px;
+            flex-shrink: 0;
+            border-radius: 11px;
+            background: #dce6ff;
+            color: #4263cf;
+            font-size: 1.25rem;
+        }
+
+        .operation-actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        @@media (max-width: 767.98px) {
+            .operation-card-body {
+                padding: 14px;
+            }
+
+            .operation-card:hover {
+                transform: none;
+            }
+        }
+    </style>
+}
+
+<div class="container py-4">
+
+    @* Cabeçalho *@
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div class="d-flex align-items-center gap-3">
+            <div class="bg-primary bg-opacity-10 text-primary rounded-3 p-3">
+                <i class="bi bi-shop fs-3"></i>
+            </div>
+            <div>
+                <h2 class="mb-1">Operações</h2>
+                <p class="text-muted mb-0">
+                    Gerencie as operações cadastradas no sistema.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    @if (hasOperations)
+    {
+        @* Listagem *@
+        <div class="card border-0 shadow-sm">
+
+            @* Cabeçalho da listagem *@
+            <div class="card-header bg-body border-0 px-3 px-md-4 pt-4 pb-3">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                    <div>
+                        <h5 class="mb-1">Operações cadastradas</h5>
+                        <p class="text-muted small mb-0">
+                            Consulte e gerencie as operações do sistema.
+                        </p>
+                    </div>
+
+                    <span class="badge text-bg-primary rounded-pill px-3 py-2">
+                        @Model.TotalItems registro(s)
+                    </span>
+                </div>
+            </div>
+
+            @* Pesquisa *@
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-3">
+                    <form id="operationSearchForm" method="get">
+                        <div class="d-flex flex-wrap align-items-center gap-2">
+                            <div class="input-group operation-search">
+                                <span class="input-group-text bg-body">
+                                    <i class="bi bi-search text-muted"></i>
+                                </span>
+                                <input type="search" class="form-control" id="operationSearch" name="search"
+                                       value="@search" placeholder="Pesquisar por nome, CNPJ ou e-mail..."
+                                       aria-label="Pesquisar operações">
+                                <button type="submit" class="btn btn-primary">
+                                    Pesquisar
+                                </button>
+                            </div>
+
+                            @if (!string.IsNullOrWhiteSpace(search))
+                            {
+                                <a asp-action="Index" class="btn btn-outline-secondary">
+                                    <i class="bi bi-x-circle me-1"></i>
+                                    Limpar
+                                </a>
+                            }
+                        </div>
+                    </form>
+                </div>
+            </div>
+            @* =========================================
+               DESKTOP - TABELA
+            ========================================= *@
+
+            <div class="d-none d-lg-block">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0" data-ordered-table>
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-4" style="width: 110px;">Ações</th>
+                                    <th table-header-ordered field="@nameof(Operation.Name)" header-text="Nome da Operação"></th>
+                                    <th table-header-ordered field="@nameof(Operation.Document)" header-text="CNPJ"></th>
+                                    <th table-header-ordered field="@nameof(Operation.Email)" header-text="E-mail"></th>
+                                    <th table-header-ordered field="@nameof(Operation.IsActive)" header-text="Situação"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var operation in operations)
+                                {
+                                    <tr>
+                                        @* Ações *@
+                                        <td class="ps-4">
+                                            <a asp-action="Edit" asp-route-id="@operation.Id"
+                                               class="btn btn-sm btn-outline-primary"
+                                               title="Editar operação">
+                                                <i class="bi bi-pencil"></i>
+                                                Editar
+                                            </a>
+                                        </td>
+
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div class="operation-icon">
+                                                    <i class="bi bi-shop"></i>
+                                                </div>
+                                                <span class="operation-name">
+                                                    @operation.Name
+                                                </span>
+                                            </div>
+                                        </td>
+
+                                        <td class="text-nowrap">
+                                            @(string.IsNullOrWhiteSpace(operation.Document) ? "-" : operation.Document)
+                                        </td>
+
+                                        <td>
+                                            @(string.IsNullOrWhiteSpace(operation.Email) ? "-" : operation.Email)
+                                        </td>
+
+                                        <td>
+                                            @if (operation.IsActive == true)
+                                            {
+                                                <span class="badge text-bg-success bg-opacity-10 text-success border border-success border-opacity-25">
+                                                    <i class="bi bi-check-circle me-1"></i>
+                                                    Ativa
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge text-bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25">
+                                                    <i class="bi bi-x-circle me-1"></i>
+                                                    Inativa
+                                                </span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            @* =========================================
+               MOBILE - CARDS
+            ========================================= *@
+            <div class="d-lg-none">
+                <div class="card-body p-3">
+
+                    @* Ordenação mobile *@
+                    <div class="mb-4" id="mobileSort">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label class="form-label fw-semibold mb-0">
+                                <i class="bi bi-sort-down me-1"></i>
+                                Ordenar por
+                            </label>
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="addMobileSort">
+                                <i class="bi bi-plus-circle me-1"></i>
+                                Adicionar campo
+                            </button>
+                        </div>
+
+                        <div id="mobileSortCriteria" class="d-flex flex-column gap-2">
+                            @foreach (var sort in mobileSorts)
+                            {
+                                <div class="row g-2 align-items-center" data-sort-row>
+                                    <div class="col-6">
+                                        <select class="form-select form-select-sm" data-sort-field>
+                                            @foreach (var field in sortableFields)
+                                            {
+                                                <option value="@field.Field" selected="@(sort.Field == field.Field)">
+                                                    @field.Label
+                                                </option>
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="col-4">
+                                        <select class="form-select form-select-sm" data-sort-direction>
+                                            <option value="asc" selected="@(sort.Direction == "asc")">Crescente</option>
+                                            <option value="desc" selected="@(sort.Direction == "desc")">Decrescente</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-2">
+                                        <button type="button" class="btn btn-outline-danger btn-sm w-100"
+                                                data-remove-sort title="Remover critério">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="d-flex justify-content-end mt-2">
+                            <button type="button" class="btn btn-primary btn-sm" id="applyMobileSort">
+                                <i class="bi bi-check2 me-1"></i>
+                                Aplicar ordenação
+                            </button>
+                        </div>
+                    </div>
+
+                    @* Template para novos critérios *@
+                    <template id="mobileSortTemplate">
+                        <div class="row g-2 align-items-center" data-sort-row>
+                            <div class="col-6">
+                                <select class="form-select form-select-sm" data-sort-field>
+                                    @foreach (var field in sortableFields)
+                                    {
+                                        <option value="@field.Field">@field.Label</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-4">
+                                <select class="form-select form-select-sm" data-sort-direction>
+                                    <option value="asc">Crescente</option>
+                                    <option value="desc" selected>Decrescente</option>
+                                </select>
+                            </div>
+                            <div class="col-2">
+                                <button type="button" class="btn btn-outline-danger btn-sm w-100"
+                                        data-remove-sort title="Remover critério">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+
+                    @* Cards *@
+                    <div class="d-flex flex-column gap-3">
+                        @foreach (var operation in operations)
+                        {
+                            <div class="operation-card">
+                                <div class="operation-card-body">
+
+                                    @* Identificação e ações *@
+                                    <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
+                                        <div class="d-flex align-items-center gap-2 min-w-0">
+                                            <div class="operation-icon">
+                                                <i class="bi bi-shop fs-5"></i>
+                                            </div>
+                                            <div class="min-w-0">
+                                                <div class="text-muted small mb-1">
+                                                    Nome da operação
+                                                </div>
+                                                <div class="operation-name">
+                                                    @operation.Name
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex align-items-center gap-2">
+                                            @if (operation.IsActive == true)
+                                            {
+                                                <span class="badge text-bg-success bg-opacity-10 text-success border border-success border-opacity-25">
+                                                    Ativa
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge text-bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25">
+                                                    Inativa
+                                                </span>
+                                            }
+
+                                            <div class="dropdown operation-actions">
+                                                <button class="btn btn-outline-secondary btn-sm" type="button"
+                                                        data-bs-toggle="dropdown" aria-expanded="false"
+                                                        aria-label="Ações da operação">
+                                                    <i class="bi bi-three-dots-vertical"></i>
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                                    <li>
+                                                        <a asp-action="Edit" asp-route-id="@operation.Id" class="dropdown-item">
+                                                            <i class="bi bi-pencil"></i>
+                                                            Editar operação
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <hr class="text-muted opacity-25">
+
+                                    @* Informações *@
+                                    <div class="d-flex flex-column gap-3">
+
+                                        @* CNPJ *@
+                                        <div class="operation-info">
+                                            <div class="operation-info-icon">
+                                                <i class="bi bi-card-text"></i>
+                                            </div>
+                                            <div class="operation-info-content">
+                                                <div class="text-muted small">
+                                                    CNPJ
+                                                </div>
+                                                <div class="value">
+                                                    @(string.IsNullOrWhiteSpace(operation.Document) ? "-" : operation.Document)
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        @* E-mail *@
+                                        <div class="operation-info">
+                                            <div class="operation-info-icon">
+                                                <i class="bi bi-envelope"></i>
+                                            </div>
+                                            <div class="operation-info-content">
+                                                <div class="text-muted small">
+                                                    E-mail
+                                                </div>
+                                                <div class="value">
+                                                    @(string.IsNullOrWhiteSpace(operation.Email) ? "-" : operation.Email)
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            @* Paginação compartilhada *@
+            <div class="card-footer bg-body border-0 py-3 px-3 px-md-4">
+                <partial name="_Pagination" model="@(new PaginationViewModel
+                         {
+                             TotalItems = Model.TotalItems,
+                             QttPerPage = Model.QttPerPage,
+                             CurrentPage = Model.CurrentPage
+                         })" />
+            </div>
+        </div>
+    }
+    else
+    {
+        @* Estado vazio *@
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center py-5 px-4">
+                <div class="bg-body-secondary rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                     style="width: 88px; height: 88px;">
+                    <i class="bi bi-shop display-5 text-secondary"></i>
+                </div>
+
+                <h4 class="mb-2">
+                    @(string.IsNullOrWhiteSpace(search) ? "Nenhuma operação cadastrada" : "Nenhuma operação encontrada")
+                </h4>
+
+                <p class="text-muted mx-auto mb-4" style="max-width: 420px;">
+                    @if (string.IsNullOrWhiteSpace(search))
+                    {
+                        @:Ainda não existem operações cadastradas no sistema. Cadastre uma nova operação para começar.
+                    }
+                    else
+                    {
+                        @:Não encontramos operações correspondentes à sua pesquisa. Experimente utilizar outros termos.
+                    }
+                </p>
+
+                @if (!string.IsNullOrWhiteSpace(search))
+                {
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-counterclockwise me-2"></i>
+                        Limpar pesquisa
+                    </a>
+                }
+                else
+                {
+                    <a asp-action="Create" class="btn btn-primary">
+                        <i class="bi bi-plus-circle me-2"></i>
+                        Nova operação
+                    </a>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@* Botão flutuante *@
+<partial name="_FloatingButtons" model="floatingButton" />
+
+@section Scripts {
+    <script src="~/js/admin/table.js" asp-append-version="true"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            // Pesquisa: preserva os critérios de ordenação
+            const searchForm = document.getElementById('operationSearchForm');
+
+            if (searchForm) {
+                searchForm.addEventListener('submit', function (event) {
+                    event.preventDefault();
+
+                    const url = new URL(window.location.href);
+                    const search = document.getElementById('operationSearch').value.trim();
+
+                    if (search)
+                        url.searchParams.set('search', search);
+                    else
+                        url.searchParams.delete('search');
+
+                    url.searchParams.set('page', '1');
+
+                    window.location.href = url.toString();
+                });
+            }
+
+            // Ordenação mobile
+            const criteria = document.getElementById('mobileSortCriteria');
+            const template = document.getElementById('mobileSortTemplate');
+            const addButton = document.getElementById('addMobileSort');
+            const applyButton = document.getElementById('applyMobileSort');
+
+            if (!criteria || !template || !addButton || !applyButton)
+                return;
+
+            function updateSortOptions() {
+                const selects = [...criteria.querySelectorAll('[data-sort-field]')];
+
+                selects.forEach(select => {
+                    [...select.options].forEach(option => {
+                        option.disabled = selects.some(other =>
+                            other !== select && other.value === option.value);
+                    });
+                });
+
+                const totalFields = template.content.querySelectorAll('[data-sort-field] option').length;
+
+                addButton.disabled = selects.length >= totalFields;
+
+                criteria.querySelectorAll('[data-remove-sort]').forEach(button => {
+                    button.disabled = selects.length === 1;
+                });
+            }
+
+            addButton.addEventListener('click', function () {
+                const usedFields = [...criteria.querySelectorAll('[data-sort-field]')]
+                    .map(select => select.value);
+
+                const availableField = [...template.content.querySelectorAll('[data-sort-field] option')]
+                    .find(option => !usedFields.includes(option.value));
+
+                if (!availableField)
+                    return;
+
+                const newRow = template.content.firstElementChild.cloneNode(true);
+
+                newRow.querySelector('[data-sort-field]').value = availableField.value;
+
+                criteria.appendChild(newRow);
+
+                updateSortOptions();
+            });
+
+            criteria.addEventListener('click', function (event) {
+                const removeButton = event.target.closest('[data-remove-sort]');
+
+                if (!removeButton || criteria.querySelectorAll('[data-sort-row]').length <= 1)
+                    return;
+
+                removeButton.closest('[data-sort-row]').remove();
+
+                updateSortOptions();
+            });
+
+            criteria.addEventListener('change', updateSortOptions);
+
+            applyButton.addEventListener('click', function () {
+                const url = new URL(window.location.href);
+                const rows = [...criteria.querySelectorAll('[data-sort-row]')];
+
+                [...url.searchParams.keys()]
+                    .filter(key => key.toLowerCase().startsWith('orderby'))
+                    .forEach(key => url.searchParams.delete(key));
+
+                rows.forEach(row => {
+                    const field = row.querySelector('[data-sort-field]').value;
+                    const direction = row.querySelector('[data-sort-direction]').value;
+
+                    url.searchParams.set(`orderBy${field}`, direction);
+                });
+
+                url.searchParams.set('page', '1');
+
+                window.location.href = url.toString();
+            });
+
+            updateSortOptions();
+        });
+    </script>
+}

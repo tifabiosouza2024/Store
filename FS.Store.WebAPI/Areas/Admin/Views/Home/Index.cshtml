@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "Início";
 
+    bool isSuper = User.IsSuper();
     var operationRoles = Model.OperationRoles.ToList();
     var hasOperation = User.GetOperationId() is Guid operationId && operationId != Guid.Empty;
     var hasCashSession = Model.CashSessionId != null;
@@ -16,7 +17,6 @@
 <div class="dashboard">
 
     <!-- Cabeçalho -->
-
     <section class="dashboard-welcome">
         <div class="welcome-content">
             <span class="welcome-eyebrow">
@@ -45,7 +45,7 @@
     </section>
 
     <!-- Convites -->
-    @if (Model.AnyInvite)
+    @if (Model.QttInvite > 0)
     {
         <section class="invite-banner">
             <div class="invite-icon">
@@ -54,7 +54,14 @@
 
             <div class="invite-content">
                 <span class="invite-label">CONVITE PENDENTE</span>
-                <h2>Você foi convidado para uma operação!</h2>
+                @if (Model.QttInvite > 1)
+                {
+                    <h2>Você foi convidado para uma operação!</h2>
+                }
+                else
+                {
+                    <h2>Você foi convidado para uma operação!</h2>
+                }
                 <p>Confira os detalhes do convite e escolha se deseja fazer parte dessa operação.</p>
             </div>
 
@@ -64,9 +71,21 @@
             </a>
         </section>
     }
+    @if (User.IsSuper())
+    {
+        <section class="cash-highlight">
+            <div class="cash-highlight-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="24px" width="24px" fill="currentcolor"><path d="M18.48,21.91q-0.18-0.06-0.32-0.21l-5.1-5.1q-0.15-0.15-0.21-0.33T12.78,15.9t0.06-0.38t0.21-0.33l2.13-2.13q0.15-0.15 0.32-0.21t0.38-0.06t0.38,0.06t0.32,0.21l5.1,5.1q0.15,0.15 0.21,0.32t0.06,0.38t-0.06,0.38t-0.21,0.32L19.55,21.7q-0.15,0.15-0.32,0.21t-0.38,0.06t-0.38-0.06Zm0.38-2.31l0.73-0.73L15.9,15.2l-0.72,0.72l3.68,3.68ZM4.74,21.93Q4.55,21.85 4.4,21.7L2.3,19.6q-0.15-0.15-0.23-0.34T2,18.88T2.08,18.5T2.3,18.18l5.3-5.3H9.73l0.85-0.85L6.45,7.9H5.03L2,4.88L4.83,2.05L7.85,5.07V6.5l4.13,4.13l2.9-2.9L13.8,6.65l1.4-1.4H12.38l-0.7-0.7L15.23,1l0.7,0.7V4.52l1.4-1.4l3.55,3.55Q21.3,7.1 21.53,7.64q0.22,0.54 0.22,1.14q0,0.6-0.22,1.15q-0.23,0.55-0.65,0.97L18.75,8.77l-1.4,1.4L16.3,9.13L11.13,14.3v2.1l-5.3,5.3Q5.68,21.85 5.5,21.93Q5.33,22 5.13,22T4.74,21.93ZM5.13,19.6l4.25-4.25V14.63H8.65L4.4,18.88L5.13,19.6Zm0,0L4.4,18.88l0.38,0.35L5.13,19.6Zm13.73,0l0.73-0.73L18.85,19.6Z" /></svg>
+            </div>
 
+            <div class="cash-highlight-content">
+                <span>SUPER-USUÁRIO</span>
+                <h2>Você está conectado como Super-Usuário e poderá realizar alterações globais no sistema.</h2>
+            </div>
+        </section>
+    }
     <!-- Seleção de operação -->
-    @if (operationRoles.Any() || !Model.AnyInvite)
+    @if (operationRoles.Any() || Model.QttInvite > 0)
     {
         <section class="dashboard-section operation-section">
 
@@ -76,9 +95,16 @@
                     <div>
                         <span class="section-eyebrow">AMBIENTE DE TRABALHO</span>
                         <h2>Sua operação</h2>
-                        @if (operationRoles.Count() > 1)
+                        @if (!User.AnyOperation())
                         {
-                            <p>Selecione a loja em que deseja trabalhar.</p>
+                            if (operationRoles.Count() > 1)
+                            {
+                                <p><b>Selecione uma das operações abaixo para iniciar seu trabalho.</b></p>
+                            }
+                            else
+                            {
+                                <p><b>Selecione a operação abaixo para iniciar seu trabalho.</b></p>
+                            }
                         }
                     </div>
 
@@ -87,93 +113,64 @@
                     </div>
                 </div>
 
-                @if (User.GetOperationId() == Guid.Empty || operationRoles.Count > 1)
-                {
-                    <form asp-action="ChangeOperation" method="post" id="operationForm">
-                        @Html.AntiForgeryToken()
+                <form asp-action="ChangeOperation" method="post" id="operationForm">
+                    @Html.AntiForgeryToken()
 
-                        <div class="operation-grid">
-                            @foreach (var operation in operationRoles)
-                                {
-                                    var isCurrent = operation.OperationId == Model.OperationId;
+                    <div class="operation-grid">
 
-                                    <button type="submit"
+                        @foreach (var operation in operationRoles)
+                        {
+                            var isCurrent = operation.OperationId == Model.OperationId;
+
+                            <button type="submit"
                                     name="OperationId"
-                                    value="@operation.OperationId"
+                                    value="@(isCurrent ? "" : operation.OperationId.ToString())"
                                     class="operation-card @(isCurrent ? "selected" : "")"
                                     aria-current="@(isCurrent ? "true" : null)"
-                                    title="@(isCurrent ? "Operação atual" : $"Acessar {operation.Operation.Name}")"
-                                    disabled="@isCurrent">
+                                    title="@(isCurrent ? "Sair desta operação" : $"Acessar {operation.Operation.Name}")">
 
-                                        <span class="operation-card-top">
-                                            <span class="operation-card-icon">
-                                                <i class="bi bi-shop-window"></i>
-                                            </span>
+                                <span class="operation-card-top">
+                                    <span class="operation-card-icon">
+                                        <i class="bi bi-shop-window"></i>
+                                    </span>
 
-                                            @if (isCurrent)
-                                            {
-                                                <span class="operation-current-badge">
-                                                    <i class="bi bi-check-circle-fill"></i>
-                                                    Atual
-                                                </span>
-                                            }
-                                            else
-                                            {
-                                                <span class="operation-access-icon">
-                                                    <i class="bi bi-arrow-up-right"></i>
-                                                </span>
-                                            }
+                                    @if (isCurrent)
+                                    {
+                                        <span class="operation-current-badge">
+                                            <i class="bi bi-check-circle-fill"></i>
+                                            Atual
                                         </span>
 
-                                        <span class="operation-card-content">
-                                            <strong>@operation.Operation.Name</strong>
-
-                                            <small>
-                                                <i class="bi bi-person-badge"></i>
-                                                @operation.Role.Name
-                                            </small>
+                                        <span class="operation-exit-icon">
+                                            <i class="bi bi-box-arrow-right"></i>
                                         </span>
-
-                                        <span class="operation-card-footer">
-                                            @(isCurrent ? "Operação selecionada" : "Acessar esta operação")
+                                    }
+                                    else
+                                    {
+                                        <span class="operation-access-icon">
+                                            <i class="bi bi-arrow-up-right"></i>
                                         </span>
-                                    </button>
-                                }
-                            </div>
-                        </form>
-                }
-                else if (operationRoles.Count == 1 && User.GetOperationId() != Guid.Empty)
-                {
-                    var operation = operationRoles.First();
-                    <div class="operation-grid single-operation">
-                        <div class="operation-card selected">
-                            <span class="operation-card-top">
-                                <span class="operation-card-icon">
-                                    <i class="bi bi-shop-window"></i>
+                                    }
                                 </span>
 
-                                <span class="operation-current-badge">
-                                    <i class="bi bi-check-circle-fill"></i>
-                                    Atual
+                                <span class="operation-card-content">
+                                    <strong>@operation.Operation.Name</strong>
+                                    <small>
+                                        <i class="bi bi-person-badge"></i>
+                                        @operation.Role.Name
+                                    </small>
                                 </span>
-                            </span>
 
-                            <span class="operation-card-content">
-                                <strong>@operation.Operation.Name</strong>
-                                <small>
-                                    <i class="bi bi-person-badge"></i>
-                                    @operation.Role.Name
-                                </small>
-                            </span>
+                                <span class="operation-card-footer">
+                                    @(isCurrent ? "Sair desta operação" : "Acessar esta operação")
+                                </span>
+                            </button>
+                        }
 
-                            <span class="operation-card-footer">
-                                Você está trabalhando nesta operação
-                            </span>
-                        </div>
                     </div>
-                }
+                </form>
             }
-            else if (!Model.AnyInvite)
+            else if (Model.QttInvite == 0)
             {
                 <div class="operation-empty">
                     <div class="operation-empty-icon">
@@ -214,7 +211,7 @@
     }
 
     <!-- Acesso rápido -->
-    @if (hasOperation)
+    @if (hasOperation || isSuper)
     {
         <section class="dashboard-section shortcuts-section">
 
@@ -232,153 +229,168 @@
 
             <div class="shortcut-grid">
 
-                <!-- Caixa -->
-                <a asp-area="Admin" asp-controller="CashSession" asp-action="Index" class="shortcut-card">
-                    <span class="shortcut-icon shortcut-purple">
-                        <i class="bi bi-wallet2"></i>
-                    </span>
-                    <span class="shortcut-category">CAIXA</span>
-                    <strong>Caixas abertos</strong>
-                    <span>Consulte as sessões de caixa em andamento.</span>
-                    <i class="bi bi-arrow-up-right shortcut-arrow"></i>
-                </a>
-
-                <a asp-area="Admin" asp-controller="CashSession" asp-action="Open" class="shortcut-card">
-                    <span class="shortcut-icon shortcut-green">
-                        <i class="bi bi-plus-circle"></i>
-                    </span>
-                    <span class="shortcut-category">CAIXA</span>
-                    <strong>Abertura de caixa</strong>
-                    <span>Inicie uma nova sessão de caixa.</span>
-                    <i class="bi bi-arrow-up-right shortcut-arrow"></i>
-                </a>
-
-                @if (hasCashSession)
+                @if (hasOperation)
                 {
-                    <a asp-area="Admin" asp-controller="CashMovement" asp-action="Index" asp-route-cashSessionId="@Model.CashSessionId" class="shortcut-card">
-                        <span class="shortcut-icon shortcut-blue">
-                            <i class="bi bi-arrow-left-right"></i>
-                        </span>
-                        <span class="shortcut-category">MOVIMENTAÇÕES</span>
-                        <strong>Movimentações</strong>
-                        <span>Consulte todas as entradas e saídas do caixa.</span>
-                        <i class="bi bi-arrow-up-right shortcut-arrow"></i>
-                    </a>
-
-                    <a asp-area="Admin" asp-controller="CashMovement" asp-action="Supply" asp-route-cashSessionId="@Model.CashSessionId" class="shortcut-card">
-                        <span class="shortcut-icon shortcut-green">
-                            <i class="bi bi-cash-coin"></i>
-                        </span>
-                        <span class="shortcut-category">MOVIMENTAÇÕES</span>
-                        <strong>Suprimento</strong>
-                        <span>Registre a entrada de dinheiro no caixa.</span>
-                        <i class="bi bi-arrow-up-right shortcut-arrow"></i>
-                    </a>
-
-                    <a asp-area="Admin" asp-controller="CashMovement" asp-action="Withdrawal" asp-route-cashSessionId="@Model.CashSessionId" class="shortcut-card">
-                        <span class="shortcut-icon shortcut-orange">
-                            <i class="bi bi-box-arrow-up-right"></i>
-                        </span>
-                        <span class="shortcut-category">MOVIMENTAÇÕES</span>
-                        <strong>Sangria</strong>
-                        <span>Registre a retirada de dinheiro do caixa.</span>
-                        <i class="bi bi-arrow-up-right shortcut-arrow"></i>
-                    </a>
-
-                    <a asp-area="Admin" asp-controller="CashMovement" asp-action="Expense" asp-route-cashSessionId="@Model.CashSessionId" class="shortcut-card">
-                        <span class="shortcut-icon shortcut-red">
-                            <i class="bi bi-receipt"></i>
-                        </span>
-                        <span class="shortcut-category">MOVIMENTAÇÕES</span>
-                        <strong>Despesas</strong>
-                        <span>Registre as despesas do caixa.</span>
-                        <i class="bi bi-arrow-up-right shortcut-arrow"></i>
-                    </a>
-
-                    <a asp-area="Admin" asp-controller="CashSession" asp-action="Close" asp-route-Id="@Model.CashSessionId" class="shortcut-card">
-                        <span class="shortcut-icon shortcut-orange">
-                            <i class="bi bi-lock"></i>
+                    <!-- Caixa -->
+                    <a asp-area="Admin" asp-controller="CashSession" asp-action="Index" class="shortcut-card">
+                        <span class="shortcut-icon shortcut-purple">
+                            <i class="bi bi-wallet2"></i>
                         </span>
                         <span class="shortcut-category">CAIXA</span>
-                        <strong>Fechar sessão</strong>
-                        <span>Realize o fechamento da sessão de caixa.</span>
+                        <strong>Caixas abertos</strong>
+                        <span>Consulte as sessões de caixa em andamento.</span>
                         <i class="bi bi-arrow-up-right shortcut-arrow"></i>
                     </a>
 
-                    @if (User.IsManagerOrGreater())
+                    <a asp-area="Admin" asp-controller="CashSession" asp-action="Open" class="shortcut-card">
+                        <span class="shortcut-icon shortcut-green">
+                            <i class="bi bi-plus-circle"></i>
+                        </span>
+                        <span class="shortcut-category">CAIXA</span>
+                        <strong>Abertura de caixa</strong>
+                        <span>Inicie uma nova sessão de caixa.</span>
+                        <i class="bi bi-arrow-up-right shortcut-arrow"></i>
+                    </a>
+
+                    @if (hasCashSession)
                     {
-                        <a asp-area="Admin" asp-controller="CashSession" asp-action="Edit" asp-route-Id="@Model.CashSessionId" class="shortcut-card">
+                        <a asp-area="Admin" asp-controller="CashMovement" asp-action="Index" asp-route-cashSessionId="@Model.CashSessionId" class="shortcut-card">
                             <span class="shortcut-icon shortcut-blue">
-                                <i class="bi bi-pencil-square"></i>
+                                <i class="bi bi-arrow-left-right"></i>
+                            </span>
+                            <span class="shortcut-category">MOVIMENTAÇÕES</span>
+                            <strong>Todas as movimentações</strong>
+                            <span>Consulte todas as entradas e saídas do caixa.</span>
+                            <i class="bi bi-arrow-up-right shortcut-arrow"></i>
+                        </a>
+
+                        <a asp-area="Admin" asp-controller="CashMovement" asp-action="Supply" asp-route-cashSessionId="@Model.CashSessionId" class="shortcut-card">
+                            <span class="shortcut-icon shortcut-green">
+                                <i class="bi bi-cash-coin"></i>
+                            </span>
+                            <span class="shortcut-category">MOVIMENTAÇÕES</span>
+                            <strong>Suprimento</strong>
+                            <span>Registre a entrada de dinheiro no caixa.</span>
+                            <i class="bi bi-arrow-up-right shortcut-arrow"></i>
+                        </a>
+
+                        <a asp-area="Admin" asp-controller="CashMovement" asp-action="Withdrawal" asp-route-cashSessionId="@Model.CashSessionId" class="shortcut-card">
+                            <span class="shortcut-icon shortcut-orange">
+                                <i class="bi bi-box-arrow-up-right"></i>
+                            </span>
+                            <span class="shortcut-category">MOVIMENTAÇÕES</span>
+                            <strong>Sangria</strong>
+                            <span>Registre a retirada de dinheiro do caixa.</span>
+                            <i class="bi bi-arrow-up-right shortcut-arrow"></i>
+                        </a>
+
+                        <a asp-area="Admin" asp-controller="CashMovement" asp-action="Expense" asp-route-cashSessionId="@Model.CashSessionId" class="shortcut-card">
+                            <span class="shortcut-icon shortcut-red">
+                                <i class="bi bi-receipt"></i>
+                            </span>
+                            <span class="shortcut-category">MOVIMENTAÇÕES</span>
+                            <strong>Despesas</strong>
+                            <span>Registre as despesas do caixa.</span>
+                            <i class="bi bi-arrow-up-right shortcut-arrow"></i>
+                        </a>
+
+                        <a asp-area="Admin" asp-controller="CashSession" asp-action="Close" asp-route-Id="@Model.CashSessionId" class="shortcut-card">
+                            <span class="shortcut-icon shortcut-orange">
+                                <i class="bi bi-lock"></i>
                             </span>
                             <span class="shortcut-category">CAIXA</span>
-                            <strong>Editar sessão</strong>
-                            <span>Altere os dados da sessão do caixa.</span>
+                            <strong>Fechamento de Caixa</strong>
+                            <span>Realize o fechamento de caixa.</span>
+                            <i class="bi bi-arrow-up-right shortcut-arrow"></i>
+                        </a>
+
+                        @if (User.IsManagerOrGreater())
+                        {
+                            <a asp-area="Admin" asp-controller="CashSession" asp-action="Edit" asp-route-Id="@Model.CashSessionId" class="shortcut-card">
+                                <span class="shortcut-icon shortcut-blue">
+                                    <i class="bi bi-pencil-square"></i>
+                                </span>
+                                <span class="shortcut-category">CAIXA</span>
+                                <strong>Editar sessão</strong>
+                                <span>Altere os dados da sessão do caixa.</span>
+                                <i class="bi bi-arrow-up-right shortcut-arrow"></i>
+                            </a>
+                        }
+                    }
+
+                    <!-- Administração -->
+                    @if (User.IsManagerOrGreater())
+                    {
+                        <a asp-area="Admin" asp-controller="PaymentTerminal" asp-action="Index" class="shortcut-card">
+                            <span class="shortcut-icon shortcut-red">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 512 512" fill="currentColor" style="display: block; flex-shrink: 0;">
+
+                                    <g fill="currentColor">
+                                        <path d="M264.551,94.063h-34.206c-4.427,0-8.017,3.589-8.017,8.017s3.589,8.017,8.017,8.017h34.206c4.427,0,8.017-3.589,8.017-8.017S268.979,94.063,264.551,94.063z"></path>
+                                        <path d="M196.142,94.063h-51.307c-4.427,0-8.017,3.589-8.017,8.017s3.589,8.017,8.017,8.017h51.307c4.427,0,8.017-3.589,8.017-8.017S200.569,94.063,196.142,94.063z"></path>
+                                        <path d="M264.551,59.858h-17.104c-4.427,0-8.017,3.589-8.017,8.017s3.589,8.017,8.017,8.017h17.104c4.427,0,8.017-3.589,8.017-8.017S268.979,59.858,264.551,59.858z"></path>
+                                        <path d="M213.243,59.858h-17.097c-4.427,0-8.017,3.589-8.017,8.017s3.589,8.017,8.017,8.017h17.097c4.427,0,8.017-3.589,8.017-8.017S217.671,59.858,213.243,59.858z"></path>
+                                        <path d="M161.939,59.858h-17.103c-4.427,0-8.017,3.589-8.017,8.017s3.589,8.017,8.017,8.017h17.103c4.427,0,8.017-3.589,8.017-8.017S166.366,59.858,161.939,59.858z"></path>
+                                        <path d="M435.574,222.33h-86.046V110.631c0-23.281-18.941-42.221-42.221-42.221h-0.534V8.017c0-2.615-1.275-5.065-3.417-6.566c-2.142-1.501-4.882-1.862-7.339-0.967L275.24,8.038l-20.776-7.555c-1.769-0.643-3.71-0.643-5.479,0l-20.776,7.555l-20.776-7.555c-1.769-0.643-3.71-0.643-5.479,0l-20.776,7.555l-20.776-7.555c-1.769-0.643-3.71-0.643-5.479,0l-20.776,7.555L113.37,0.483c-2.456-0.894-5.196-0.533-7.339,0.967c-2.142,1.501-3.417,3.952-3.417,6.566v60.392h-0.534c-23.281,0-42.221,18.941-42.221,42.221v359.148c0,23.281,18.941,42.221,42.221,42.221h205.228c20.54,0,37.691-14.745,41.448-34.205h86.819c9.136,0,16.568-7.432,16.568-16.568v-222.33C452.142,229.762,444.71,222.33,435.574,222.33z M118.647,19.463l12.759,4.639c1.769,0.643,3.71,0.643,5.479,0l20.776-7.555l20.776,7.555c1.769,0.643,3.71,0.643,5.479,0l20.776-7.555l20.776,7.555c1.769,0.643,3.71,0.643,5.479,0l20.776-7.555l20.776,7.555c1.769,0.643,3.71,0.643,5.479,0l12.759-4.639v108.805H118.647V19.463z M333.495,469.779c0,14.44-11.748,26.188-26.188,26.188H102.079c-14.44,0-26.188-11.748-26.188-26.188V110.631c0-14.44,11.748-26.188,26.188-26.188h0.534v43.825h-0.534c-4.427,0-8.017,3.589-8.017,8.017s3.589,8.017,8.017,8.017h205.228c4.427,0,8.017-3.589,8.017-8.017s-3.589-8.017-8.017-8.017h-0.534V84.443h0.534c14.44,0,26.188,11.748,26.188,26.188V469.779z M367.699,461.762h-18.171V238.364h18.171V461.762z M436.109,461.228c0,0.294-0.239,0.534-0.534,0.534h-17.637V298.755c0-4.428-3.589-8.017-8.017-8.017c-4.427,0-8.017,3.588-8.017,8.017v163.007h-18.171V238.364h18.171v26.185c0,4.427,3.589,8.017,8.017,8.017s8.017-3.589,8.017-8.017v-26.185h17.637c0.295,0,0.534,0.24,0.534,0.534V461.228z"></path>
+                                        <path d="M208.969,290.739h-8.551c-13.851,0-25.119,11.268-25.119,25.119c0,13.851,11.268,25.119,25.119,25.119h8.551c13.851,0,25.119-11.268,25.119-25.119C234.088,302.008,222.82,290.739,208.969,290.739z M208.969,324.944h-8.551c-5.01,0-9.086-4.076-9.086-9.086s4.076-9.086,9.086-9.086h8.551c5.01,0,9.086,4.076,9.086,9.086S213.979,324.944,208.969,324.944z"></path>
+                                        <path d="M208.969,359.148h-8.551c-13.851,0-25.119,11.268-25.119,25.119c0,13.851,11.268,25.119,25.119,25.119h8.551c13.851,0,25.119-11.268,25.119-25.119C234.088,370.417,222.82,359.148,208.969,359.148z M208.969,393.353h-8.551c-5.01,0-9.086-4.076-9.086-9.086s4.076-9.086,9.086-9.086h8.551c5.01,0,9.086,4.076,9.086,9.086S213.979,393.353,208.969,393.353z"></path>
+                                        <path d="M208.969,427.558h-8.551c-13.851,0-25.119,11.268-25.119,25.119c0,13.851,11.268,25.119,25.119,25.119h8.551c13.851,0,25.119-11.268,25.119-25.119C234.088,438.826,222.82,427.558,208.969,427.558z M208.969,461.762h-8.551c-5.01,0-9.086-4.076-9.086-9.086s4.076-9.086,9.086-9.086h8.551c5.01,0,9.086,4.076,9.086,9.086S213.979,461.762,208.969,461.762z"></path>
+                                        <path d="M285.929,290.739h-8.551c-13.851,0-25.119,11.268-25.119,25.119c0,13.851,11.268,25.119,25.119,25.119h8.551c13.851,0,25.119-11.268,25.119-25.119C311.048,302.008,299.78,290.739,285.929,290.739z M285.929,324.944h-8.551c-5.01,0-9.086-4.076-9.086-9.086s4.076-9.086,9.086-9.086h8.551c5.01,0,9.086,4.076,9.086,9.086S290.939,324.944,285.929,324.944z"></path>
+                                        <path d="M285.929,359.148h-8.551c-13.851,0-25.119,11.268-25.119,25.119c0,13.851,11.268,25.119,25.119,25.119h8.551c13.851,0,25.119-11.268,25.119-25.119C311.048,370.417,299.78,359.148,285.929,359.148z M285.929,393.353h-8.551c-5.01,0-9.086-4.076-9.086-9.086s4.076-9.086,9.086-9.086h8.551c5.01,0,9.086,4.076,9.086,9.086S290.939,393.353,285.929,393.353z"></path>
+                                        <path d="M285.929,427.558h-8.551c-13.851,0-25.119,11.268-25.119,25.119c0,13.851,11.268,25.119,25.119,25.119h8.551c13.851,0,25.119-11.268,25.119-25.119C311.048,438.826,299.78,427.558,285.929,427.558z M285.929,461.762h-8.551c-5.01,0-9.086-4.076-9.086-9.086s4.076-9.086,9.086-9.086h8.551c5.01,0,9.086,4.076,9.086,9.086S290.939,461.762,285.929,461.762z"></path>
+                                        <path d="M132.008,290.739h-8.551c-13.851,0-25.119,11.268-25.119,25.119c0,13.851,11.268,25.119,25.119,25.119h8.551c13.851,0,25.119-11.268,25.119-25.119C157.127,302.008,145.859,290.739,132.008,290.739z M132.008,324.944h-8.551c-5.01,0-9.086-4.076-9.086-9.086s4.076-9.086,9.086-9.086h8.551c5.01,0,9.086,4.076,9.086,9.086S137.018,324.944,132.008,324.944z"></path>
+                                        <path d="M132.008,359.148h-8.551c-13.851,0-25.119,11.268-25.119,25.119c0,13.851,11.268,25.119,25.119,25.119h8.551c13.851,0,25.119-11.268,25.119-25.119C157.127,370.417,145.859,359.148,132.008,359.148z M132.008,393.353h-8.551c-5.01,0-9.086-4.076-9.086-9.086s4.076-9.086,9.086-9.086h8.551c5.01,0,9.086,4.076,9.086,9.086S137.018,393.353,132.008,393.353z"></path>
+                                        <path d="M132.008,427.558h-8.551c-13.851,0-25.119,11.268-25.119,25.119c0,13.851,11.268,25.119,25.119,25.119h8.551c13.851,0,25.119-11.268,25.119-25.119C157.127,438.826,145.859,427.558,132.008,427.558z M132.008,461.762h-8.551c-5.01,0-9.086-4.076-9.086-9.086s4.076-9.086,9.086-9.086h8.551c5.01,0,9.086,4.076,9.086,9.086S137.018,461.762,132.008,461.762z"></path>
+                                        <path d="M298.756,162.472H110.631c-9.136,0-16.568,7.432-16.568,16.568V256c0,9.136,7.432,16.568,16.568,16.568h188.125c9.136,0,16.568-7.432,16.568-16.568v-76.96C315.324,169.904,307.892,162.472,298.756,162.472z M299.29,256c0,0.294-0.239,0.534-0.534,0.534H110.631c-0.295,0-0.534-0.24-0.534-0.534v-76.96c0-0.294,0.239-0.534,0.534-0.534h188.125c0.295,0,0.534,0.24,0.534,0.534V256z"></path>
+                                    </g>
+                                </svg>
+                            </span>
+                            <span class="shortcut-category">ADMINISTRAÇÃO</span>
+                            <strong>Maquininhas</strong>
+                            <span>Gerencie os fornecedores de maquininhas.</span>
+                            <i class="bi bi-arrow-up-right shortcut-arrow"></i>
+                        </a>
+
+                        <a asp-area="Admin" asp-controller="CashSession" asp-action="History" class="shortcut-card">
+                            <span class="shortcut-icon shortcut-purple">
+                                <i class="bi bi-clock-history"></i>
+                            </span>
+                            <span class="shortcut-category">ADMINISTRAÇÃO</span>
+                            <strong>Histórico de caixas</strong>
+                            <span>Consulte as sessões de caixa anteriores.</span>
+                            <i class="bi bi-arrow-up-right shortcut-arrow"></i>
+                        </a>
+
+                        <a asp-area="Admin" asp-controller="User" asp-action="Index" class="shortcut-card">
+                            <span class="shortcut-icon shortcut-blue">
+                                <i class="bi bi-people"></i>
+                            </span>
+                            <span class="shortcut-category">ADMINISTRAÇÃO</span>
+                            <strong>Usuários cadastrados</strong>
+                            <span>Consulte os usuários cadastrados no sistema.</span>
+                            <i class="bi bi-arrow-up-right shortcut-arrow"></i>
+                        </a>
+
+                        <a asp-area="Admin" asp-controller="User" asp-action="Create" class="shortcut-card">
+                            <span class="shortcut-icon shortcut-green">
+                                <i class="bi bi-person-plus"></i>
+                            </span>
+                            <span class="shortcut-category">ADMINISTRAÇÃO</span>
+                            <strong>Cadastrar usuário</strong>
+                            <span>Adicione um novo usuário ao sistema.</span>
                             <i class="bi bi-arrow-up-right shortcut-arrow"></i>
                         </a>
                     }
                 }
-
-                <!-- Administração -->
-                @if (User.IsManagerOrGreater())
+                @if (isSuper)
                 {
-                    <a asp-area="Admin" asp-controller="PaymentTerminal" asp-action="Index" class="shortcut-card">
-                        <span class="shortcut-icon shortcut-red">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 512 512" fill="currentColor" style="display: block; flex-shrink: 0;">
-
-                                <g fill="currentColor">
-                                    <path d="M264.551,94.063h-34.206c-4.427,0-8.017,3.589-8.017,8.017s3.589,8.017,8.017,8.017h34.206c4.427,0,8.017-3.589,8.017-8.017S268.979,94.063,264.551,94.063z"></path>
-                                    <path d="M196.142,94.063h-51.307c-4.427,0-8.017,3.589-8.017,8.017s3.589,8.017,8.017,8.017h51.307c4.427,0,8.017-3.589,8.017-8.017S200.569,94.063,196.142,94.063z"></path>
-                                    <path d="M264.551,59.858h-17.104c-4.427,0-8.017,3.589-8.017,8.017s3.589,8.017,8.017,8.017h17.104c4.427,0,8.017-3.589,8.017-8.017S268.979,59.858,264.551,59.858z"></path>
-                                    <path d="M213.243,59.858h-17.097c-4.427,0-8.017,3.589-8.017,8.017s3.589,8.017,8.017,8.017h17.097c4.427,0,8.017-3.589,8.017-8.017S217.671,59.858,213.243,59.858z"></path>
-                                    <path d="M161.939,59.858h-17.103c-4.427,0-8.017,3.589-8.017,8.017s3.589,8.017,8.017,8.017h17.103c4.427,0,8.017-3.589,8.017-8.017S166.366,59.858,161.939,59.858z"></path>
-                                    <path d="M435.574,222.33h-86.046V110.631c0-23.281-18.941-42.221-42.221-42.221h-0.534V8.017c0-2.615-1.275-5.065-3.417-6.566c-2.142-1.501-4.882-1.862-7.339-0.967L275.24,8.038l-20.776-7.555c-1.769-0.643-3.71-0.643-5.479,0l-20.776,7.555l-20.776-7.555c-1.769-0.643-3.71-0.643-5.479,0l-20.776,7.555l-20.776-7.555c-1.769-0.643-3.71-0.643-5.479,0l-20.776,7.555L113.37,0.483c-2.456-0.894-5.196-0.533-7.339,0.967c-2.142,1.501-3.417,3.952-3.417,6.566v60.392h-0.534c-23.281,0-42.221,18.941-42.221,42.221v359.148c0,23.281,18.941,42.221,42.221,42.221h205.228c20.54,0,37.691-14.745,41.448-34.205h86.819c9.136,0,16.568-7.432,16.568-16.568v-222.33C452.142,229.762,444.71,222.33,435.574,222.33z M118.647,19.463l12.759,4.639c1.769,0.643,3.71,0.643,5.479,0l20.776-7.555l20.776,7.555c1.769,0.643,3.71,0.643,5.479,0l20.776-7.555l20.776,7.555c1.769,0.643,3.71,0.643,5.479,0l20.776-7.555l20.776,7.555c1.769,0.643,3.71,0.643,5.479,0l12.759-4.639v108.805H118.647V19.463z M333.495,469.779c0,14.44-11.748,26.188-26.188,26.188H102.079c-14.44,0-26.188-11.748-26.188-26.188V110.631c0-14.44,11.748-26.188,26.188-26.188h0.534v43.825h-0.534c-4.427,0-8.017,3.589-8.017,8.017s3.589,8.017,8.017,8.017h205.228c4.427,0,8.017-3.589,8.017-8.017s-3.589-8.017-8.017-8.017h-0.534V84.443h0.534c14.44,0,26.188,11.748,26.188,26.188V469.779z M367.699,461.762h-18.171V238.364h18.171V461.762z M436.109,461.228c0,0.294-0.239,0.534-0.534,0.534h-17.637V298.755c0-4.428-3.589-8.017-8.017-8.017c-4.427,0-8.017,3.588-8.017,8.017v163.007h-18.171V238.364h18.171v26.185c0,4.427,3.589,8.017,8.017,8.017s8.017-3.589,8.017-8.017v-26.185h17.637c0.295,0,0.534,0.24,0.534,0.534V461.228z"></path>
-                                    <path d="M208.969,290.739h-8.551c-13.851,0-25.119,11.268-25.119,25.119c0,13.851,11.268,25.119,25.119,25.119h8.551c13.851,0,25.119-11.268,25.119-25.119C234.088,302.008,222.82,290.739,208.969,290.739z M208.969,324.944h-8.551c-5.01,0-9.086-4.076-9.086-9.086s4.076-9.086,9.086-9.086h8.551c5.01,0,9.086,4.076,9.086,9.086S213.979,324.944,208.969,324.944z"></path>
-                                    <path d="M208.969,359.148h-8.551c-13.851,0-25.119,11.268-25.119,25.119c0,13.851,11.268,25.119,25.119,25.119h8.551c13.851,0,25.119-11.268,25.119-25.119C234.088,370.417,222.82,359.148,208.969,359.148z M208.969,393.353h-8.551c-5.01,0-9.086-4.076-9.086-9.086s4.076-9.086,9.086-9.086h8.551c5.01,0,9.086,4.076,9.086,9.086S213.979,393.353,208.969,393.353z"></path>
-                                    <path d="M208.969,427.558h-8.551c-13.851,0-25.119,11.268-25.119,25.119c0,13.851,11.268,25.119,25.119,25.119h8.551c13.851,0,25.119-11.268,25.119-25.119C234.088,438.826,222.82,427.558,208.969,427.558z M208.969,461.762h-8.551c-5.01,0-9.086-4.076-9.086-9.086s4.076-9.086,9.086-9.086h8.551c5.01,0,9.086,4.076,9.086,9.086S213.979,461.762,208.969,461.762z"></path>
-                                    <path d="M285.929,290.739h-8.551c-13.851,0-25.119,11.268-25.119,25.119c0,13.851,11.268,25.119,25.119,25.119h8.551c13.851,0,25.119-11.268,25.119-25.119C311.048,302.008,299.78,290.739,285.929,290.739z M285.929,324.944h-8.551c-5.01,0-9.086-4.076-9.086-9.086s4.076-9.086,9.086-9.086h8.551c5.01,0,9.086,4.076,9.086,9.086S290.939,324.944,285.929,324.944z"></path>
-                                    <path d="M285.929,359.148h-8.551c-13.851,0-25.119,11.268-25.119,25.119c0,13.851,11.268,25.119,25.119,25.119h8.551c13.851,0,25.119-11.268,25.119-25.119C311.048,370.417,299.78,359.148,285.929,359.148z M285.929,393.353h-8.551c-5.01,0-9.086-4.076-9.086-9.086s4.076-9.086,9.086-9.086h8.551c5.01,0,9.086,4.076,9.086,9.086S290.939,393.353,285.929,393.353z"></path>
-                                    <path d="M285.929,427.558h-8.551c-13.851,0-25.119,11.268-25.119,25.119c0,13.851,11.268,25.119,25.119,25.119h8.551c13.851,0,25.119-11.268,25.119-25.119C311.048,438.826,299.78,427.558,285.929,427.558z M285.929,461.762h-8.551c-5.01,0-9.086-4.076-9.086-9.086s4.076-9.086,9.086-9.086h8.551c5.01,0,9.086,4.076,9.086,9.086S290.939,461.762,285.929,461.762z"></path>
-                                    <path d="M132.008,290.739h-8.551c-13.851,0-25.119,11.268-25.119,25.119c0,13.851,11.268,25.119,25.119,25.119h8.551c13.851,0,25.119-11.268,25.119-25.119C157.127,302.008,145.859,290.739,132.008,290.739z M132.008,324.944h-8.551c-5.01,0-9.086-4.076-9.086-9.086s4.076-9.086,9.086-9.086h8.551c5.01,0,9.086,4.076,9.086,9.086S137.018,324.944,132.008,324.944z"></path>
-                                    <path d="M132.008,359.148h-8.551c-13.851,0-25.119,11.268-25.119,25.119c0,13.851,11.268,25.119,25.119,25.119h8.551c13.851,0,25.119-11.268,25.119-25.119C157.127,370.417,145.859,359.148,132.008,359.148z M132.008,393.353h-8.551c-5.01,0-9.086-4.076-9.086-9.086s4.076-9.086,9.086-9.086h8.551c5.01,0,9.086,4.076,9.086,9.086S137.018,393.353,132.008,393.353z"></path>
-                                    <path d="M132.008,427.558h-8.551c-13.851,0-25.119,11.268-25.119,25.119c0,13.851,11.268,25.119,25.119,25.119h8.551c13.851,0,25.119-11.268,25.119-25.119C157.127,438.826,145.859,427.558,132.008,427.558z M132.008,461.762h-8.551c-5.01,0-9.086-4.076-9.086-9.086s4.076-9.086,9.086-9.086h8.551c5.01,0,9.086,4.076,9.086,9.086S137.018,461.762,132.008,461.762z"></path>
-                                    <path d="M298.756,162.472H110.631c-9.136,0-16.568,7.432-16.568,16.568V256c0,9.136,7.432,16.568,16.568,16.568h188.125c9.136,0,16.568-7.432,16.568-16.568v-76.96C315.324,169.904,307.892,162.472,298.756,162.472z M299.29,256c0,0.294-0.239,0.534-0.534,0.534H110.631c-0.295,0-0.534-0.24-0.534-0.534v-76.96c0-0.294,0.239-0.534,0.534-0.534h188.125c0.295,0,0.534,0.24,0.534,0.534V256z"></path>
-                                </g>
-                            </svg>
-                        </span>
-                        <span class="shortcut-category">ADMINISTRAÇÃO</span>
-                        <strong>Maquininhas</strong>
-                        <span>Gerencie os fornecedores de maquininhas.</span>
-                        <i class="bi bi-arrow-up-right shortcut-arrow"></i>
-                    </a>
-
-                    <a asp-area="Admin" asp-controller="CashSession" asp-action="History" class="shortcut-card">
-                        <span class="shortcut-icon shortcut-purple">
-                            <i class="bi bi-clock-history"></i>
-                        </span>
-                        <span class="shortcut-category">ADMINISTRAÇÃO</span>
-                        <strong>Histórico de caixas</strong>
-                        <span>Consulte as sessões de caixa anteriores.</span>
-                        <i class="bi bi-arrow-up-right shortcut-arrow"></i>
-                    </a>
-
-                    <a asp-area="Admin" asp-controller="User" asp-action="Index" class="shortcut-card">
+                    <a asp-area="Admin" asp-controller="Operation" asp-action="Index" class="shortcut-card">
                         <span class="shortcut-icon shortcut-blue">
-                            <i class="bi bi-people"></i>
+                            <i class="bi bi-shop"></i>
                         </span>
-                        <span class="shortcut-category">ADMINISTRAÇÃO</span>
-                        <strong>Usuários cadastrados</strong>
-                        <span>Consulte os usuários cadastrados no sistema.</span>
-                        <i class="bi bi-arrow-up-right shortcut-arrow"></i>
-                    </a>
-
-                    <a asp-area="Admin" asp-controller="User" asp-action="Create" class="shortcut-card">
-                        <span class="shortcut-icon shortcut-green">
-                            <i class="bi bi-person-plus"></i>
-                        </span>
-                        <span class="shortcut-category">ADMINISTRAÇÃO</span>
-                        <strong>Cadastrar usuário</strong>
-                        <span>Adicione um novo usuário ao sistema.</span>
+                        <span class="shortcut-category">Operações</span>
+                        <strong>Operações</strong>
+                        <span>Veja lista de operações.</span>
                         <i class="bi bi-arrow-up-right shortcut-arrow"></i>
                     </a>
                 }

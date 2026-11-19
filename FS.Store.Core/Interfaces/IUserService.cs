@@ -6,7 +6,7 @@ namespace FS.Store.Core.Interfaces
 {
     public interface IUserService : IBaseService<User, Guid>
     {
-        Task CreateAsync(AssignUserToOperationDto userDto);
+        Task CreateNewUserOperationAsync(AssignUserToOperationDto userDto);
         Task<User?> FindByEmailAsync(string email);
 
         Task<Pagination<User>> GetAllPagedAsync(int? currentPage, int? qttPerPage

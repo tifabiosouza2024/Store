@@ -13,6 +13,8 @@ namespace FS.Store.DAL.Context
         public DbSet<CashClosingTerminal> CashClosingTerminals { get; set; } = default!;
         public DbSet<CashMovement> CashMovements { get; set; } = default!;
         public DbSet<CashRegisterSession> CashRegisterSessions { get; set; } = default!;
+        public DbSet<GlobalRole> GlobalRoles { get; set; } = default!;
+        public DbSet<GlobalUserRole> GlobalUserRoles { get; set; } = default!;
         public DbSet<Operation> Operations { get; set; } = default!;
         public DbSet<OperationUserRole> OperationUserRoles { get; set; } = default!;
         public DbSet<PaymentProvider> PaymentProviders { get; set; } = default!;
@@ -79,6 +81,26 @@ namespace FS.Store.DAL.Context
                     .HasOne(s => s.CashClosing)
                     .WithOne(c => c.CashRegisterSession)
                     .HasForeignKey<CashClosing>(c => c.CashRegisterSessionId);
+            });
+
+            modelBuilder.Entity<GlobalUserRole>(entity =>
+            {
+                entity.HasIndex(e => new
+                {
+                    e.UserId,
+                    e.RoleId
+                }).IsUnique();
+                entity.Property(e => e.IsActive).HasDefaultValue(true);
+
+                entity.HasOne(x => x.InvitedByUser)
+                    .WithMany()
+                    .HasForeignKey(x => x.InvitedByUserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.Property(e => e.InvitedAt)
+                    .HasColumnType("datetime(0)")
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                    .ValueGeneratedOnAdd();
             });
 
             modelBuilder.Entity<Operation>(entity =>

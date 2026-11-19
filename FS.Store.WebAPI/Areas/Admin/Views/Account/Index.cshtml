@@ -5,6 +5,7 @@
 
 @section Styles {
     <link rel="stylesheet" href="~/css/admin/change-password.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/admin/account-index.css" asp-append-version="true" />
 }
 
 <div class="container-fluid account-page">
@@ -41,15 +42,48 @@
                         Segurança
                     </button>
                 </li>
+                @if (Model.QttInvite > 0)
+                {
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="invite-tab" data-bs-toggle="tab" data-bs-target="#invite" type="button" role="tab" aria-controls="invite" aria-selected="false">
+                            <i class="bi bi-envelope-paper"></i>
+                            Convites
+                            <span class="badge rounded-pill bg-primary ms-2">@Model.QttInvite</span>
+                        </button>
+                    </li>
+                }
             </ul>
 
             <div class="tab-content" id="accountTabsContent">
-                <div class="tab-pane fade show active" id="personal-data" role="tabpanel" aria-labelledby="personal-data-tab" tabindex="0">
+                <div class="tab-pane fade show active" id="personal-data" role="tabpanel" aria-labelledby="personal-data-tab">
                     <partial name="_PersonalData" model="@Model.PersonalData" />
                 </div>
 
-                <div class="tab-pane fade" id="change-password" role="tabpanel" aria-labelledby="change-password-tab" tabindex="0">
+                <div class="tab-pane fade" id="change-password" role="tabpanel" aria-labelledby="change-password-tab">
                     <partial name="_ChangePassword" model="@new ChangePasswordViewModel()" />
+                </div>
+
+                <div class="tab-pane fade" id="invite" role="tabpanel" aria-labelledby="invite-tab">
+                    <div class="account-invite">
+                        <div class="account-invite-icon">
+                            <i class="bi bi-envelope-paper"></i>
+                        </div>
+                        <div class="account-invite-content">
+                            <div class="d-flex align-items-center gap-2 flex-wrap mb-2">
+                                <h6 class="mb-0">Convite para participar de uma operação</h6>
+                                <span class="badge rounded-pill text-bg-warning">Pendente</span>
+                            </div>
+                            <p class="text-muted mb-0">
+                                Você recebeu um convite para participar de uma operação. Confira os detalhes e escolha se deseja aceitar ou recusar.
+                            </p>
+                        </div>
+                        <div class="account-invite-action">
+                            <a asp-action="ViewInvite" asp-controller="Home" asp-area="Admin" class="btn btn-primary">
+                                <i class="bi bi-eye me-1"></i>
+                                Visualizar convite
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

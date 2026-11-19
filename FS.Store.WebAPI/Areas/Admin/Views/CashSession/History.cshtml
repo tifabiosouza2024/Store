@@ -2,17 +2,58 @@
 
 @{
     ViewData["Title"] = "Histórico de caixas";
+
     var pagination = Model.Pagination;
-    var data = pagination?.Data;
+    var data = pagination?.Data?.ToList() ?? [];
 }
 
 @section Styles {
     <link rel="stylesheet" href="~/css/admin/table.css" asp-append-version="true" />
+
+    <style>
+        .cash-history-card {
+            background-color: #F1F4FA;
+            border: 1px solid #e2e7f0;
+            border-radius: 10px;
+            padding: 16px;
+            transition: background-color .2s ease;
+        }
+
+            .cash-history-card:hover {
+                background-color: #eaf0fa;
+            }
+
+        .cash-history-info {
+            background-color: #fff;
+            border: 1px solid #e9edf4;
+            border-radius: 8px;
+            padding: 10px 12px;
+            height: 100%;
+        }
+
+            .cash-history-info .info-label {
+                display: block;
+                color: #6c757d;
+                font-size: .75rem;
+                margin-bottom: 4px;
+            }
+
+            .cash-history-info .info-value {
+                font-weight: 600;
+                font-size: .9rem;
+                overflow-wrap: anywhere;
+            }
+
+        .cash-history-card .card-divider {
+            border-top: 1px solid #dce3ef;
+            margin: 14px 0;
+        }
+    </style>
 }
 
 <div class="container-fluid">
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
 
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
         <div>
             <h4 class="mb-1">Histórico de caixas</h4>
             <p class="text-muted mb-0">
@@ -24,7 +65,6 @@
             <i class="bi bi-plus-lg me-1"></i>
             Abrir caixa
         </a>
-
     </div>
 
     <div class="card border-0 shadow-sm">
@@ -43,31 +83,37 @@
         </div>
 
         <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th table-header-ordered field="@nameof(CashRegisterSession.CashSessionNumber)" header-text="Número do Caixa" is-number></th>
-                            <th table-header-ordered field="@nameof(CashRegisterSession.OpenedAt)" header-text="Data de abertura"></th>
-                            <th table-header-ordered field="@nameof(CashRegisterSession.OpeningAmount)" header-text="Valor inicial" is-number class="text-end"></th>
-                            <th table-header-ordered field="@nameof(CashRegisterSession.OpenedByUser).@nameof(FS.Store.Model.Entity.User.Name)" header-text="Aberto por"></th>
-                            <th table-header-ordered field="@nameof(CashRegisterSession.ClosedAt)" header-text="Data de fechamento"></th>
-                            <th>Balanço</th>
-                            <th table-header-ordered field="@nameof(CashRegisterSession.TotalSales)" header-text="Total Vendido" is-number></th>
-                            <th table-header-ordered field="@nameof(CashRegisterSession.ClosedByUser).@nameof(FS.Store.Model.Entity.User.Name)" header-text="Fechado por por"></th>
-                            <th table-header-ordered field="@nameof(CashRegisterSession.CashRegisterStatus)" header-text="Status" class="text-center"></th>
-                            <th class="text-end pe-3">Ações</th>
-                        </tr>
-                    </thead>
 
-                    <tbody>
+            @if (data.Any())
+            {
+                @* DESKTOP: TABELA *@
+                <div class="table-responsive d-none d-lg-block">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th table-header-ordered field="@nameof(CashRegisterSession.CashSessionNumber)" header-text="Número do Caixa" is-number></th>
+                                <th table-header-ordered field="@nameof(CashRegisterSession.OpenedAt)" header-text="Data de abertura"></th>
+                                <th table-header-ordered field="@nameof(CashRegisterSession.OpeningAmount)" header-text="Valor inicial" is-number class="text-end"></th>
+                                <th table-header-ordered field="@nameof(CashRegisterSession.OpenedByUser).@nameof(FS.Store.Model.Entity.User.Name)" header-text="Aberto por"></th>
+                                <th table-header-ordered field="@nameof(CashRegisterSession.ClosedAt)" header-text="Data de fechamento"></th>
+                                <th>Balanço</th>
+                                <th table-header-ordered field="@nameof(CashRegisterSession.TotalSales)" header-text="Total vendido" is-number></th>
+                                <th table-header-ordered field="@nameof(CashRegisterSession.ClosedByUser).@nameof(FS.Store.Model.Entity.User.Name)" header-text="Fechado por"></th>
+                                <th table-header-ordered field="@nameof(CashRegisterSession.CashRegisterStatus)" header-text="Status" class="text-center"></th>
+                                <th class="text-end pe-3">Ações</th>
+                            </tr>
+                        </thead>
 
-                        @if (data != null&& data.Any())
-                        {
-                            foreach (var item in data)
+                        <tbody>
+                            @foreach (var item in data)
                             {
-                                if (item == null)
-                                    continue;
+                                var (statusText, statusClass) = item.CashRegisterStatus switch
+                                {
+                                    CashRegisterStatusEnum.Open => ("Aberto", "text-bg-success"),
+                                    CashRegisterStatusEnum.Closed => ("Fechado", "text-bg-secondary"),
+                                    CashRegisterStatusEnum.Canceled => ("Cancelado", "text-bg-danger"),
+                                    _ => ("Desconhecido", "text-bg-light")
+                                };
 
                                 <tr>
                                     <td class="ps-3 fw-semibold">
@@ -80,9 +126,11 @@
                                             @item.OpenedAt.ToString("HH:mm")
                                         </div>
                                     </td>
+
                                     <td class="text-end">
                                         @item.OpeningAmount.ToString("C2")
                                     </td>
+
                                     <td>
                                         @item.OpenedByUser?.Name
                                     </td>
@@ -100,81 +148,215 @@
                                             <span class="text-muted">—</span>
                                         }
                                     </td>
-                                    <td class="@(item.ClosingBalance != item.TotalSales ? "text-danger" : 0)">
+
+                                    <td class="@(item.ClosingBalance != item.TotalSales ? "text-danger fw-semibold" : "")">
                                         @item.ClosingBalance.ToString("C2")
                                     </td>
+
                                     <td>
                                         @item.TotalSales.ToString("C2")
                                     </td>
+
                                     <td>
                                         @item.ClosedByUser?.Name
                                     </td>
 
-
                                     <td class="text-center">
-                                        @switch (item.CashRegisterStatus)
-                                        {
-                                            case CashRegisterStatusEnum.Open:
-                                                <span class="badge rounded-pill text-bg-success">
-                                                    Aberto
-                                                </span>
-                                                break;
-
-                                            case CashRegisterStatusEnum.Closed:
-                                                <span class="badge rounded-pill text-bg-secondary">
-                                                    Fechado
-                                                </span>
-                                                break;
-
-                                            case CashRegisterStatusEnum.Canceled:
-                                                <span class="badge rounded-pill text-bg-danger">
-                                                    Cancelado
-                                                </span>
-                                                break;
-                                        }
+                                        <span class="badge rounded-pill @statusClass">
+                                            @statusText
+                                        </span>
                                     </td>
 
                                     <td class="text-end pe-3">
-                                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-light" title="Visualizar">
-                                            <i class="bi bi-eye"></i>
-                                        </a>
+                                        <div class="dropdown cash-session-actions">
+                                            <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="dropdown" data-bs-boundary="viewport" aria-expanded="false" title="Ações">
+                                                <i class="bi bi-three-dots-vertical"></i>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                                <li>
+                                                    <a asp-action="Details" asp-route-id="@item.Id" class="dropdown-item">
+                                                        <i class="bi bi-eye me-2 text-primary"></i>
+                                                        Visualizar detalhes
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
                                     </td>
                                 </tr>
                             }
-                        }
-                        else
+                        </tbody>
+                    </table>
+                </div>
+
+                @* MOBILE: CARDS *@
+                <div class="d-lg-none p-3">
+                    <div class="d-flex flex-column gap-3">
+
+                        @foreach (var item in data)
                         {
-                            <tr>
-                                <td colspan="7" class="text-center py-5">
-                                    <i class="bi bi-inbox fs-2 text-muted"></i>
+                            var (statusText, statusClass) = item.CashRegisterStatus switch
+                            {
+                                CashRegisterStatusEnum.Open => ("Aberto", "text-bg-success"),
+                                CashRegisterStatusEnum.Closed => ("Fechado", "text-bg-secondary"),
+                                CashRegisterStatusEnum.Canceled => ("Cancelado", "text-bg-danger"),
+                                _ => ("Desconhecido", "text-bg-light")
+                            };
 
-                                    <p class="fw-semibold mt-2 mb-1">
-                                        Nenhum registro encontrado
-                                    </p>
+                            <div class="cash-history-card">
 
-                                    <span class="text-muted small">
-                                        Não existem caixas para exibir.
-                                    </span>
-                                </td>
-                            </tr>
+                                @* CABEÇALHO *@
+                                <div class="d-flex justify-content-between align-items-center gap-2">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="bg-white rounded-3 p-2 text-primary">
+                                            <i class="bi bi-cash-stack fs-5"></i>
+                                        </div>
+
+                                        <div>
+                                            <div class="fw-bold">
+                                                Caixa #@item.CashSessionNumber
+                                            </div>
+                                            <small class="text-muted">
+                                                @item.OpenedAt.ToString("dd/MM/yyyy") às @item.OpenedAt.ToString("HH:mm")
+                                            </small>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="badge rounded-pill @statusClass">
+                                            @statusText
+                                        </span>
+
+                                        <div class="dropdown cash-session-actions">
+                                            <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="dropdown" data-bs-display="static" data-bs-boundary="viewport" aria-expanded="false" title="Ações">
+                                                <i class="bi bi-three-dots-vertical"></i>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                                <li>
+                                                    <a asp-action="Details" asp-route-id="@item.Id" class="dropdown-item">
+                                                        <i class="bi bi-eye me-2 text-primary"></i>
+                                                        Visualizar detalhes
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card-divider"></div>
+
+                                @* ABERTURA *@
+                                <div class="small fw-semibold text-primary mb-2">
+                                    <i class="bi bi-box-arrow-in-right me-1"></i>
+                                    Abertura
+                                </div>
+
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        <div class="cash-history-info">
+                                            <span class="info-label">Valor inicial</span>
+                                            <div class="info-value">
+                                                @item.OpeningAmount.ToString("C2")
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-6">
+                                        <div class="cash-history-info">
+                                            <span class="info-label">Aberto por</span>
+                                            <div class="info-value">
+                                                @(item.OpenedByUser?.Name ?? "—")
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                @* FECHAMENTO *@
+                                <div class="small fw-semibold text-primary mt-3 mb-2">
+                                    <i class="bi bi-box-arrow-right me-1"></i>
+                                    Fechamento
+                                </div>
+
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        <div class="cash-history-info">
+                                            <span class="info-label">Data de fechamento</span>
+                                            <div class="info-value">
+                                                @if (item.ClosedAt.HasValue)
+                                                {
+                                                    @item.ClosedAt.Value.ToString("dd/MM/yyyy")
+                                                    <div class="text-muted small fw-normal">
+                                                        @item.ClosedAt.Value.ToString("HH:mm")
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">—</span>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-6">
+                                        <div class="cash-history-info">
+                                            <span class="info-label">Fechado por</span>
+                                            <div class="info-value">
+                                                @(item.ClosedByUser?.Name ?? "—")
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-6">
+                                        <div class="cash-history-info">
+                                            <span class="info-label">Balanço</span>
+                                            <div class="info-value @(item.ClosingBalance != item.TotalSales ? "text-danger" : "")">
+                                                @item.ClosingBalance.ToString("C2")
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-6">
+                                        <div class="cash-history-info">
+                                            <span class="info-label">Total vendido</span>
+                                            <div class="info-value">
+                                                @item.TotalSales.ToString("C2")
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
                         }
 
-                    </tbody>
-                </table>
-            </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <i class="bi bi-inbox fs-2 text-muted"></i>
+
+                    <p class="fw-semibold mt-2 mb-1">
+                        Nenhum registro encontrado
+                    </p>
+
+                    <span class="text-muted small">
+                        Não existem caixas para exibir.
+                    </span>
+                </div>
+            }
+
         </div>
 
         @if (pagination != null)
         {
             <div class="card-footer bg-white border-0 py-3">
-                <partial name="_Pagination"
-                         model="@(new PaginationViewModel
+                <partial name="_Pagination" model="@(new PaginationViewModel
                          {
                              TotalItems = pagination.TotalItems,
                              QttPerPage = pagination.QttPerPage,
                              CurrentPage = pagination.CurrentPage
                          })" />
-            </div>            
+            </div>
         }
 
     </div>

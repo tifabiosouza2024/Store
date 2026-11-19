@@ -5,6 +5,6 @@ namespace FS.Store.Core.Interfaces
 {
     public interface IOperationUserRoleService : IBaseService<OperationUserRole, long>
     {
-        Task<IEnumerable<OperationUserRole>?> FindAllOperationsByUserIdAsync(OperationUserRoleStatusEnum? status = null);
+        Task<IEnumerable<OperationUserRole>?> FindAllOperationsByUserIdAsync(RoleStatusEnum? status = null);
     }
 }

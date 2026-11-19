@@ -27,6 +27,9 @@ namespace FS.Store.Core.Extension
             return default;
         }
 
+        public static bool AnyOperation(this ClaimsPrincipal user)
+            => !user.GetOperationId().Equals(Guid.Empty);
+
         public static string GetOperationName(this ClaimsPrincipal user)
         {
             return user.FindFirst(OperationName)?.Value ?? string.Empty;
@@ -49,5 +52,8 @@ namespace FS.Store.Core.Extension
             => user.IsAdminOrGreater() || user.IsManager();
         public static bool IsSellerOrGreater(this ClaimsPrincipal user)
             => user.IsManagerOrGreater() || user.IsSeller();
+
+        public static bool IsAuthenticated(this ClaimsPrincipal user)
+            => user.Identity?.IsAuthenticated ?? false;
     }
 }

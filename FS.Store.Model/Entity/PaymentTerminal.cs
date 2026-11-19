@@ -11,7 +11,7 @@ namespace FS.Store.Model.Entity
     /// </para>
     /// </summary>
     [Table("payment_terminal")]
-    [Comment("Armazena os terminais (maquininhas) de pagamento")]
+    [Comment("Armazena os terminais de pagamento (maquininhas)")]
     public class PaymentTerminal : BaseEntity<Guid>
     {
         [Column("name")]

@@ -12,7 +12,7 @@ namespace FS.Store.Model.Entity
     /// </para>
     /// </summary>
     [Table("payment_provider")]
-    [Comment("Armazena os fornecedores dos terminais")]
+    [Comment("Armazena os fornecedores dos terminais (maquininhas)")]
     public class PaymentProvider : BaseEntity<int>
     {
         [Column("name")]

@@ -1,7 +1,10 @@
 ﻿using FS.Store.Core.Extension;
 using FS.Store.Core.Helper;
 using FS.Store.Core.Interfaces;
+using FS.Store.Model.Enums;
+using FS.Store.Model.Extensions;
 using FS.Store.WebAPI.Areas.Admin.ViewModels;
+using FS.Store.WebAPI.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,6 +13,7 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
     [Area("Admin")]
     [Authorize]
     public class AccountController(PasswordHelper passwordHelper
+        , AuthHelper authHelper
         , IUserService userService) : Controller
     {
         public async Task<IActionResult> Index()
@@ -21,7 +25,8 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
                 {
                     Name = user?.Name,
                     Email = user?.Email
-                }
+                },
+                QttInvite = user.Operations.Count(o => o.Status == RoleStatusEnum.Pending)
             };
             return View(vm);
         }
@@ -41,12 +46,24 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
             if (existsUser)
                 ModelState.AddModelError(nameof(PersonalDataViewModel.Email), "Já existe um usuário cadastrado com este e-mail");
 
-            if (user != null && !existsUser && (!user.Name.Equals(vm.Name) || !user.Email.Equals(vm.Email)))
+            if (user != null && !existsUser)
             {
-                user.Name = vm.Name;
-                user.Email = vm.Email;
+                bool hasChange = false;
+                if (vm.Name.IsNotNullOrEmpty() && !vm.Name.Equals(user?.Name))
+                {
+                    user.Name = vm.Name;
+                    hasChange = true;
+                }
+                if (vm.Email.IsNotNullOrEmpty() && !vm.Email.Equals(user?.Email))
+                {
+                    user.Email = vm.Email;
+                    hasChange = true;
+                }
 
-                await userService.SaveChangesAsync();
+                if (hasChange)
+                    await userService.SaveChangesAsync();
+
+                await authHelper.AssignPermissionsAsync(user, User.GetOperationId());
 
                 return RedirectToAction(nameof(Index), "Account", new { Area = "Admin" }, fragment: "personal-data");
             }

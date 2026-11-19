@@ -11,6 +11,7 @@
     using System.Security.Claims;
 
     public class AuthHelper(PasswordHelper passwordHelper
+        , CurrentUserHelper currentUserHelper
         , IHttpContextAccessor httpContextAccessor
         , IUserService userService
         , IOperationService operationService
@@ -21,19 +22,25 @@
             if (user == null || !user.IsActive || !passwordHelper.IsCorrectPassword(user, model.Password))
                 return false;
 
-            if (user.Operations?.Count(o => o.IsActive && o.Status == OperationUserRoleStatusEnum.Active) > 1)
+            user!.RememberMe = model.RememberMe;
+
+            if (user.GlobalRoles != null && user.GlobalRoles.Any(o => o.IsActive && o.Status == RoleStatusEnum.Active))
             {
-                user.LastOperationId = null;
+                await AssignPermissionsAsync(user, null);
             }
             else
             {
-                user.LastOperationId = user.Operations?.FirstOrDefault(o => o.IsActive && o.Status == OperationUserRoleStatusEnum.Active)?.OperationId;
+                if (user.Operations?.Count(o => o.IsActive && o.Status == RoleStatusEnum.Active) > 1)
+                {
+                    user.LastOperationId = null;
+                }
+                else
+                {
+                    user.LastOperationId = user.Operations?.FirstOrDefault(o => o.IsActive && o.Status == RoleStatusEnum.Active)?.OperationId;
+                }
+
+                await AssignPermissionsAsync(user, user?.LastOperationId);
             }
-
-            await AssignPermissionsAsync(user, user?.LastOperationId);
-
-            user!.RememberMe = model.RememberMe;
-            await userService.AddOrUpdateAsync(user);
 
             return true;
         }
@@ -56,14 +63,19 @@
                 claims.Add(new(ClaimTypesExtensions.OperationName, operation.Name.ToString()));
             }
 
-            var operationRoles = user.Operations?.Where(o => o.OperationId == operationId && o.IsActive && o.Status == OperationUserRoleStatusEnum.Active).ToList();
-            if (operationRoles is not null && operationRoles.Any())
+            var globalRoles = user.GlobalRoles?.Where(o => o.IsActive && o.Status == RoleStatusEnum.Active).ToList() ?? [];
+            if (operationId != null && operationId != Guid.Empty)
             {
+                var operationRoles = user.Operations?.Where(o => o.OperationId == operationId && o.IsActive && o.Status == RoleStatusEnum.Active) ?? [];
                 foreach (var operationRole in operationRoles)
-                {
                     if (operationRole.Role is not null)
                         claims.Add(new Claim(ClaimTypes.Role, operationRole.Role.NormalizedName));
-                }
+            }
+            else if (globalRoles.Any())
+            {
+                foreach (var globalRole in globalRoles)
+                    if (globalRole.Role is not null)
+                        claims.Add(new Claim(ClaimTypes.Role, globalRole.Role.NormalizedName));
             }
 
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -82,6 +94,8 @@
 
             if (logger.IsEnabled(LogLevel.Information))
                 logger.LogInformation("Login realizado para o usuário {UserId}.", user.Id);
+
+            await userService.SaveChangesAsync();
 
         }
     }

@@ -53,8 +53,10 @@ namespace FS.Store.WebAPI.Areas.Admin.Controllers
                 model.OperationName = User.GetOperationName();
                 return View(model);
             }
-
-            await userService.CreateAsync(model.ToDto<AssignUserToOperationDto>());
+            var dto = model.ToDto<AssignUserToOperationDto>();
+            dto.InvitedByUserId = User.GetUserId();
+            dto.OperationId = User.GetOperationId();
+            await userService.CreateNewUserOperationAsync(dto);
 
             return RedirectToAction(nameof(Index));
         }

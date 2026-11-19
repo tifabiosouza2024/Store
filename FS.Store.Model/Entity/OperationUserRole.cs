@@ -12,7 +12,7 @@ namespace FS.Store.Model.Entity
     /// </para>
     /// </summary>
     [Table("operation_user_role")]
-    [Comment("Relacionamento entre Operação, Usuário e seus papeis")]
+    [Comment("Relacionamento entre Operação, Usuário e seus papeis na operação")]
     public class OperationUserRole : BaseEntity<long>
     {
         [Column("is_active")]
@@ -22,7 +22,7 @@ namespace FS.Store.Model.Entity
 
         [Column("status")]
         [Comment("Status do vínculo do usuário com a operação")]
-        public OperationUserRoleStatusEnum Status { get; set; } = OperationUserRoleStatusEnum.Pending;
+        public RoleStatusEnum Status { get; set; } = RoleStatusEnum.Pending;
 
         [Column("invited_at", TypeName = "datetime(0)")]
         [Comment("Data do convite")]

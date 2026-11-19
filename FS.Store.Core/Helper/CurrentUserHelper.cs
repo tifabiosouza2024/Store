@@ -12,6 +12,9 @@ namespace FS.Store.Core.Helper
         public bool IsAuthenticated
             => User?.Identity?.IsAuthenticated ?? false;
 
+        public bool IsSuper
+            => User?.IsSuper() ?? false;
+
         public Guid? CurrentOperationId
             => User?.GetOperationId();
         public ClaimsPrincipal? User

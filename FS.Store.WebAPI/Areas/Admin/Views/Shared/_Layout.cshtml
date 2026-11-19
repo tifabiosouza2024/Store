@@ -1,6 +1,6 @@
 ﻿@{
     var year = DateTime.Now.Year;
-    var isAuthenticated = User.Identity?.IsAuthenticated == true;
+    var isAuthenticated = User.IsAuthenticated();
 }
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -79,6 +79,8 @@
     </div>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/lib/inputmask/jquery.inputmask.min.js" asp-append-version="true"></script>
     <script src="~/js/price-mask.js" asp-append-version="true"></script>

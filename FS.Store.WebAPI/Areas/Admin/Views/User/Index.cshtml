@@ -4,176 +4,312 @@
     ViewData["Title"] = "Usuários";
 
     var operationId = User.GetOperationId();
+    var currentUserId = User.GetUserId();
     var data = Model.Data;
 }
 
 <div class="container-fluid py-4">
-
-    <!-- Cabeçalho -->
+    @* Cabeçalho *@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h4 class="fw-bold mb-1">Usuários</h4>
-            <p class="text-muted mb-0">
-                Gerencie os usuários e suas permissões de acesso.
-            </p>
+            <p class="text-muted mb-0">Gerencie os usuários e suas permissões de acesso.</p>
         </div>
     </div>
 
-    <!-- Tabela -->
     <div class="card border-0 shadow-sm">
+        @* Título e quantidade *@
         <div class="card-header bg-white py-3">
             <div class="d-flex align-items-center justify-content-between">
                 <h6 class="mb-0 fw-semibold">
                     <i class="bi bi-people me-2"></i>
                     Usuários cadastrados
                 </h6>
-
-                <span class="badge text-bg-light">
-                    @Model.TotalItems registro(s)
-                </span>
+                <span class="badge text-bg-light">@Model.TotalItems registro(s)</span>
             </div>
         </div>
 
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th table-header-ordered field="@nameof(FS.Store.Model.Entity.User.Name)" header-text="Nome"></th>
-                            <th table-header-ordered field="@nameof(FS.Store.Model.Entity.User.Email)" header-text="E-mail"></th>
-                            <th>Função</th>
-                            <th table-header-ordered field="@nameof(FS.Store.Model.Entity.User.CreatedAt)" header-text="Data de cadastro"></th>
-                            <th table-header-ordered field="@nameof(FS.Store.Model.Entity.User.IsActive)" header-text="Status" class="text-center"></th>
-                            <th class="text-center">Beta</th>
-                            <th class="text-end pe-3">Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (data != null && data.Any())
-                        {
-                            foreach (var item in data)
-                            {
-                                if (item == null)
-                                    continue;
+        <div class="card-body">
+            @if (data != null && data.Any())
+            {
+                @* Ordenação mobile *@
+                <div class="d-lg-none mb-3" id="mobileSort">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="fw-semibold small">
+                            <i class="bi bi-arrow-down-up me-1"></i>
+                            Ordenar usuários
+                        </span>
+                        <button type="button" class="btn btn-sm btn-outline-primary" id="addMobileSort">
+                            <i class="bi bi-plus-lg me-1"></i>Adicionar critério
+                        </button>
+                    </div>
 
-                                var role = item.Operations?.FirstOrDefault(x => x.OperationId == operationId)?.Role?.Name;
+                    <div id="mobileSortCriteria">
+                        <div class="mobile-sort-row" data-sort-row>
+                            <div class="row g-2 align-items-center">
+                                <div class="col-7">
+                                    <select class="form-select form-select-sm" data-sort-field aria-label="Campo de ordenação">
+                                        <option value="Name">Nome</option>
+                                        <option value="Email">E-mail</option>
+                                        <option value="CreatedAt">Data de cadastro</option>
+                                        <option value="IsActive">Status</option>
+                                    </select>
+                                </div>
+                                <div class="col-4">
+                                    <select class="form-select form-select-sm" data-sort-direction aria-label="Direção da ordenação">
+                                        <option value="asc">Crescente</option>
+                                        <option value="desc" selected>Decrescente</option>
+                                    </select>
+                                </div>
+                                <div class="col-1 text-end">
+                                    <button type="button" class="btn btn-sm btn-light text-danger" data-remove-sort title="Remover critério" aria-label="Remover critério">
+                                        <i class="bi bi-x-lg"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
+                    <div class="text-end mt-2">
+                        <button type="button" class="btn btn-sm btn-primary" id="applyMobileSort">
+                            <i class="bi bi-check2 me-1"></i>Aplicar ordenação
+                        </button>
+                    </div>
+                </div>
+
+                <template id="mobileSortTemplate">
+                    <div class="mobile-sort-row" data-sort-row>
+                        <div class="row g-2 align-items-center">
+                            <div class="col-7">
+                                <select class="form-select form-select-sm" data-sort-field aria-label="Campo de ordenação">
+                                    <option value="Name">Nome</option>
+                                    <option value="Email">E-mail</option>
+                                    <option value="CreatedAt">Data de cadastro</option>
+                                    <option value="IsActive">Status</option>
+                                </select>
+                            </div>
+                            <div class="col-4">
+                                <select class="form-select form-select-sm" data-sort-direction aria-label="Direção da ordenação">
+                                    <option value="asc">Crescente</option>
+                                    <option value="desc">Decrescente</option>
+                                </select>
+                            </div>
+                            <div class="col-1 text-end">
+                                <button type="button" class="btn btn-sm btn-light text-danger" data-remove-sort title="Remover critério" aria-label="Remover critério">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                @* Desktop: tabela *@
+                <div class="d-none d-lg-block">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0" data-ordered-table>
+                            <thead class="table-light">
                                 <tr>
-                                    <!-- Nome -->
-                                    <td class="ps-3">
-                                        <div class="fw-semibold">
-                                            @item.Name
-                                        </div>
-                                    </td>
-
-                                    <!-- E-mail -->
-                                    <td>
-                                        <span class="text-muted">
-                                            @item.Email
-                                        </span>
-                                    </td>
-
-                                    <!-- Função -->
-                                    <td>
-                                        @if (role.IsNotNullOrEmpty())
-                                        {
-                                            <span class="badge rounded-pill text-bg-light border">
-                                                @role
-                                            </span>
-                                        }
-                                        else
-                                        {
-                                            <span class="text-muted">—</span>
-                                        }
-                                    </td>
-
-                                    <!-- Cadastro -->
-                                    <td>
-                                        @item.CreatedAt.ToString("dd/MM/yyyy")
-                                        <div class="text-muted small">
-                                            @item.CreatedAt.ToString("HH:mm")
-                                        </div>
-                                    </td>
-
-                                    <!-- Status -->
-                                    <td class="text-center">
-                                        @if (item.IsActive)
-                                        {
-                                            <span class="badge rounded-pill text-bg-success">
-                                                Ativo
-                                            </span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge rounded-pill text-bg-secondary">
-                                                Inativo
-                                            </span>
-                                        }
-                                    </td>
-
-                                    <!-- Beta -->
-                                    <td class="text-center">
-                                        @if (item.IsBeta)
-                                        {
-                                            <span class="badge rounded-pill text-bg-info">
-                                                <i class="bi bi-flask me-1"></i>Sim
-                                            </span>
-                                        }
-                                        else
-                                        {
-                                            <span class="text-muted">—</span>
-                                        }
-                                    </td>
-
-                                    <!-- Ações -->
-                                    <td class="text-end pe-3">
-                                        @if (item.Id != User.GetUserId())
-                                        {
-                                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-light" title="Visualizar">
-                                                <i class="bi bi-eye"></i>
-                                            </a>
-
-                                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-light" title="Editar">
-                                                <i class="bi bi-pencil"></i>
-                                            </a>
-                                        }
-                                        else
-                                        {
-                                            <button class="btn btn-sm btn-light disabled" title="Visualizar">
-                                                <i class="bi bi-eye"></i>
-                                            </button>
-
-                                            <button class="btn btn-sm btn-light disabled" title="Editar">
-                                                <i class="bi bi-pencil"></i>
-                                            </button>
-                                        }
-                                    </td>
+                                    <th table-header-ordered field="@nameof(FS.Store.Model.Entity.User.Name)" header-text="Nome"></th>
+                                    <th table-header-ordered field="@nameof(FS.Store.Model.Entity.User.Email)" header-text="E-mail"></th>
+                                    <th>Função</th>
+                                    <th table-header-ordered field="@nameof(FS.Store.Model.Entity.User.CreatedAt)" header-text="Data de cadastro"></th>
+                                    <th table-header-ordered field="@nameof(FS.Store.Model.Entity.User.IsActive)" header-text="Status" class="text-center"></th>
+                                    <th class="text-center">Beta</th>
+                                    <th class="text-end pe-3">Ações</th>
                                 </tr>
-                            }
-                        }
-                        else
+                            </thead>
+                            <tbody>
+                                @foreach (var item in data)
+                                {
+                                    if (item == null)
+                                        continue;
+
+                                    var role = item.Operations?.FirstOrDefault(x => x.OperationId == operationId)?.Role?.Name;
+
+                                    <tr>
+                                        <td class="ps-3">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div class="user-avatar">
+                                                    <i class="bi bi-person"></i>
+                                                </div>
+                                                <span class="fw-semibold">@item.Name</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="text-muted">@item.Email</span>
+                                        </td>
+                                        <td>
+                                            @if (role.IsNotNullOrEmpty())
+                                            {
+                                                <span class="badge rounded-pill text-bg-light border">@role</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">—</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @item.CreatedAt.ToString("dd/MM/yyyy")
+                                            <div class="text-muted small">@item.CreatedAt.ToString("HH:mm")</div>
+                                        </td>
+                                        <td class="text-center">
+                                            @if (item.IsActive)
+                                            {
+                                                <span class="badge rounded-pill text-bg-success">Ativo</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge rounded-pill text-bg-secondary">Inativo</span>
+                                            }
+                                        </td>
+                                        <td class="text-center">
+                                            @if (item.IsBeta)
+                                            {
+                                                <span class="badge rounded-pill text-bg-info">
+                                                    <i class="bi bi-flask me-1"></i>Sim
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">—</span>
+                                            }
+                                        </td>
+                                        <td class="text-end pe-3">
+                                            @if (item.Id != currentUserId)
+                                            {
+                                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-light" title="Visualizar" aria-label="Visualizar">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-light" title="Editar" aria-label="Editar">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <button type="button" class="btn btn-sm btn-light" disabled title="Não é possível visualizar o próprio usuário">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-light" disabled title="Não é possível editar o próprio usuário">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                @* Mobile: cards *@
+                <div class="d-lg-none">
+                    <div class="row g-3">
+                        @foreach (var item in data)
                         {
-                            <tr>
-                                <td colspan="7" class="text-center py-5">
-                                    <i class="bi bi-people fs-2 text-muted"></i>
-                                    <p class="fw-semibold mt-2 mb-1">
-                                        Nenhum usuário encontrado
-                                    </p>
-                                    <span class="text-muted small">
-                                        Não existem usuários cadastrados nesta operação.
-                                    </span>
-                                </td>
-                            </tr>
+                            if (item == null)
+                                continue;
+
+                            var role = item.Operations?.FirstOrDefault(x => x.OperationId == operationId)?.Role?.Name;
+
+                            <div class="col-12">
+                                <div class="user-card">
+                                    <div class="user-card-body">
+                                        <div class="d-flex align-items-start gap-3">
+                                            <div class="user-avatar user-avatar-lg">
+                                                <i class="bi bi-person"></i>
+                                            </div>
+
+                                            <div class="user-card-content flex-grow-1">
+                                                <div class="d-flex align-items-start justify-content-between gap-2">
+                                                    <div class="user-card-name">@item.Name</div>
+
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-sm btn-light user-card-action" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Ações do usuário">
+                                                            <i class="bi bi-three-dots-vertical"></i>
+                                                        </button>
+                                                        <ul class="dropdown-menu dropdown-menu-end">
+                                                            @if (item.Id != currentUserId)
+                                                            {
+                                                                <li>
+                                                                    <a asp-action="Details" asp-route-id="@item.Id" class="dropdown-item">
+                                                                        <i class="bi bi-eye me-2"></i>Visualizar
+                                                                    </a>
+                                                                </li>
+                                                                <li>
+                                                                    <a asp-action="Edit" asp-route-id="@item.Id" class="dropdown-item">
+                                                                        <i class="bi bi-pencil me-2"></i>Editar
+                                                                    </a>
+                                                                </li>
+                                                            }
+                                                            else
+                                                            {
+                                                                <li>
+                                                                    <span class="dropdown-item disabled">
+                                                                        <i class="bi bi-eye me-2"></i>Visualizar
+                                                                    </span>
+                                                                </li>
+                                                                <li>
+                                                                    <span class="dropdown-item disabled">
+                                                                        <i class="bi bi-pencil me-2"></i>Editar
+                                                                    </span>
+                                                                </li>
+                                                            }
+                                                        </ul>
+                                                    </div>
+                                                </div>
+
+                                                <div class="user-card-email">@item.Email</div>
+
+                                                <div class="user-card-info">
+                                                    <div class="user-card-info-item">
+                                                        <i class="bi bi-person-badge"></i>
+                                                        <span>@(role.IsNotNullOrEmpty() ? role : "Função não definida")</span>
+                                                    </div>
+                                                    <div class="user-card-info-item">
+                                                        <i class="bi bi-calendar3"></i>
+                                                        <span>@item.CreatedAt.ToString("dd/MM/yyyy 'às' HH:mm")</span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="user-card-badges">
+                                                    @if (item.IsActive)
+                                                    {
+                                                        <span class="badge rounded-pill text-bg-success">Ativo</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge rounded-pill text-bg-secondary">Inativo</span>
+                                                    }
+
+                                                    @if (item.IsBeta)
+                                                    {
+                                                        <span class="badge rounded-pill text-bg-info">
+                                                            <i class="bi bi-flask me-1"></i>Beta
+                                                        </span>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         }
-                    </tbody>
-                </table>
-            </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <i class="bi bi-people display-4 text-muted"></i>
+                    <h5 class="mt-3">Nenhum usuário encontrado</h5>
+                    <p class="text-muted mb-0">Não existem usuários cadastrados nesta operação.</p>
+                </div>
+            }
         </div>
 
-        <!-- Paginação -->
+        @* Paginação única *@
         <div class="card-footer bg-white border-0 py-3">
-            <partial name="_Pagination"
-                     model="@(new PaginationViewModel
+            <partial name="_Pagination" model="@(new PaginationViewModel
                      {
                          TotalItems = Model.TotalItems,
                          QttPerPage = Model.QttPerPage,
@@ -183,7 +319,7 @@
     </div>
 </div>
 
-<!-- Botão flutuante -->
+@* Botão flutuante *@
 @{
     var fab = new FloatingButtonDto
     {
@@ -201,4 +337,139 @@
 
 @section Styles {
     <link rel="stylesheet" href="~/css/admin/table.css" asp-append-version="true" />
+
+    <style>
+        /* Avatar */
+        .user-avatar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            flex-shrink: 0;
+            border-radius: 10px;
+            background: #eaf0ff;
+            color: #4263cf;
+            font-size: 1.1rem;
+        }
+
+        .user-avatar-lg {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            font-size: 1.3rem;
+        }
+
+        /* Cards mobile */
+        .user-card {
+            background: #f1f4fa;
+            border: 1px solid #dce3ef;
+            border-radius: 14px;
+            overflow: visible;
+            transition: background-color .2s ease, border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+        }
+
+            .user-card:hover {
+                background: #eaf0fa;
+                border-color: #c5d2e8;
+                box-shadow: 0 4px 14px rgb(30 50 90 / 9%);
+                transform: translateY(-2px);
+            }
+
+        .user-card-body {
+            padding: 16px;
+        }
+
+        .user-card-content {
+            min-width: 0;
+        }
+
+        .user-card-name {
+            color: #25324a;
+            font-size: 1rem;
+            font-weight: 600;
+            overflow-wrap: anywhere;
+        }
+
+        .user-card-email {
+            color: #667085;
+            font-size: .85rem;
+            overflow-wrap: anywhere;
+            margin-top: 2px;
+        }
+
+        .user-card-info {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 13px;
+            padding: 10px 12px;
+            background: #fff;
+            border: 1px solid #e3e8f0;
+            border-radius: 10px;
+        }
+
+        .user-card-info-item {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            color: #475467;
+            font-size: .85rem;
+            overflow-wrap: anywhere;
+        }
+
+            .user-card-info-item i {
+                color: #4263cf;
+                font-size: 1rem;
+                flex-shrink: 0;
+            }
+
+        .user-card-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 12px;
+        }
+
+        .user-card-action {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            border: 1px solid #dce3ef;
+            border-radius: 8px;
+            color: #475467;
+        }
+
+            .user-card-action:hover,
+            .user-card-action:focus {
+                background: #eaf0ff;
+                border-color: #c5d2e8;
+                color: #4263cf;
+            }
+
+        /* Ordenação mobile */
+        .mobile-sort-row {
+            padding: 9px;
+            background: #f1f4fa;
+            border: 1px solid #dce3ef;
+            border-radius: 10px;
+        }
+
+            .mobile-sort-row + .mobile-sort-row {
+                margin-top: 8px;
+            }
+
+        @@media (max-width: 575.98px) {
+            .user-card-body {
+                padding: 14px;
+            }
+
+            .user-card:hover {
+                transform: none;
+            }
+        }
+    </style>
 }

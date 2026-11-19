@@ -1,7 +1,4 @@
-﻿using FS.Store.Model.Entity;
-using FS.Store.Model.Enums;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 using MySql.EntityFrameworkCore.Metadata;
 
 #nullable disable
@@ -9,132 +6,11 @@ using MySql.EntityFrameworkCore.Metadata;
 namespace FS.Store.DAL.Migrations
 {
     /// <inheritdoc />
-    public partial class CreateUserAndRoleAndOperationAndOperationUserRoles : Migration
+    public partial class CreateCashManagement : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterDatabase()
-                .Annotation("MySQL:Charset", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "operations",
-                columns: table => new
-                {
-                    id = table.Column<Guid>(type: "char(36)", nullable: false),
-                    document = table.Column<string>(type: "varchar(18)", maxLength: 18, nullable: false, comment: "CNPJ da Operação"),
-                    name = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Nome da Operação"),
-                    email = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "E-mail da Operação"),
-                    is_active = table.Column<bool>(type: "tinyint(1)", nullable: true, defaultValue: true, comment: "Operação ativa"),
-                    created_at = table.Column<DateTime>(type: "datetime(0)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP", comment: "Data de criação do registro"),
-                    updated_at = table.Column<DateTime>(type: "datetime(0)", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP", comment: "Data de atualização do registro"),
-                    deleted = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: false, comment: "registro deletado virtualmente")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_operations", x => x.id);
-                },
-                comment: "Empresa/Loja Operante")
-                .Annotation("MySQL:Charset", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "payment_provider",
-                columns: table => new
-                {
-                    id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
-                    name = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false, comment: "Empresa da maquininha de cartão"),
-                    logo_icon = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: true, comment: "Ícone do logo do fornecedor"),
-                    created_at = table.Column<DateTime>(type: "datetime(0)", nullable: false, comment: "Data de criação do registro"),
-                    updated_at = table.Column<DateTime>(type: "datetime(0)", nullable: true, comment: "Data de atualização do registro"),
-                    deleted = table.Column<bool>(type: "tinyint(1)", nullable: false, comment: "registro deletado virtualmente")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_payment_provider", x => x.id);
-                },
-                comment: "Armazena os fornecedores dos terminais")
-                .Annotation("MySQL:Charset", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "roles",
-                columns: table => new
-                {
-                    id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
-                    name = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Nome do papel"),
-                    normalized_name = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Nome do papel normalizado (em uppercase)"),
-                    created_at = table.Column<DateTime>(type: "datetime(0)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP", comment: "Data de criação do registro"),
-                    updated_at = table.Column<DateTime>(type: "datetime(0)", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP", comment: "Data de atualização do registro"),
-                    deleted = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: false, comment: "registro deletado virtualmente")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_roles", x => x.id);
-                },
-                comment: "Papéis de usuários do sistema")
-                .Annotation("MySQL:Charset", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "users",
-                columns: table => new
-                {
-                    id = table.Column<Guid>(type: "char(36)", nullable: false),
-                    email = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "E-mail do usuário"),
-                    name = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: true, comment: "Nome do usuário"),
-                    password_hash = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Hash de senha"),
-                    is_active = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: true, comment: "Usuário ativo"),
-                    is_beta = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: false, comment: "Usuário testador de versões beta"),
-                    remember_me = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: false, comment: "Informa se o usuário permanece logado após fechar o navegador"),
-                    must_change_password = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: true, comment: "Indica se o usuário deve alterar a senha no próximo acesso"),
-                    last_operation_id = table.Column<Guid>(type: "char(36)", nullable: true, comment: "Id da última operação logada"),
-                    created_at = table.Column<DateTime>(type: "datetime(0)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP", comment: "Data de criação do registro"),
-                    updated_at = table.Column<DateTime>(type: "datetime(0)", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP", comment: "Data de atualização do registro"),
-                    deleted = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: false, comment: "registro deletado virtualmente")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_users", x => x.id);
-                    table.ForeignKey(
-                        name: "FK_users_operations_last_operation_id",
-                        column: x => x.last_operation_id,
-                        principalTable: "operations",
-                        principalColumn: "id");
-                },
-                comment: "Usuários do sistema")
-                .Annotation("MySQL:Charset", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "payment_terminal",
-                columns: table => new
-                {
-                    id = table.Column<Guid>(type: "char(36)", nullable: false),
-                    name = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false, comment: "Nome do terminal"),
-                    payment_provider_id = table.Column<int>(type: "int", nullable: false, comment: "Id do fornecedor do terminal"),
-                    operation_id = table.Column<Guid>(type: "char(36)", nullable: false, comment: "Id da operação"),
-                    created_at = table.Column<DateTime>(type: "datetime(0)", nullable: false, comment: "Data de criação do registro"),
-                    updated_at = table.Column<DateTime>(type: "datetime(0)", nullable: true, comment: "Data de atualização do registro"),
-                    deleted = table.Column<bool>(type: "tinyint(1)", nullable: false, comment: "registro deletado virtualmente")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_payment_terminal", x => x.id);
-                    table.ForeignKey(
-                        name: "FK_payment_terminal_operations_operation_id",
-                        column: x => x.operation_id,
-                        principalTable: "operations",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_payment_terminal_payment_provider_payment_provider_id",
-                        column: x => x.payment_provider_id,
-                        principalTable: "payment_provider",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                },
-                comment: "Armazena os terminais (maquininhas) de pagamento")
-                .Annotation("MySQL:Charset", "utf8mb4");
-
             migrationBuilder.CreateTable(
                 name: "cash_register_session",
                 columns: table => new
@@ -151,9 +27,9 @@ namespace FS.Store.DAL.Migrations
                     opened_by_user_id = table.Column<Guid>(type: "char(36)", nullable: false, comment: "ID do Usuário que abriu o caixa"),
                     closed_by_user_id = table.Column<Guid>(type: "char(36)", nullable: true, comment: "ID do Usuário que fechou o caixa"),
                     changed_by_user_id = table.Column<Guid>(type: "char(36)", nullable: true, comment: "ID do Usuário que alterou o caixa"),
-                    created_at = table.Column<DateTime>(type: "datetime(0)", nullable: false, comment: "Data de criação do registro"),
-                    updated_at = table.Column<DateTime>(type: "datetime(0)", nullable: true, comment: "Data de atualização do registro"),
-                    deleted = table.Column<bool>(type: "tinyint(1)", nullable: false, comment: "registro deletado virtualmente")
+                    created_at = table.Column<DateTime>(type: "datetime(0)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP", comment: "Data de criação do registro"),
+                    updated_at = table.Column<DateTime>(type: "datetime(0)", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP", comment: "Data de atualização do registro"),
+                    deleted = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: false, comment: "registro deletado virtualmente")
                 },
                 constraints: table =>
                 {
@@ -185,52 +61,22 @@ namespace FS.Store.DAL.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "operation_user_role",
+                name: "payment_provider",
                 columns: table => new
                 {
-                    id = table.Column<long>(type: "bigint", nullable: false)
+                    id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
-                    is_active = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: true, comment: "Determina se o usuário estará ativo para aquela operação."),
-                    status = table.Column<int>(type: "int", nullable: false, comment: "Status do vínculo do usuário com a operação"),
-                    invited_at = table.Column<DateTime>(type: "datetime(0)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP", comment: "Data do convite"),
-                    accepted_at = table.Column<DateTime>(type: "datetime(0)", nullable: true, comment: "Data de aceitação do convite"),
-                    operation_id = table.Column<Guid>(type: "char(36)", nullable: false, comment: "Id da Operação"),
-                    user_id = table.Column<Guid>(type: "char(36)", nullable: false, comment: "Id do Usuário"),
-                    role_id = table.Column<int>(type: "int", nullable: false, comment: "Id do papel do Usuário na Operação"),
-                    invited_by_user_id = table.Column<Guid>(type: "char(36)", nullable: true, comment: "Usuário responsável pelo convite"),
+                    name = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false, comment: "Empresa da maquininha de cartão"),
+                    logo_icon = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: true, comment: "Ícone do logo do fornecedor"),
                     created_at = table.Column<DateTime>(type: "datetime(0)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP", comment: "Data de criação do registro"),
                     updated_at = table.Column<DateTime>(type: "datetime(0)", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP", comment: "Data de atualização do registro"),
                     deleted = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: false, comment: "registro deletado virtualmente")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_operation_user_role", x => x.id);
-                    table.ForeignKey(
-                        name: "FK_operation_user_role_operations_operation_id",
-                        column: x => x.operation_id,
-                        principalTable: "operations",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_operation_user_role_roles_role_id",
-                        column: x => x.role_id,
-                        principalTable: "roles",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_operation_user_role_users_invited_by_user_id",
-                        column: x => x.invited_by_user_id,
-                        principalTable: "users",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_operation_user_role_users_user_id",
-                        column: x => x.user_id,
-                        principalTable: "users",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
+                    table.PrimaryKey("PK_payment_provider", x => x.id);
                 },
-                comment: "Relacionamento entre Operação, Usuário e seus papeis")
+                comment: "Armazena os fornecedores dos terminais (maquininhas)")
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
@@ -250,9 +96,9 @@ namespace FS.Store.DAL.Migrations
                     notes = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: true, comment: "Observações sobre o fechamento"),
                     cash_register_session_id = table.Column<long>(type: "bigint", nullable: false, comment: "Id da sessão de Caixa"),
                     closed_by_user_id = table.Column<Guid>(type: "char(36)", nullable: false, comment: "Usuário que realizou o fechamento"),
-                    created_at = table.Column<DateTime>(type: "datetime(0)", nullable: false, comment: "Data de criação do registro"),
-                    updated_at = table.Column<DateTime>(type: "datetime(0)", nullable: true, comment: "Data de atualização do registro"),
-                    deleted = table.Column<bool>(type: "tinyint(1)", nullable: false, comment: "registro deletado virtualmente")
+                    created_at = table.Column<DateTime>(type: "datetime(0)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP", comment: "Data de criação do registro"),
+                    updated_at = table.Column<DateTime>(type: "datetime(0)", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP", comment: "Data de atualização do registro"),
+                    deleted = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: false, comment: "registro deletado virtualmente")
                 },
                 constraints: table =>
                 {
@@ -288,9 +134,9 @@ namespace FS.Store.DAL.Migrations
                     created_by_user_id = table.Column<Guid>(type: "char(36)", nullable: false, comment: "Usuário que criou a movimentação"),
                     canceled_by_user_id = table.Column<Guid>(type: "char(36)", nullable: true, comment: "Usuário que realizou o cancelamento da movimentação"),
                     cash_register_session_id = table.Column<long>(type: "bigint", nullable: false, comment: "Sessão de Caixa"),
-                    created_at = table.Column<DateTime>(type: "datetime(0)", nullable: false, comment: "Data de criação do registro"),
-                    updated_at = table.Column<DateTime>(type: "datetime(0)", nullable: true, comment: "Data de atualização do registro"),
-                    deleted = table.Column<bool>(type: "tinyint(1)", nullable: false, comment: "registro deletado virtualmente")
+                    created_at = table.Column<DateTime>(type: "datetime(0)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP", comment: "Data de criação do registro"),
+                    updated_at = table.Column<DateTime>(type: "datetime(0)", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP", comment: "Data de atualização do registro"),
+                    deleted = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: false, comment: "registro deletado virtualmente")
                 },
                 constraints: table =>
                 {
@@ -317,6 +163,37 @@ namespace FS.Store.DAL.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "payment_terminal",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "char(36)", nullable: false),
+                    name = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false, comment: "Nome do terminal"),
+                    payment_provider_id = table.Column<int>(type: "int", nullable: false, comment: "Id do fornecedor do terminal"),
+                    operation_id = table.Column<Guid>(type: "char(36)", nullable: false, comment: "Id da operação"),
+                    created_at = table.Column<DateTime>(type: "datetime(0)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP", comment: "Data de criação do registro"),
+                    updated_at = table.Column<DateTime>(type: "datetime(0)", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP", comment: "Data de atualização do registro"),
+                    deleted = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: false, comment: "registro deletado virtualmente")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_payment_terminal", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_payment_terminal_operations_operation_id",
+                        column: x => x.operation_id,
+                        principalTable: "operations",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_payment_terminal_payment_provider_payment_provider_id",
+                        column: x => x.payment_provider_id,
+                        principalTable: "payment_provider",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                },
+                comment: "Armazena os terminais de pagamento (maquininhas)")
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "cash_closing_terminal",
                 columns: table => new
                 {
@@ -330,9 +207,9 @@ namespace FS.Store.DAL.Migrations
                     cash_register_session_id = table.Column<long>(type: "bigint", nullable: false),
                     cash_closing_id = table.Column<long>(type: "bigint", nullable: false),
                     created_by_user_id = table.Column<Guid>(type: "char(36)", nullable: false, comment: "Usuário que criou a movimentação"),
-                    created_at = table.Column<DateTime>(type: "datetime(0)", nullable: false, comment: "Data de criação do registro"),
-                    updated_at = table.Column<DateTime>(type: "datetime(0)", nullable: true, comment: "Data de atualização do registro"),
-                    deleted = table.Column<bool>(type: "tinyint(1)", nullable: false, comment: "registro deletado virtualmente")
+                    created_at = table.Column<DateTime>(type: "datetime(0)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP", comment: "Data de criação do registro"),
+                    updated_at = table.Column<DateTime>(type: "datetime(0)", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP", comment: "Data de atualização do registro"),
+                    deleted = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: false, comment: "registro deletado virtualmente")
                 },
                 constraints: table =>
                 {
@@ -432,45 +309,6 @@ namespace FS.Store.DAL.Migrations
                 column: "operation_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_operation_user_role_invited_by_user_id",
-                table: "operation_user_role",
-                column: "invited_by_user_id");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_operation_user_role_operation_id",
-                table: "operation_user_role",
-                column: "operation_id");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_operation_user_role_role_id",
-                table: "operation_user_role",
-                column: "role_id");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_operation_user_role_user_id_operation_id_role_id",
-                table: "operation_user_role",
-                columns: new[] { "user_id", "operation_id", "role_id" },
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_operations_document",
-                table: "operations",
-                column: "document",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_operations_document_email",
-                table: "operations",
-                columns: new[] { "document", "email" },
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_operations_email",
-                table: "operations",
-                column: "email",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_payment_terminal_operation_id",
                 table: "payment_terminal",
                 column: "operation_id");
@@ -480,40 +318,10 @@ namespace FS.Store.DAL.Migrations
                 table: "payment_terminal",
                 column: "payment_provider_id");
 
-            migrationBuilder.CreateIndex(
-                name: "IX_users_email",
-                table: "users",
-                column: "email",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_users_last_operation_id",
-                table: "users",
-                column: "last_operation_id");
-
             migrationBuilder.Sql(@"
-INSERT INTO roles (name, normalized_name, deleted) VALUES
-('Super', 'SUPER', false),
-('Admin', 'ADMIN', false),
-('Manager', 'MANAGER', false),
-('Seller', 'SELLER', false);");
+INSERT INTO payment_provider (name, logo_icon) VALUES
+('InfinitePay', 'bank-icons/infinitepay.webp'), ('Stone', 'bank-icons/stone.png');");
 
-            var passwordHasher = new PasswordHasher<User>();
-            var u = new User();
-            var passwordHashed = passwordHasher.HashPassword(u, "admin@123!");
-            migrationBuilder.Sql(@$"
-INSERT INTO users (id, name, email, password_hash, is_active, is_beta) VALUES
-(uuid(),'Super User', 'superuser@gmail.com', '{passwordHashed}', true, true);");
-
-            migrationBuilder.Sql($"INSERT INTO operations (id, document, name, email) VALUES (uuid(),'40.953.557/0001-61', 'First Gift', 'firstgift@mail.com');");
-
-            migrationBuilder.Sql(@$"
-INSERT INTO operation_user_role (user_id, role_id, operation_id, is_active, status)
-SELECT
-    (SELECT id FROM users WHERE email LIKE 'superuser%'), r.id, o.id, true, {(int)OperationUserRoleStatusEnum.Pending}
-FROM roles r
-CROSS JOIN operations o
-WHERE r.normalized_name = 'SUPER';");
         }
 
         /// <inheritdoc />
@@ -526,28 +334,16 @@ WHERE r.normalized_name = 'SUPER';");
                 name: "cash_movement");
 
             migrationBuilder.DropTable(
-                name: "operation_user_role");
-
-            migrationBuilder.DropTable(
                 name: "cash_closing");
 
             migrationBuilder.DropTable(
                 name: "payment_terminal");
 
             migrationBuilder.DropTable(
-                name: "roles");
-
-            migrationBuilder.DropTable(
                 name: "cash_register_session");
 
             migrationBuilder.DropTable(
                 name: "payment_provider");
-
-            migrationBuilder.DropTable(
-                name: "users");
-
-            migrationBuilder.DropTable(
-                name: "operations");
         }
     }
 }

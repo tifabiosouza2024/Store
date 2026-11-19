@@ -12,32 +12,30 @@ namespace FS.Store.Core.Service
         , PasswordHelper passwordHelper
         , CurrentUserHelper currentUserHelper) : BaseService<User, Guid>(repository), IUserService
     {
-        public async Task CreateAsync(AssignUserToOperationDto userDto)
+        public async Task CreateNewUserOperationAsync(AssignUserToOperationDto userDto)
         {
             var user = await FindByEmailAsync(userDto.Email.Trim());
 
-            if (user == null)
+            user ??= new User
             {
-                user = new User
-                {
-                    Email = userDto.Email.Trim(),
-                    PasswordHash = passwordHelper.HashPassword(null!, userDto.Password),
-                    CreatedAt = DateTime.Now,
-                    IsActive = true,
-                    MustChangePassword = true
-                };
-            }
+                Email = userDto.Email.Trim(),
+                PasswordHash = passwordHelper.HashPassword(null!, userDto.Password),
+                CreatedAt = DateTime.Now,
+                IsActive = true,
+                MustChangePassword = true
+            };
+
             await repository.AddOrUpdateAsync(user);
 
             var now = DateTime.Now;
             var userOperation = new OperationUserRole
             {
-                OperationId = currentUserHelper.CurrentOperationId.GetValueOrDefault(),
+                OperationId = userDto.OperationId,
                 RoleId = userDto.RoleId,
                 IsActive = true,
                 InvitedAt = now,
-                Status = Model.Enums.OperationUserRoleStatusEnum.Pending,
-                InvitedByUserId = currentUserHelper.UserId.GetValueOrDefault()
+                Status = Model.Enums.RoleStatusEnum.Pending,
+                InvitedByUserId = userDto.InvitedByUserId
             };
             if (user.Operations == null)
                 user.Operations = [];

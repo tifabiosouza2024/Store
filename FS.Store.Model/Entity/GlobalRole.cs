@@ -1,0 +1,35 @@
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace FS.Store.Model.Entity
+{
+    /// <summary>
+    /// Papéis de usuários no sistema
+    /// <para>
+    /// TypeId: int
+    /// </para>
+    /// </summary>
+    [Table("global_roles")]
+    [Comment("Papéis de usuários do sistema")]
+    public class GlobalRole : BaseEntity<int>
+    {
+
+        [Column("name")]
+        [MaxLength(255)]
+        [Required]
+        [Comment("Nome do papel")]
+        public string Name { get; set; } = default!;
+
+        [Column("normalized_name")]
+        [Required]
+        [MaxLength(255)]
+        [Comment("Nome do papel normalizado (em uppercase)")]
+        public string NormalizedName
+        {
+            get => _normalizedName;
+            set => _normalizedName = value?.ToUpperInvariant() ?? default!;
+        }
+        private string _normalizedName = default!;
+    }
+}

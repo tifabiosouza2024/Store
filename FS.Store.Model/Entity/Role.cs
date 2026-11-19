@@ -11,7 +11,7 @@ namespace FS.Store.Model.Entity
     /// </para>
     /// </summary>
     [Table("roles")]
-    [Comment("Papéis de usuários do sistema")]
+    [Comment("Papéis de usuários das operações")]
     public class Role : BaseEntity<int>
     {
 

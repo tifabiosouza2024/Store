@@ -25,6 +25,27 @@
         ? (decimal?)null
         : Model.CashClosing.ClosingTotalSales - Model.OpeningAmount;
 
+    var terminalCreditTotal = Model.CashClosingTerminals.Sum(x => x.CreditAmount);
+    var terminalDebitTotal = Model.CashClosingTerminals.Sum(x => x.DebitAmount);
+    var terminalPixTotal = Model.CashClosingTerminals.Sum(x => x.PixAmount);
+    var terminalGrandTotal = terminalCreditTotal + terminalDebitTotal + terminalPixTotal;
+
+    var supplyMovements = Model.CashMovements
+        .Where(x => x.CashMovementType.ToString() is "CashInflows" or "Supply")
+        .ToList();
+
+    var withdrawalMovements = Model.CashMovements
+        .Where(x => x.CashMovementType.ToString() == "Withdrawal")
+        .ToList();
+
+    var expenseMovements = Model.CashMovements
+        .Where(x => x.CashMovementType.ToString() == "Expense")
+        .ToList();
+
+    var supplyTotal = supplyMovements.Sum(x => x.Amount);
+    var withdrawalTotal = withdrawalMovements.Sum(x => x.Amount);
+    var expenseTotal = expenseMovements.Sum(x => x.Amount);
+
     string MovementLabel(CashMovementTypeEnum type) => type.ToString() switch
     {
         "CashInflows" or "Supply" => "Suprimento",
@@ -39,6 +60,72 @@
         "Withdrawal" or "Expense" => "text-danger",
         _ => "text-secondary"
     };
+
+    string MovementBadgeClass(CashMovementTypeEnum type) => type.ToString() switch
+    {
+        "CashInflows" or "Supply" => "bg-success-subtle text-success",
+        "Withdrawal" => "bg-danger-subtle text-danger",
+        "Expense" => "bg-danger-subtle text-danger",
+        _ => "bg-secondary-subtle text-secondary"
+    };
+}
+
+@section Styles {
+    <style>
+        .cash-history-card {
+            background: #F1F4FA;
+            border: 1px solid #e2e7f0;
+            border-radius: 10px;
+            padding: 16px;
+        }
+
+        .cash-history-info {
+            background: #fff;
+            border: 1px solid #e9edf4;
+            border-radius: 8px;
+            padding: 10px 12px;
+            height: 100%;
+        }
+
+        .info-label {
+            color: #6c757d;
+            font-size: .75rem;
+            margin-bottom: 3px;
+        }
+
+        .terminal-total-card {
+            background: #eaf2ff;
+            border: 1px solid #c5d8f5;
+            border-radius: 10px;
+            padding: 16px;
+        }
+
+        .terminal-total-info {
+            background: rgba(255, 255, 255, .75);
+            border: 1px solid #d7e4f7;
+            border-radius: 8px;
+            padding: 10px 12px;
+            height: 100%;
+        }
+
+        .movement-summary-card {
+            border: 1px solid #e9edf4;
+            border-radius: 10px;
+            padding: 14px 16px;
+            height: 100%;
+            background: #fff;
+        }
+
+        .movement-summary-icon {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 9px;
+            font-size: 1.1rem;
+        }
+    </style>
 }
 
 <div class="container-fluid">
@@ -144,7 +231,6 @@
                     </div>
                 </div>
 
-
                 <div class="col-12 col-md-6 col-lg-3">
                     <div class="text-muted small">Data de abertura</div>
                     <div class="fw-semibold">
@@ -158,6 +244,7 @@
                         @(Model.ClosedByUser?.Name ?? "—")
                     </div>
                 </div>
+
                 <div class="col-12 col-md-6 col-lg-3">
                     <div class="text-muted small">Data de fechamento</div>
                     <div class="fw-semibold">
@@ -257,7 +344,6 @@
         </div>
     }
 
-    
     <!-- Fechamentos das maquininhas -->
     <div class="border-top pt-4 mb-4">
 
@@ -273,7 +359,8 @@
 
         @if (Model.CashClosingTerminals.Any())
         {
-            <div class="table-responsive">
+            <!-- Desktop -->
+            <div class="table-responsive d-none d-md-block">
                 <table class="table table-hover align-middle mb-0">
 
                     <thead class="table-light">
@@ -291,9 +378,7 @@
                     <tbody>
                         @foreach (var terminal in Model.CashClosingTerminals)
                         {
-                            var terminalTotal = terminal.CreditAmount
-                                + terminal.DebitAmount
-                                + terminal.PixAmount;
+                            var terminalTotal = terminal.CreditAmount + terminal.DebitAmount + terminal.PixAmount;
 
                             <tr>
                                 <td class="ps-3">
@@ -334,24 +419,139 @@
                             <td colspan="3" class="ps-3">Total dos terminais</td>
 
                             <td class="text-end">
-                                @Model.CashClosingTerminals.Sum(x => x.CreditAmount).ToString("C2")
+                                @terminalCreditTotal.ToString("C2")
                             </td>
 
                             <td class="text-end">
-                                @Model.CashClosingTerminals.Sum(x => x.DebitAmount).ToString("C2")
+                                @terminalDebitTotal.ToString("C2")
                             </td>
 
                             <td class="text-end">
-                                @Model.CashClosingTerminals.Sum(x => x.PixAmount).ToString("C2")
+                                @terminalPixTotal.ToString("C2")
                             </td>
 
                             <td class="text-end pe-3">
-                                @Model.CashClosingTerminals.Sum(x => x.CreditAmount + x.DebitAmount + x.PixAmount).ToString("C2")
+                                @terminalGrandTotal.ToString("C2")
                             </td>
                         </tr>
                     </tfoot>
 
                 </table>
+            </div>
+
+            <!-- Mobile -->
+            <div class="d-md-none d-flex flex-column gap-3">
+
+                @foreach (var terminal in Model.CashClosingTerminals)
+                {
+                    var terminalTotal = terminal.CreditAmount + terminal.DebitAmount + terminal.PixAmount;
+
+                    <div class="cash-history-card">
+
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <div class="bg-white rounded-3 p-2 text-primary">
+                                <i class="bi bi-credit-card fs-5"></i>
+                            </div>
+
+                            <div>
+                                <div class="fw-bold">
+                                    @terminal.PaymentTerminal?.Name
+                                </div>
+                                <small class="text-muted">
+                                    @(terminal.ClosedAt?.ToString("dd/MM/yyyy HH:mm") ?? "Não informado")
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="cash-history-info mb-3">
+                            <div class="info-label">Responsável</div>
+                            <div class="fw-semibold">
+                                @(terminal.CreatedByUser?.Name ?? "—")
+                            </div>
+                        </div>
+
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <div class="cash-history-info">
+                                    <div class="info-label">Crédito</div>
+                                    <div class="fw-semibold">
+                                        @terminal.CreditAmount.ToString("C2")
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-6">
+                                <div class="cash-history-info">
+                                    <div class="info-label">Débito</div>
+                                    <div class="fw-semibold">
+                                        @terminal.DebitAmount.ToString("C2")
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-6">
+                                <div class="cash-history-info">
+                                    <div class="info-label">Pix</div>
+                                    <div class="fw-semibold">
+                                        @terminal.PixAmount.ToString("C2")
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-6">
+                                <div class="cash-history-info">
+                                    <div class="info-label">Total</div>
+                                    <div class="fw-bold text-primary">
+                                        @terminalTotal.ToString("C2")
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                }
+
+                <!-- Total geral dos terminais -->
+                <div class="terminal-total-card">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <div class="bg-white rounded-3 p-2 text-primary">
+                            <i class="bi bi-calculator fs-5"></i>
+                        </div>
+                        <div>
+                            <div class="fw-bold">Total de todos os terminais</div>
+                            <small class="text-muted">Resumo dos valores recebidos</small>
+                        </div>
+                    </div>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-4">
+                            <div class="terminal-total-info">
+                                <div class="info-label">Crédito</div>
+                                <div class="fw-semibold small">@terminalCreditTotal.ToString("C2")</div>
+                            </div>
+                        </div>
+
+                        <div class="col-4">
+                            <div class="terminal-total-info">
+                                <div class="info-label">Débito</div>
+                                <div class="fw-semibold small">@terminalDebitTotal.ToString("C2")</div>
+                            </div>
+                        </div>
+
+                        <div class="col-4">
+                            <div class="terminal-total-info">
+                                <div class="info-label">Pix</div>
+                                <div class="fw-semibold small">@terminalPixTotal.ToString("C2")</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="border-top pt-3 d-flex justify-content-between align-items-center gap-2">
+                        <span class="fw-semibold">Total geral</span>
+                        <span class="fw-bold fs-4 text-primary">@terminalGrandTotal.ToString("C2")</span>
+                    </div>
+                </div>
+
             </div>
         }
         else
@@ -365,7 +565,6 @@
         }
 
     </div>
-
 
     <!-- Histórico de movimentações -->
     <div class="card border-0 shadow-sm mb-4">
@@ -381,11 +580,68 @@
             </div>
         </div>
 
-        <div class="card-body p-0">
+        <div class="card-body">
+
+            <!-- Resumo por tipo de movimentação -->
+            <div class="row g-3 mb-4">
+
+                <div class="col-12 col-sm-4">
+                    <div class="movement-summary-card">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <div class="movement-summary-icon bg-success-subtle text-success">
+                                <i class="bi bi-arrow-down-circle"></i>
+                            </div>
+                            <span class="text-muted small fw-semibold">Suprimentos</span>
+                        </div>
+                        <div class="fs-5 fw-bold text-success">
+                            @supplyTotal.ToString("C2")
+                        </div>
+                        <small class="text-muted">
+                            @supplyMovements.Count movimentações
+                        </small>
+                    </div>
+                </div>
+
+                <div class="col-12 col-sm-4">
+                    <div class="movement-summary-card">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <div class="movement-summary-icon bg-danger-subtle text-danger">
+                                <i class="bi bi-arrow-up-circle"></i>
+                            </div>
+                            <span class="text-muted small fw-semibold">Sangrias</span>
+                        </div>
+                        <div class="fs-5 fw-bold text-danger">
+                            @withdrawalTotal.ToString("C2")
+                        </div>
+                        <small class="text-muted">
+                            @withdrawalMovements.Count movimentações
+                        </small>
+                    </div>
+                </div>
+
+                <div class="col-12 col-sm-4">
+                    <div class="movement-summary-card">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <div class="movement-summary-icon bg-warning-subtle text-warning-emphasis">
+                                <i class="bi bi-receipt"></i>
+                            </div>
+                            <span class="text-muted small fw-semibold">Despesas</span>
+                        </div>
+                        <div class="fs-5 fw-bold text-danger">
+                            @expenseTotal.ToString("C2")
+                        </div>
+                        <small class="text-muted">
+                            @expenseMovements.Count movimentações
+                        </small>
+                    </div>
+                </div>
+
+            </div>
 
             @if (Model.CashMovements.Any())
             {
-                <div class="table-responsive">
+                <!-- Desktop -->
+                <div class="table-responsive d-none d-md-block">
                     <table class="table table-hover align-middle mb-0">
 
                         <thead class="table-light">
@@ -416,7 +672,9 @@
                                         @(string.IsNullOrWhiteSpace(movement.Description) ? "—" : movement.Description)
                                     </td>
 
-                                    <td>@movement.CreatedByUser?.Name</td>
+                                    <td>
+                                        @movement.CreatedByUser?.Name
+                                    </td>
 
                                     <td class="text-end pe-3 fw-semibold text-nowrap">
                                         @movement.Amount.ToString("C2")
@@ -426,6 +684,54 @@
                         </tbody>
 
                     </table>
+                </div>
+
+                <!-- Mobile -->
+                <div class="d-md-none d-flex flex-column gap-3">
+                    @foreach (var movement in Model.CashMovements.OrderByDescending(x => x.OccurredAt))
+                    {
+                        <div class="cash-history-card">
+
+                            <div class="d-flex justify-content-between align-items-center gap-2 mb-3">
+                                <div>
+                                    <div class="fw-semibold">
+                                        @movement.OccurredAt.ToString("dd/MM/yyyy")
+                                    </div>
+                                    <small class="text-muted">
+                                        @movement.OccurredAt.ToString("HH:mm")
+                                    </small>
+                                </div>
+
+                                <span class="badge rounded-pill @MovementBadgeClass(movement.CashMovementType)">
+                                    @MovementLabel(movement.CashMovementType)
+                                </span>
+                            </div>
+
+                            <div class="cash-history-info mb-3">
+                                <div class="info-label">Descrição</div>
+                                <div class="fw-semibold">
+                                    @(string.IsNullOrWhiteSpace(movement.Description) ? "—" : movement.Description)
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center gap-2">
+                                <div>
+                                    <div class="info-label">Responsável</div>
+                                    <div class="small fw-semibold">
+                                        @(movement.CreatedByUser?.Name ?? "—")
+                                    </div>
+                                </div>
+
+                                <div class="text-end">
+                                    <div class="info-label">Valor</div>
+                                    <div class="fw-bold fs-5 @MovementClass(movement.CashMovementType)">
+                                        @movement.Amount.ToString("C2")
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    }
                 </div>
             }
             else

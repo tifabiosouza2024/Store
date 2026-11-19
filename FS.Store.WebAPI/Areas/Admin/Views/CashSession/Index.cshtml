@@ -36,6 +36,7 @@
         mobileSorts.Add(("OpenedAt", "Aberto em", "desc"));
 }
 
+
 @section Styles {
     <link rel="stylesheet" href="~/css/admin/table.css" asp-append-version="true" />
 
@@ -52,15 +53,22 @@
 
         /* Cards mobile */
         .cash-session-card {
+            position: relative;
             border: 1px solid var(--border-color);
             border-radius: 12px;
             background: white;
+            overflow: visible;
             transition: box-shadow .2s ease;
         }
 
             .cash-session-card:hover {
                 box-shadow: 0 3px 12px rgb(0 0 0 / 5%);
             }
+
+        .cash-session-card-body {
+            position: relative;
+            overflow: visible;
+        }
 
         .cash-session-number {
             font-size: 1.15rem;
@@ -101,27 +109,56 @@
                 overflow-wrap: anywhere;
             }
 
-        .cash-session-actions .dropdown-menu {
-            min-width: 220px;
+        /* Dropdown de ações mobile */
+        .cash-session-actions {
+            position: relative;
+            flex-shrink: 0;
         }
 
-        .cash-session-actions .dropdown-item {
-            padding: 9px 14px;
-            font-size: .9rem;
+            .cash-session-actions .dropdown-menu {
+                position: absolute;
+                z-index: 1080;
+                min-width: 220px;
+                max-width: calc(100vw - 32px);
+                padding: 6px 0;
+                border: 1px solid var(--border-color);
+                border-radius: 9px;
+                box-shadow: 0 5px 18px rgb(0 0 0 / 12%);
+            }
+
+            .cash-session-actions .dropdown-item {
+                display: flex;
+                align-items: center;
+                padding: 9px 14px;
+                font-size: .9rem;
+                white-space: normal;
+            }
+
+                .cash-session-actions .dropdown-item i {
+                    width: 20px;
+                    flex-shrink: 0;
+                    display: inline-block;
+                }
+
+                .cash-session-actions .dropdown-item svg {
+                    width: 20px;
+                    height: 20px;
+                    flex-shrink: 0;
+                    vertical-align: middle;
+                    margin-right: 8px;
+                }
+
+            .cash-session-actions .dropdown-divider {
+                margin: 6px 0;
+            }
+
+        /* Evita ancoragem automática de rolagem nos cards */
+        .cash-session-card,
+        .cash-session-card-body {
+            overflow-anchor: none;
         }
 
-            .cash-session-actions .dropdown-item i {
-                width: 20px;
-                display: inline-block;
-            }
-
-            .cash-session-actions .dropdown-item svg {
-                width: 20px;
-                height: 20px;
-                vertical-align: middle;
-                margin-right: 8px;
-            }
-
+        /* Ações da tabela desktop */
         .cash-session-table-actions svg {
             width: 20px;
             height: 20px;
@@ -149,6 +186,7 @@
         }
     </style>
 }
+
 
 <div class="container py-4">
     @* Cabeçalho *@
@@ -412,7 +450,7 @@
                                                 @session.CashRegisterStatus
                                             </span>
                                             <div class="dropdown cash-session-actions">
-                                                <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Ações do caixa">
+                                                <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="dropdown" data-bs-display="static" data-bs-boundary="viewport" aria-expanded="false" aria-label="Ações do caixa">
                                                     <i class="bi bi-three-dots-vertical"></i>
                                                 </button>
                                                 <ul class="dropdown-menu dropdown-menu-end shadow-sm">

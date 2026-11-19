@@ -9,7 +9,7 @@ namespace FS.Store.Core.Service
     public class OperationUserRoleService(IOperationUserRoleRepository repository
         , CurrentUserHelper currentUserHelper) : BaseService<OperationUserRole, long>(repository), IOperationUserRoleService
     {
-        public async Task<IEnumerable<OperationUserRole>?> FindAllOperationsByUserIdAsync(OperationUserRoleStatusEnum? status = null)
+        public async Task<IEnumerable<OperationUserRole>?> FindAllOperationsByUserIdAsync(RoleStatusEnum? status = null)
         {
             var our = await repository.GetAllAsync(o => o.UserId == currentUserHelper.UserId && o.IsActive && (status == null || status == o.Status));
             return our;

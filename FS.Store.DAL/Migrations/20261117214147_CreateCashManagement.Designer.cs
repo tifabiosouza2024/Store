@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FS.Store.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20261117120516_CreateUserAndRoleAndOperationAndOperationUserRoles")]
-    partial class CreateUserAndRoleAndOperationAndOperationUserRoles
+    [Migration("20261117214147_CreateCashManagement")]
+    partial class CreateCashManagement
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -53,12 +53,16 @@ namespace FS.Store.DAL.Migrations
                         .HasComment("Usuário que realizou o fechamento");
 
                     b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(0)")
                         .HasColumnName("created_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP")
                         .HasComment("Data de criação do registro");
 
                     b.Property<bool>("Deleted")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false)
                         .HasColumnName("deleted")
                         .HasComment("registro deletado virtualmente");
 
@@ -99,8 +103,10 @@ namespace FS.Store.DAL.Migrations
                         .HasComment("Valor total de saques realizado em dinheiro");
 
                     b.Property<DateTime?>("UpdatedAt")
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime(0)")
                         .HasColumnName("updated_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
                         .HasComment("Data de atualização do registro");
 
                     b.HasKey("Id");
@@ -139,8 +145,10 @@ namespace FS.Store.DAL.Migrations
                         .HasComment("Data/Hora de fechamento");
 
                     b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(0)")
                         .HasColumnName("created_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP")
                         .HasComment("Data de criação do registro");
 
                     b.Property<Guid>("CreatedByUserId")
@@ -159,7 +167,9 @@ namespace FS.Store.DAL.Migrations
                         .HasComment("Valor em débito do terminal");
 
                     b.Property<bool>("Deleted")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false)
                         .HasColumnName("deleted")
                         .HasComment("registro deletado virtualmente");
 
@@ -174,8 +184,10 @@ namespace FS.Store.DAL.Migrations
                         .HasComment("Valor em PIX do terminal");
 
                     b.Property<DateTime?>("UpdatedAt")
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime(0)")
                         .HasColumnName("updated_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
                         .HasComment("Data de atualização do registro");
 
                     b.HasKey("Id");
@@ -233,8 +245,10 @@ namespace FS.Store.DAL.Migrations
                         .HasComment("Sessão de Caixa");
 
                     b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(0)")
                         .HasColumnName("created_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP")
                         .HasComment("Data de criação do registro");
 
                     b.Property<Guid>("CreatedByUserId")
@@ -243,7 +257,9 @@ namespace FS.Store.DAL.Migrations
                         .HasComment("Usuário que criou a movimentação");
 
                     b.Property<bool>("Deleted")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false)
                         .HasColumnName("deleted")
                         .HasComment("registro deletado virtualmente");
 
@@ -259,8 +275,10 @@ namespace FS.Store.DAL.Migrations
                         .HasComment("Data/Hora em que ocorreu a movimentação");
 
                     b.Property<DateTime?>("UpdatedAt")
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime(0)")
                         .HasColumnName("updated_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
                         .HasComment("Data de atualização do registro");
 
                     b.HasKey("Id");
@@ -309,12 +327,16 @@ namespace FS.Store.DAL.Migrations
                         .HasComment("ID do Usuário que fechou o caixa");
 
                     b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(0)")
                         .HasColumnName("created_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP")
                         .HasComment("Data de criação do registro");
 
                     b.Property<bool>("Deleted")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false)
                         .HasColumnName("deleted")
                         .HasComment("registro deletado virtualmente");
 
@@ -346,8 +368,10 @@ namespace FS.Store.DAL.Migrations
                         .HasComment("Valor total vendido");
 
                     b.Property<DateTime?>("UpdatedAt")
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime(0)")
                         .HasColumnName("updated_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
                         .HasComment("Data de atualização do registro");
 
                     b.HasKey("Id");
@@ -363,6 +387,138 @@ namespace FS.Store.DAL.Migrations
                     b.ToTable("cash_register_session", t =>
                         {
                             t.HasComment("controle de abertura e fechamento de caixa");
+                        });
+                });
+
+            modelBuilder.Entity("FS.Store.Model.Entity.GlobalRole", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(0)")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                        .HasComment("Data de criação do registro");
+
+                    b.Property<bool>("Deleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false)
+                        .HasColumnName("deleted")
+                        .HasComment("registro deletado virtualmente");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("name")
+                        .HasComment("Nome do papel");
+
+                    b.Property<string>("NormalizedName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("normalized_name")
+                        .HasComment("Nome do papel normalizado (em uppercase)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime(0)")
+                        .HasColumnName("updated_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+                        .HasComment("Data de atualização do registro");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("global_roles", t =>
+                        {
+                            t.HasComment("Papéis de usuários do sistema");
+                        });
+                });
+
+            modelBuilder.Entity("FS.Store.Model.Entity.GlobalUserRole", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime?>("AcceptedAt")
+                        .HasColumnType("datetime(0)")
+                        .HasColumnName("accepted_at")
+                        .HasComment("Data de aceitação do convite");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(0)")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                        .HasComment("Data de criação do registro");
+
+                    b.Property<bool>("Deleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false)
+                        .HasColumnName("deleted")
+                        .HasComment("registro deletado virtualmente");
+
+                    b.Property<DateTime>("InvitedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(0)")
+                        .HasColumnName("invited_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                        .HasComment("Data do convite");
+
+                    b.Property<Guid?>("InvitedByUserId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("invited_by_user_id")
+                        .HasComment("Usuário responsável pelo convite");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(true)
+                        .HasColumnName("is_active")
+                        .HasComment("Determina se o usuário estará ativo para operação do sistema.");
+
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int")
+                        .HasColumnName("role_id")
+                        .HasComment("Id do papel do Usuário na Operação");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int")
+                        .HasColumnName("status")
+                        .HasComment("Status da função do usuário no sistema");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime(0)")
+                        .HasColumnName("updated_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+                        .HasComment("Data de atualização do registro");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("user_id")
+                        .HasComment("Id do Usuário");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InvitedByUserId");
+
+                    b.HasIndex("RoleId");
+
+                    b.HasIndex("UserId", "RoleId")
+                        .IsUnique();
+
+                    b.ToTable("global_user_roles", t =>
+                        {
+                            t.HasComment("Relacionamento entre usuário do sistema e suas funções");
                         });
                 });
 
@@ -524,7 +680,7 @@ namespace FS.Store.DAL.Migrations
 
                     b.ToTable("operation_user_role", t =>
                         {
-                            t.HasComment("Relacionamento entre Operação, Usuário e seus papeis");
+                            t.HasComment("Relacionamento entre Operação, Usuário e seus papeis na operação");
                         });
                 });
 
@@ -536,12 +692,16 @@ namespace FS.Store.DAL.Migrations
                         .HasColumnName("id");
 
                     b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(0)")
                         .HasColumnName("created_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP")
                         .HasComment("Data de criação do registro");
 
                     b.Property<bool>("Deleted")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false)
                         .HasColumnName("deleted")
                         .HasComment("registro deletado virtualmente");
 
@@ -559,15 +719,17 @@ namespace FS.Store.DAL.Migrations
                         .HasComment("Empresa da maquininha de cartão");
 
                     b.Property<DateTime?>("UpdatedAt")
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime(0)")
                         .HasColumnName("updated_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
                         .HasComment("Data de atualização do registro");
 
                     b.HasKey("Id");
 
                     b.ToTable("payment_provider", t =>
                         {
-                            t.HasComment("Armazena os fornecedores dos terminais");
+                            t.HasComment("Armazena os fornecedores dos terminais (maquininhas)");
                         });
                 });
 
@@ -579,12 +741,16 @@ namespace FS.Store.DAL.Migrations
                         .HasColumnName("id");
 
                     b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(0)")
                         .HasColumnName("created_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP")
                         .HasComment("Data de criação do registro");
 
                     b.Property<bool>("Deleted")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false)
                         .HasColumnName("deleted")
                         .HasComment("registro deletado virtualmente");
 
@@ -606,8 +772,10 @@ namespace FS.Store.DAL.Migrations
                         .HasComment("Id do fornecedor do terminal");
 
                     b.Property<DateTime?>("UpdatedAt")
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime(0)")
                         .HasColumnName("updated_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
                         .HasComment("Data de atualização do registro");
 
                     b.HasKey("Id");
@@ -618,7 +786,7 @@ namespace FS.Store.DAL.Migrations
 
                     b.ToTable("payment_terminal", t =>
                         {
-                            t.HasComment("Armazena os terminais (maquininhas) de pagamento");
+                            t.HasComment("Armazena os terminais de pagamento (maquininhas)");
                         });
                 });
 
@@ -668,7 +836,7 @@ namespace FS.Store.DAL.Migrations
 
                     b.ToTable("roles", t =>
                         {
-                            t.HasComment("Papéis de usuários do sistema");
+                            t.HasComment("Papéis de usuários das operações");
                         });
                 });
 
@@ -876,6 +1044,32 @@ namespace FS.Store.DAL.Migrations
                     b.Navigation("Operation");
                 });
 
+            modelBuilder.Entity("FS.Store.Model.Entity.GlobalUserRole", b =>
+                {
+                    b.HasOne("FS.Store.Model.Entity.User", "InvitedByUser")
+                        .WithMany()
+                        .HasForeignKey("InvitedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("FS.Store.Model.Entity.GlobalRole", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FS.Store.Model.Entity.User", "User")
+                        .WithMany("GlobalRoles")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("InvitedByUser");
+
+                    b.Navigation("Role");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("FS.Store.Model.Entity.OperationUserRole", b =>
                 {
                     b.HasOne("FS.Store.Model.Entity.User", "InvitedByUser")
@@ -913,7 +1107,7 @@ namespace FS.Store.DAL.Migrations
             modelBuilder.Entity("FS.Store.Model.Entity.PaymentTerminal", b =>
                 {
                     b.HasOne("FS.Store.Model.Entity.Operation", "Operation")
-                        .WithMany()
+                        .WithMany("PaymentTerminals")
                         .HasForeignKey("OperationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -954,11 +1148,15 @@ namespace FS.Store.DAL.Migrations
 
             modelBuilder.Entity("FS.Store.Model.Entity.Operation", b =>
                 {
+                    b.Navigation("PaymentTerminals");
+
                     b.Navigation("UsersRoles");
                 });
 
             modelBuilder.Entity("FS.Store.Model.Entity.User", b =>
                 {
+                    b.Navigation("GlobalRoles");
+
                     b.Navigation("Operations");
                 });
 #pragma warning restore 612, 618

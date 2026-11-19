@@ -57,5 +57,6 @@ namespace FS.Store.Model.Entity
         public virtual Operation? LastOperation { get; set; }
 
         public virtual ICollection<OperationUserRole>? Operations { get; set; }
+        public virtual ICollection<GlobalUserRole>? GlobalRoles { get; set; }
     }
 }

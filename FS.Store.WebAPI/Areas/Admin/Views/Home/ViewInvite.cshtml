@@ -33,7 +33,7 @@
 
             @foreach (var invite in Model)
             {
-                var isPending = invite.Status == OperationUserRoleStatusEnum.Pending;
+                var isPending = invite.Status == RoleStatusEnum.Pending;
 
                 <div class="col-12 col-xl-6">
                     <div class="card h-100 shadow-sm">
@@ -56,7 +56,7 @@
                                         Pendente
                                     </span>
                                 }
-                                else if (invite.Status == OperationUserRoleStatusEnum.Active)
+                                else if (invite.Status == RoleStatusEnum.Active)
                                 {
                                     <span class="badge bg-success">
                                         Aceito

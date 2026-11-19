@@ -7,7 +7,7 @@
     /// 3. Rejeitado<br />
     /// 4. Revogado<br />
     /// </summary>
-    public enum OperationUserRoleStatusEnum
+    public enum RoleStatusEnum
     {
         Pending = 1,
         Active = 2,

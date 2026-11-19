@@ -8,9 +8,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h2 class="mb-1">Terminais de Pagamento</h2>
-            <p class="text-muted mb-0">
-                Gerencie os terminais de pagamento da operação.
-            </p>
+            <p class="text-muted mb-0">Gerencie os terminais de pagamento da operação.</p>
         </div>
     </div>
 
@@ -18,59 +16,106 @@
         <div class="card-body">
             @if (Model.PaymentTerminals?.Any() == true)
             {
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Nome do terminal</th>
-                                <th>Fornecedor</th>
-                                <th class="text-end" style="width: 150px;">
-                                    Ações
-                                </th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            @foreach (var terminal in Model.PaymentTerminals)
-                            {
+                @* Desktop: tabela *@
+                <div class="d-none d-lg-block">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
                                 <tr>
-                                    <td>
-                                        <span class="fw-semibold">
-                                            @terminal.Name
-                                        </span>
-                                    </td>
-
-                                    <td>
-                                        @(terminal.PaymentProvider?.Name ?? "Não informado")
-                                    </td>
-
-                                    <td class="text-end">
-                                        <div class="btn-group btn-group-sm" role="group">
-                                            <a asp-action="Edit"                                               asp-route-id="@terminal.Id"                                               class="btn btn-outline-primary"                                               title="Editar terminal"                                               aria-label="Editar terminal">
-                                                <i class="bi bi-pencil"></i>
-                                            </a>
-
-                                            <a asp-action="Delete"                                               asp-route-id="@terminal.Id"                                               class="btn btn-outline-danger"                                               title="Excluir terminal"                                               aria-label="Excluir terminal">
-                                                <i class="bi bi-trash"></i>
-                                            </a>
-                                        </div>
-                                    </td>
+                                    <th>Nome do terminal</th>
+                                    <th>Fornecedor</th>
+                                    <th class="text-end" style="width: 150px;">Ações</th>
                                 </tr>
-                            }
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                @foreach (var terminal in Model.PaymentTerminals)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="payment-terminal-icon">
+                                                    <i class="bi bi-credit-card-2-front"></i>
+                                                </span>
+                                                <span class="fw-semibold">@terminal.Name</span>
+                                            </div>
+                                        </td>
+                                        <td><img src="~/img/@terminal.PaymentProvider.LogoIcon" width="100" /></td>
+                                        <td class="text-end">
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <a asp-action="Edit" asp-route-id="@terminal.Id" class="btn btn-outline-primary" title="Editar terminal" aria-label="Editar terminal">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                <a asp-action="Delete" asp-route-id="@terminal.Id" class="btn btn-outline-danger" title="Excluir terminal" aria-label="Excluir terminal">
+                                                    <i class="bi bi-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                @* Mobile e tablet: cards *@
+                <div class="d-lg-none">
+                    <div class="row g-3">
+                        @foreach (var terminal in Model.PaymentTerminals)
+                        {
+                            <div class="col-12">
+                                <div class="payment-terminal-card">
+                                    <div class="payment-terminal-card-body">
+                                        <div class="d-flex align-items-start gap-3">
+                                            <div class="payment-terminal-icon">
+                                                <i class="bi bi-credit-card-2-front"></i>
+                                            </div>
+
+                                            <div class="flex-grow-1 min-w-0">
+                                                <div class="d-flex align-items-start justify-content-between gap-2">
+                                                    <div class="min-w-0">
+                                                        
+                                                        <div class="payment-terminal-name">@terminal.Name</div>
+                                                        <small class="text-muted">Terminal de pagamento</small>
+                                                    </div>
+
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-sm btn-light payment-terminal-action" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Ações do terminal">
+                                                            <i class="bi bi-three-dots-vertical"></i>
+                                                        </button>
+                                                        <ul class="dropdown-menu dropdown-menu-end">
+                                                            <li>
+                                                                <a asp-action="Edit" asp-route-id="@terminal.Id" class="dropdown-item">
+                                                                    <i class="bi bi-pencil me-2"></i>Editar
+                                                                </a>
+                                                            </li>
+                                                            <li><hr class="dropdown-divider"></li>
+                                                            <li>
+                                                                <a asp-action="Delete" asp-route-id="@terminal.Id" class="dropdown-item text-danger">
+                                                                    <i class="bi bi-trash me-2"></i>Excluir
+                                                                </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+
+                                                <div class="payment-terminal-provider">
+                                                    <img src="~/img/@terminal.PaymentProvider.LogoIcon" height="35" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
                 </div>
             }
             else
             {
                 <div class="text-center py-5">
                     <i class="bi bi-credit-card display-4 text-muted"></i>
-
                     <h5 class="mt-3">Nenhum terminal cadastrado</h5>
-
-                    <p class="text-muted">
-                        Cadastre um terminal para começar a utilizá-lo.
-                    </p>
+                    <p class="text-muted mb-0">Cadastre um terminal para começar a utilizá-lo.</p>
                 </div>
             }
         </div>
@@ -85,3 +130,92 @@
 }
 
 <partial name="_FloatingButtons" model="fab" />
+
+<style>
+    .payment-terminal-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 42px;
+        height: 42px;
+        flex-shrink: 0;
+        border-radius: 10px;
+        background: #eaf0ff;
+        color: #4263cf;
+        font-size: 1.2rem;
+    }
+
+    .payment-terminal-card {
+        background: #f1f4fa;
+        border: 1px solid #dce3ef;
+        border-radius: 14px;
+        overflow: visible;
+        transition: background-color .2s ease, border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+    }
+
+        .payment-terminal-card:hover {
+            background: #eaf0fa;
+            border-color: #c5d2e8;
+            box-shadow: 0 4px 14px rgb(30 50 90 / 9%);
+            transform: translateY(-2px);
+        }
+
+    .payment-terminal-card-body {
+        padding: 16px;
+    }
+
+    .payment-terminal-name {
+        color: #25324a;
+        font-size: 1rem;
+        font-weight: 600;
+        overflow-wrap: anywhere;
+    }
+
+    .payment-terminal-provider {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 12px;
+        padding: 9px 11px;
+        background: #fff;
+        border: 1px solid #e3e8f0;
+        border-radius: 9px;
+        color: #475467;
+        font-size: .875rem;
+    }
+
+        .payment-terminal-provider i {
+            color: #4263cf;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+    .payment-terminal-action {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        border: 1px solid #dce3ef;
+        border-radius: 8px;
+        color: #475467;
+    }
+
+        .payment-terminal-action:hover,
+        .payment-terminal-action:focus {
+            background: #eaf0ff;
+            border-color: #c5d2e8;
+            color: #4263cf;
+        }
+
+    @@media (max-width: 575.98px) {
+        .payment-terminal-card-body {
+            padding: 14px;
+        }
+
+        .payment-terminal-card:hover {
+            transform: none;
+        }
+    }
+</style>
