@@ -77,7 +77,7 @@ namespace FS.Store.Model.Entity
         /// <summary>
         /// retorna o balanço, obtendo os valores do fechamento subtraindo o valor de entrada, resultando no total vendido.
         /// </summary>
-        public decimal ClosingBalance
-            => CashClosing?.ClosingTotalSales ?? 0 - OpeningAmount;
+        public decimal ClosingTotalSales
+            => (CashClosing?.ClosingTotalSales ?? 0) - OpeningAmount;
     }
 }

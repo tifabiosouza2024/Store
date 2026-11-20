@@ -55,7 +55,7 @@ namespace FS.Store.Core.Helper
             session!.ClosedByUserId = userId;
             session.CashRegisterStatus = CashRegisterStatusEnum.Closed;
             session.ClosedAt = now;
-            session.TotalSales = session.ClosingBalance;
+            session.TotalSales = session.ClosingTotalSales;
             await cashClosingService.SaveChangesAsync();
         }
 
